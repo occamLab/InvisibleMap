@@ -1,0 +1,4 @@
+*.framework
+/Pods
+/Frameworks
+/InvisibleMap/GoogleService-Info.plist
