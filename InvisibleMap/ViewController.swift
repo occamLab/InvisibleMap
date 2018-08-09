@@ -44,8 +44,9 @@ class ViewController: UIViewController {
     var waypointKeyDictionary = [String:Int]()
     var count: Int = 0
     let distanceToWaypoint: Float = 1.5
-    let tagTiltMin: Float = 0.1
-    let tagTiltMax: Float = 0.85
+    let tagTiltMin: Float = 0.09
+    let tagTiltMax: Float = 0.91
+    var mapFileName: String = ""
     
     @IBOutlet var sceneView: ARSCNView!
     
@@ -64,6 +65,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(mapFileName)
         // Do any additional setup after loading the view, typically from a nib.
         startSession()
         createMap()
@@ -80,7 +82,7 @@ class ViewController: UIViewController {
         createMapNode()
         let storage = Storage.storage()
         storageRef = storage.reference()
-        let mapRef = storageRef.child("map.json")
+        let mapRef = storageRef.child(mapFileName)
         mapRef.getData(maxSize: 10 * 1024 * 1024) { mapData, error in
             if let error = error {
                 print(error.localizedDescription)
@@ -188,11 +190,13 @@ class ViewController: UIViewController {
         //let (image, time) = getVideoFrames()
         //let rotatedImage = imageRotatedByDegrees(oldImage: image, deg: 90)
         aprilTagQueue.async {
+            print(self.count)
             let (image, time) = self.getVideoFrames()
             let rotatedImage = self.imageRotatedByDegrees(oldImage: image, deg: 90)
             self.checkTagDetection(rotatedImage: rotatedImage, timestamp: time)
             self.detectNearbyWaypoints()
             self.isProcessingFrame = false
+            self.count += 1
         }
        
        
@@ -246,12 +250,13 @@ class ViewController: UIViewController {
     }
     
     /// Check Tag Axis
-    func checkTagAxis(tagNum: String) -> Bool {
-        let tagZinRoot = sceneView.scene.rootNode.childNode(withName: "Tag_\(tagNum)", recursively: false)?.convertPosition(SCNVector3(0,0,1), to: sceneView.scene.rootNode)
-        let tagvector = SCNVector3ToGLKVector3(tagZinRoot!)
+    func checkTagAxis(tagNum: String, rootTagNode: SCNNode) -> Bool {
+        //let tagZinRoot = sceneView.scene.rootNode.childNode(withName: "Tag_\(tagNum)", recursively: false)?.convertVector(SCNVector3(0,0,1), to: sceneView.scene.rootNode)
+        let tagZinRoot = rootTagNode.convertVector(SCNVector3(0,0,1), to: sceneView.scene.rootNode)
+        let tagvector = SCNVector3ToGLKVector3(tagZinRoot)
         let gravityvector = GLKVector3Make(0.0, 1.0, 0.0)
         let dotproduct = GLKVector3DotProduct(tagvector,gravityvector)
-        if tagTiltMin < dotproduct && dotproduct < tagTiltMax{
+        if tagTiltMin < abs(dotproduct) && abs(dotproduct) < tagTiltMax{
             print("Not Used")
             print(dotproduct)
             return false
@@ -277,14 +282,19 @@ class ViewController: UIViewController {
         
        //updateCameraCoordinates()
         let rootTag = cameraNode.convertTransform(poseMatrix, to: sceneView.scene.rootNode)
+        let rootTagNode = SCNNode()
+        rootTagNode.transform = rootTag
         if sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false) == nil {
-            let rootTagNode = SCNNode(geometry: SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0))
-            rootTagNode.transform = rootTag
+            rootTagNode.geometry = SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0)
+            //let rootTagNode = SCNNode(geometry: SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0))
+            //rootTagNode.transform = rootTag
             rootTagNode.name = "Tag_\(num)"
             rootTagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
             sceneView.scene.rootNode.addChildNode(rootTagNode)
         } else {
-            if checkTagAxis(tagNum: num){
+            //let oldTransform = sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.transform
+            //sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.transform = rootTag
+            if checkTagAxis(tagNum: num, rootTagNode: rootTagNode){
                 sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.transform = rootTag
             }
 

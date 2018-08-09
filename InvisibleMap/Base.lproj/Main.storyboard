@@ -86,7 +86,7 @@
                                                         <constraint firstAttribute="height" constant="100" id="ztt-1F-pm8"/>
                                                     </constraints>
                                                 </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="AC" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bL7-Tx-xuI">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="AC" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bL7-Tx-xuI">
                                                     <rect key="frame" x="208" y="11" width="152" height="53"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -98,7 +98,6 @@
                                         <connections>
                                             <outlet property="mapName" destination="bL7-Tx-xuI" id="9iW-C9-ynf"/>
                                             <outlet property="mapPhoto" destination="8pd-7t-f57" id="X1K-7w-avs"/>
-                                            <segue destination="BYZ-38-t0r" kind="show" id="IuO-PB-qdT"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -114,7 +113,7 @@
                     <navigationItem key="navigationItem" id="Vpp-NS-1UD"/>
                     <connections>
                         <outlet property="tableView" destination="nnx-rC-cHH" id="AxB-56-fAz"/>
-                        <segue destination="BYZ-38-t0r" kind="show" id="ePx-Sl-DQu"/>
+                        <segue destination="BYZ-38-t0r" kind="show" identifier="userSelectSegue" id="ePx-Sl-DQu"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="agb-Jo-ISX" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -125,7 +124,4 @@
     <resources>
         <image name="academicCenter" width="480" height="289"/>
     </resources>
-    <inferredMetricsTieBreakers>
-        <segue reference="ePx-Sl-DQu"/>
-    </inferredMetricsTieBreakers>
 </document>
