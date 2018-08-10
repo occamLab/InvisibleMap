@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  InvisibleMap
 //
-//  Created by Occam Lab on 7/30/18.
+//  Created by djconnolly on 7/30/18.
 //  Copyright © 2018 Occam Lab. All rights reserved.
 //
 
@@ -13,36 +13,19 @@ import Firebase
 import FirebaseDatabase
 import FirebaseStorage
 
-extension SCNMatrix4 {
-//    public func transpose(m: SCNMatrix4) -> SCNMatrix4 {
-//        return SCNMatrix4(
-//            m11: m.m11, m12: m.m21, m13: m.m31, m14: m.m41,
-//            m21: m.m12, m22: m.m22, m23: m.m32, m24: m.m42,
-//            m31: m.m13, m32: m.m23, m33: m.m33, m34: m.m43,
-//            m41: m.m14, m42: m.m24, m43: m.m34, m44: m.m44)
-//    }
-    public func transpose() -> SCNMatrix4 {
-        return SCNMatrix4(
-            m11: m11, m12: m21, m13: m31, m14: m41,
-            m21: m12, m22: m22, m23: m32, m24: m42,
-            m31: m13, m32: m23, m33: m33, m34: m43,
-            m41: m14, m42: m24, m43: m34, m44: m44)
-    }
-}
 
+/// The view controller for displaying a map and announcing waypoints
 class ViewController: UIViewController {
     
+    //MARK: Properties
     var storageRef: StorageReference!
     var myMap: Map!
-    var jsonMap: NSDictionary!
     var mapNode: SCNNode!
     var cameraNode: SCNNode!
-    var tagDict: Dictionary<Int, Array<Float>>!
     var aprilTagDetectionDictionary = Dictionary<Int, Array<Float>>()
-    var tag_dictionary = [Int:ViewController.Map.Vertex]()
+    var tagDictionary = [Int:ViewController.Map.Vertex]()
     var waypointDictionary = [Int:ViewController.Map.WaypointVertex]()
     var waypointKeyDictionary = [String:Int]()
-    var count: Int = 0
     let distanceToWaypoint: Float = 1.5
     let tagTiltMin: Float = 0.09
     let tagTiltMax: Float = 0.91
@@ -57,19 +40,21 @@ class ViewController: UIViewController {
     var isProcessingFrame = false
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.invisiblemap", qos: DispatchQoS.userInitiated)
     
+    
+    /// Initializes the ARSession and downloads the selected map data from firebase
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        startSession()
+        createMap()
+    }
+    
+    
+    
+    /// Initializes the map node, of which all of the tags and waypoints downloaded from firebase are children
     func createMapNode() {
         mapNode = SCNNode()
         mapNode.position = SCNVector3(x: 0, y: 0, z: 0)
         sceneView.scene.rootNode.addChildNode(mapNode)
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        print(mapFileName)
-        // Do any additional setup after loading the view, typically from a nib.
-        startSession()
-        createMap()
-
     }
     
     /// Initialize the ARSession
@@ -78,6 +63,7 @@ class ViewController: UIViewController {
         sceneView.session.run(configuration)
     }
     
+    /// Downloads the selected map from firebase
     func createMap() {
         createMapNode()
         let storage = Storage.storage()
@@ -91,8 +77,8 @@ class ViewController: UIViewController {
                 if mapData != nil {
                     do {
                         self.myMap =  try JSONDecoder().decode(Map.self, from: mapData!)
-                        self.store_tagvertex_in_dictionary()
-                        self.store_waypointvertex_in_dictionary()
+                        self.storeTagsInDictionary()
+                        self.storeWaypointsInDictionary()
 
                     } catch let error {
                         print(error)
@@ -102,7 +88,9 @@ class ViewController: UIViewController {
         }
     }
     
-    func store_waypointvertex_in_dictionary(){
+    
+    /// Stores the waypoints from firebase in a dictionary to speed up lookup of nearby waypoints
+    func storeWaypointsInDictionary(){
         var count: Int = 0
         for vertex in myMap.waypointsVertices{
             waypointDictionary[count] = vertex
@@ -126,6 +114,8 @@ class ViewController: UIViewController {
         }
     }
     
+    
+    /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
     func detectNearbyWaypoints(){
         let curr_pose = cameraNode.position
         for count in waypointDictionary.keys{
@@ -134,7 +124,8 @@ class ViewController: UIViewController {
                 let waypoint_pose = sceneView.scene.rootNode.convertPosition(waypoint_pose_map!, from: mapNode)
                 let distanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2) + pow((waypoint_pose.z - curr_pose.z),2))
                 if distanceToCurrPose < distanceToWaypoint{
-                    let announcement: String = (waypointDictionary[count]?.id)! + " is " + String(distanceToCurrPose) + " away."
+                    let twoDimensionalDistanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2))
+                    let announcement: String = (waypointDictionary[count]?.id)! + " is " + String(format: "%.1f", twoDimensionalDistanceToCurrPose) + " meters away."
                     let utterance = AVSpeechUtterance(string: announcement)
                     utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
                     let synth = AVSpeechSynthesizer()
@@ -146,9 +137,11 @@ class ViewController: UIViewController {
     }
     
     
-    func store_tagvertex_in_dictionary(){
+    
+    /// Stores the april tags from firebase in a dictionary to speed up lookup of tags
+    func storeTagsInDictionary() {
         for vertex in myMap.tagVertices{
-            tag_dictionary[vertex.id] = vertex
+            tagDictionary[vertex.id] = vertex
             var tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
             tagMatrix = convertRosToIosCoordinates(matrix: tagMatrix)
             let tagNode = SCNNode(geometry: SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0))
@@ -162,48 +155,53 @@ class ViewController: UIViewController {
     
     
     
+    /// Processes the pose, april tags, and nearby waypoints on a timer.
     func scheduledLocalizationTimer() {
         tagFinderTimer.invalidate()
         tagFinderTimer = Timer()
         tagFinderTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateLandmarks), userInfo: nil, repeats: true)
-
     }
     
-    @IBAction func enterMap(_ sender: UIButton) {
-        if sender.currentTitle == "Enter Map" {
-            sender.setTitle("Exit Map", for: .normal)
+    
+    /// Starts and stops the live detection of april tags.
+    ///
+    /// - Parameter sender: UIButton that reacts to being pressed
+    @IBAction func startTagDetection(_ sender: UIButton) {
+        if sender.currentTitle == "Start Tag Detection" {
+            sender.setTitle("Stop Tag Detection", for: .normal)
+            sender.accessibilityLabel = "Stop Tag Detection Button"
             scheduledLocalizationTimer()
             
         } else {
-            sender.setTitle("Enter Map", for: .normal)
+            sender.setTitle("Start Tag Detection", for: .normal)
+            sender.accessibilityLabel = "Start Tag Detection Button"
             tagFinderTimer.invalidate()
             tagFinderTimer = Timer()
         }
-        
     }
+
     
+    /// Processes the pose pose, april tags, and nearby waypoints.
     @objc func updateLandmarks() {
         if isProcessingFrame {
             return
         }
         isProcessingFrame = true
-        //let (image, time) = getVideoFrames()
-        //let rotatedImage = imageRotatedByDegrees(oldImage: image, deg: 90)
         aprilTagQueue.async {
-            print(self.count)
             let (image, time) = self.getVideoFrames()
             let rotatedImage = self.imageRotatedByDegrees(oldImage: image, deg: 90)
             self.checkTagDetection(rotatedImage: rotatedImage, timestamp: time)
             self.detectNearbyWaypoints()
             self.isProcessingFrame = false
-            self.count += 1
         }
        
        
 
     }
     
-    /// Get video frames.
+    /// Gets the current frames from the camera
+    ///
+    /// - Returns: the current camera frame as a UIImage and its timestamp
     func getVideoFrames() -> (UIImage, Double) {
         let cameraFrame = sceneView.session.currentFrame
         let cameraTransform = sceneView.session.currentFrame?.camera.transform
@@ -227,7 +225,11 @@ class ViewController: UIViewController {
         return (uiImage, stampedTime!)
     }
     
-    /// Check if tag is detected
+    /// Check if tag is detected and update the tag and map transforms
+    ///
+    /// - Parameters:
+    ///   - rotatedImage: the camera frame rotated by 90 degrees to enable accurate tag detection
+    ///   - timestamp: the timestamp of the current frame
     func checkTagDetection(rotatedImage: UIImage, timestamp: Double) {
         let intrinsics = sceneView.session.currentFrame?.camera.intrinsics.columns
         f.findTags(rotatedImage, intrinsics!.1.y, intrinsics!.0.x, intrinsics!.2.y, intrinsics!.2.x)
@@ -237,11 +239,12 @@ class ViewController: UIViewController {
             for i in 0...f.getNumberOfTags()-1 {
                 tagArray.append(f.getTagAt(i))
             }
+            /// Add or update the tags that are detected
             for i in 0...tagArray.count-1 {
                 addTagDetectionNode(tag: tagArray[i])
-                //print("tag detected in frame:", tagArray)
-                if tag_dictionary[Int(tagArray[i].number)] != nil {
-                    updateRootToMap(vertex: tag_dictionary[Int(tagArray[i].number)]!)
+                /// Update the root to map transform if the tag detected is in the map
+                if tagDictionary[Int(tagArray[i].number)] != nil {
+                    updateRootToMap(vertex: tagDictionary[Int(tagArray[i].number)]!)
 
                 }
             }
@@ -249,26 +252,27 @@ class ViewController: UIViewController {
         }
     }
     
-    /// Check Tag Axis
-    func checkTagAxis(tagNum: String, rootTagNode: SCNNode) -> Bool {
-        //let tagZinRoot = sceneView.scene.rootNode.childNode(withName: "Tag_\(tagNum)", recursively: false)?.convertVector(SCNVector3(0,0,1), to: sceneView.scene.rootNode)
+    /// Ensures a tag detection is only used if the tag's z axis is nearly perpendicular or parallel to the gravity vector
+    ///
+    /// - Parameters:
+    ///   - rootTagNode: A dummy node with a tag's potential updated transform
+    /// - Returns: A boolean value indicating whether the updated transform should be used to update the tag node transform
+    func checkTagAxis(rootTagNode: SCNNode) -> Bool {
         let tagZinRoot = rootTagNode.convertVector(SCNVector3(0,0,1), to: sceneView.scene.rootNode)
         let tagvector = SCNVector3ToGLKVector3(tagZinRoot)
         let gravityvector = GLKVector3Make(0.0, 1.0, 0.0)
         let dotproduct = GLKVector3DotProduct(tagvector,gravityvector)
         if tagTiltMin < abs(dotproduct) && abs(dotproduct) < tagTiltMax{
-            print("Not Used")
-            print(dotproduct)
             return false
         }else{
-            print("Used")
-            print(dotproduct)
             return true
         }
     }
     
     
-    /// Add Tag node when tag is detected
+    /// Adds or updates a tag node when a tag is detected
+    ///
+    /// - Parameter tag: the april tag detected by the visual servoing platform
     func addTagDetectionNode(tag: AprilTags) {
         let pose = tag.poseData
         var poseMatrix = SCNMatrix4.init(m11: Float(pose.0), m12: Float(pose.1), m13: Float(pose.2), m14: Float(pose.3), m21: Float(pose.4), m22: Float(pose.5), m23: Float(pose.6), m24: Float(pose.7), m31: Float(pose.8), m32: Float(pose.9), m33: Float(pose.10), m34: Float(pose.11), m41: Float(pose.12), m42: Float(pose.13), m43: Float(pose.14), m44: Float(pose.15))
@@ -280,26 +284,23 @@ class ViewController: UIViewController {
         poseMatrix = poseMatrix.transpose()
         let num = String(tag.number)
         
-       //updateCameraCoordinates()
         let rootTag = cameraNode.convertTransform(poseMatrix, to: sceneView.scene.rootNode)
         let rootTagNode = SCNNode()
         rootTagNode.transform = rootTag
         if sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false) == nil {
             rootTagNode.geometry = SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0)
-            //let rootTagNode = SCNNode(geometry: SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0))
-            //rootTagNode.transform = rootTag
             rootTagNode.name = "Tag_\(num)"
             rootTagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
             sceneView.scene.rootNode.addChildNode(rootTagNode)
         } else {
-            //let oldTransform = sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.transform
-            //sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.transform = rootTag
-            if checkTagAxis(tagNum: num, rootTagNode: rootTagNode){
+            if checkTagAxis(rootTagNode: rootTagNode){
                 sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.transform = rootTag
             }
 
-            
         }
+        
+        
+        /// Adds axes to the tag to aid in the visualization
         let xAxis = SCNNode(geometry: SCNBox(width: 1.0, height: 0.1, length: 0.1, chamferRadius: 0))
         xAxis.position = SCNVector3.init(1, 0, 0)
         xAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.red
@@ -313,8 +314,6 @@ class ViewController: UIViewController {
         sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.addChildNode(yAxis)
         sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.addChildNode(zAxis)
 
-        
-        
         let quat2 = sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.orientation
         let trans2 = sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.position
         let tagPose = [trans2?.x, trans2?.y, trans2?.z, quat2?.x, quat2?.y, quat2?.z, quat2?.w]
@@ -322,36 +321,12 @@ class ViewController: UIViewController {
         aprilTagDetectionDictionary[Int(tag.number)] = tagPose as? [Float]
     }
     
-    /// Get pose data (transformation matrix, time) and send to ROS.
-    func updateCameraCoordinates() {
-        let camera = sceneView.session.currentFrame?.camera
-        let cameraTransform = camera?.transform
-        let scene = SCNMatrix4(cameraTransform!)
-        if sceneView.scene.rootNode.childNode(withName: "camera", recursively: false) == nil {
-            cameraNode = SCNNode()
-            cameraNode.transform = scene
-            cameraNode.name = "camera"
-            sceneView.scene.rootNode.addChildNode(cameraNode)
-        } else {
-            cameraNode.transform = scene
-        }
-        
-    }
-
-    
-    /// Get the camera intrinsics to send to ROS
-    func getCameraIntrinsics() -> Data {
-        let camera = sceneView.session.currentFrame?.camera
-        let intrinsics = camera?.intrinsics
-        let columns = intrinsics?.columns
-        let res = camera?.imageResolution
-        let width = res?.width
-        let height = res?.height
-        
-        return String(format: "%f,%f,%f,%f,%f,%f,%f", columns!.0.x, columns!.1.y, columns!.2.x, columns!.2.y, columns!.2.z, width!, height!).data(using: .utf8)!
-    }
-    
-    /// Rotates an image clockwise
+    /// Rotates an image clockwise by a given angle
+    ///
+    /// - Parameters:
+    ///   - oldImage: the original image
+    ///   - degrees: the angle by which the image is to be rotated
+    /// - Returns: the rotated image
     func imageRotatedByDegrees(oldImage: UIImage, deg degrees: CGFloat) -> UIImage {
         //Calculate the size of the rotated view's containing box for our drawing space
         let rotatedViewBox: UIView = UIView(frame: CGRect(x: 0, y: 0, width: oldImage.size.width, height: oldImage.size.height))
@@ -374,9 +349,9 @@ class ViewController: UIViewController {
     }
     
     
+    /// Updates the root to map transform if a tag currently being detected exists in the map
     ///
-    ///
-    /// - Parameter vertex:
+    /// - Parameter vertex: the tag vertex from firebase corresponding to the tag currently being detected
     func updateRootToMap(vertex: Map.Vertex) {
         var tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
         tagMatrix = convertRosToIosCoordinates(matrix: tagMatrix)
@@ -388,7 +363,10 @@ class ViewController: UIViewController {
         computeRootToMap(tagId: vertex.id)
     }
     
-    /// Convert firebase coordinates to iOS coordinates
+    /// Converts from the coordinate system in firebase data to iOS coordinates
+    ///
+    /// - Parameter matrix: a transformation matrix in the firebase coordinate system
+    /// - Returns: a transformation matrix in the iOS coordinate system
     func convertRosToIosCoordinates(matrix: SCNMatrix4) -> SCNMatrix4 {
         var mat = matrix.transpose()
         let rotate180aboutX = SCNMatrix4.init(m11: 1, m12: 0, m13: 0, m14: 0, m21: 0, m22: -1, m23: 0, m24: 0, m31: 0, m32: 0, m33: -1, m34: 0, m41: 0, m42: 0, m43: 0, m44: 1)
@@ -399,7 +377,9 @@ class ViewController: UIViewController {
         return mat
     }
     
-    /// Compute root to map
+    /// Computes and updates the root to map transform
+    ///
+    /// - Parameter tagId: the id number of an april tag as an integer
     func computeRootToMap(tagId: Int) {
         if aprilTagDetectionDictionary[tagId] != nil {
             let rootToTag = (sceneView.scene.rootNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform)!.transpose()
@@ -411,6 +391,8 @@ class ViewController: UIViewController {
         }
     }
 
+    
+    /// Automatically decodes the map Json files from firebase
     struct Map: Decodable {
         let tagVertices: [Vertex]
         let odometryVertices: [Vertex]
@@ -502,10 +484,23 @@ class ViewController: UIViewController {
             }
     }
     
+    
+    /// Dispose of any resources that can be recreated.
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
 
 }
+
+extension SCNMatrix4 {
+    
+    public func transpose() -> SCNMatrix4 {
+        return SCNMatrix4(
+            m11: m11, m12: m21, m13: m31, m14: m41,
+            m21: m12, m22: m22, m23: m32, m24: m42,
+            m31: m13, m32: m23, m33: m33, m34: m43,
+            m41: m14, m42: m24, m43: m34, m44: m44)
+    }
+}
+

@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  InvisibleMap
 //
-//  Created by Occam Lab on 7/30/18.
+//  Created by djconnolly27 on 7/30/18.
 //  Copyright © 2018 Occam Lab. All rights reserved.
 //
 

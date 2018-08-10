@@ -34,20 +34,35 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ijc-kT-M2e">
-                                <rect key="frame" x="0.0" y="127" width="375" height="540"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </arscnView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="O30-Ak-K3c">
-                                <rect key="frame" x="112" y="89" width="150" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Enter Map"/>
-                                <connections>
-                                    <action selector="enterMap:" destination="BYZ-38-t0r" eventType="touchUpInside" id="lcI-S3-goc"/>
-                                </connections>
-                            </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="dXX-Qq-imk">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <subviews>
+                                    <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ijc-kT-M2e">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="529"/>
+                                    </arscnView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xha-bI-luW">
+                                        <rect key="frame" x="0.0" y="532" width="375" height="71"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NOO-QN-UUX">
+                                                <rect key="frame" x="0.0" y="0.0" width="375" height="71"/>
+                                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="36"/>
+                                                <state key="normal" title="Start Tag Detection"/>
+                                                <connections>
+                                                    <action selector="startTagDetection:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uUk-vk-RfD"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="dXX-Qq-imk" secondAttribute="bottom" id="551-s6-HyL"/>
+                            <constraint firstItem="dXX-Qq-imk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="pvJ-xs-IR9"/>
+                            <constraint firstItem="dXX-Qq-imk" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="qnf-8M-7cL"/>
+                            <constraint firstItem="dXX-Qq-imk" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="tWT-Yb-f4Q"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" id="1gv-cO-1Xg"/>
@@ -57,7 +72,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="482" y="131"/>
+            <point key="canvasLocation" x="480.80000000000001" y="130.88455772113943"/>
         </scene>
         <!--ChooseMapViewController-->
         <scene sceneID="5kc-6j-cXo">
