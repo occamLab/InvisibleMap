@@ -1,3 +1,4 @@
-*.framework
+/opencv2.framework
+/visp3.framework
 /Frameworks
 /InvisibleMap/GoogleService-Info.plist
