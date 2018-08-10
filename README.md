@@ -13,3 +13,5 @@ Built for OccamLab @Olin College 2018
 (4) In your terminal, run `open InvisibleMap.xcworkspace/`.
 
 (5) Build and run the app!
+
+To learn more about OccamLab, please visit our website: http://occam.olin.edu/.
