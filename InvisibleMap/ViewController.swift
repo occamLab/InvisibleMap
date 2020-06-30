@@ -187,25 +187,28 @@ class ViewController: UIViewController {
             return
         }
         isProcessingFrame = true
-        aprilTagQueue.async {
-            let (image, time) = self.getVideoFrames()
+        let (image, time, cameraTransform, cameraIntrinsics) = self.getVideoFrames()
+        if let image = image, let time = time, let cameraTransform = cameraTransform, let cameraIntrinsics = cameraIntrinsics {
             let rotatedImage = self.imageRotatedByDegrees(oldImage: image, deg: 90)
-            self.checkTagDetection(rotatedImage: rotatedImage, timestamp: time)
-            self.detectNearbyWaypoints()
-            self.isProcessingFrame = false
-        }
-       
-       
 
+            aprilTagQueue.async {
+                self.checkTagDetection(rotatedImage: rotatedImage, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+                self.detectNearbyWaypoints()
+                self.isProcessingFrame = false
+            }
+        } else {
+            isProcessingFrame = false
+        }
     }
     
     /// Gets the current frames from the camera
     ///
     /// - Returns: the current camera frame as a UIImage and its timestamp
-    func getVideoFrames() -> (UIImage, Double) {
-        let cameraFrame = sceneView.session.currentFrame
-        let cameraTransform = sceneView.session.currentFrame?.camera.transform
-        let scene = SCNMatrix4(cameraTransform!)
+    func getVideoFrames() -> (UIImage?, Double?, simd_float4x4?, simd_float3x3?) {
+        guard let cameraFrame = sceneView.session.currentFrame, let cameraTransform = sceneView.session.currentFrame?.camera.transform else {
+            return (nil, nil, nil, nil)
+        }
+        let scene = SCNMatrix4(cameraTransform)
         if sceneView.scene.rootNode.childNode(withName: "camera", recursively: false) == nil {
             cameraNode = SCNNode()
             cameraNode.transform = scene
@@ -214,15 +217,14 @@ class ViewController: UIViewController {
         } else {
             cameraNode.transform = scene
         }
-        let stampedTime = cameraFrame?.timestamp
         
         // Convert ARFrame to a UIImage
-        let pixelBuffer = cameraFrame?.capturedImage
-        let ciImage = CIImage(cvPixelBuffer: pixelBuffer!)
+        let pixelBuffer = cameraFrame.capturedImage
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         let context = CIContext(options: nil)
         let cgImage = context.createCGImage(ciImage, from: ciImage.extent)
         let uiImage = UIImage(cgImage: cgImage!)
-        return (uiImage, stampedTime!)
+        return (uiImage, cameraFrame.timestamp, cameraTransform, cameraFrame.camera.intrinsics)
     }
     
     /// Check if tag is detected and update the tag and map transforms
@@ -230,9 +232,9 @@ class ViewController: UIViewController {
     /// - Parameters:
     ///   - rotatedImage: the camera frame rotated by 90 degrees to enable accurate tag detection
     ///   - timestamp: the timestamp of the current frame
-    func checkTagDetection(rotatedImage: UIImage, timestamp: Double) {
-        let intrinsics = sceneView.session.currentFrame?.camera.intrinsics.columns
-        f.findTags(rotatedImage, intrinsics!.1.y, intrinsics!.0.x, intrinsics!.2.y, intrinsics!.2.x)
+    func checkTagDetection(rotatedImage: UIImage, timestamp: Double, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3) {
+        let intrinsics = cameraIntrinsics.columns
+        f.findTags(rotatedImage, intrinsics.1.y, intrinsics.0.x, intrinsics.2.y, intrinsics.2.x)
         var tagArray: Array<AprilTags> = Array()
         let numTags = f.getNumberOfTags()
         if numTags > 0 {
@@ -241,11 +243,10 @@ class ViewController: UIViewController {
             }
             /// Add or update the tags that are detected
             for i in 0...tagArray.count-1 {
-                addTagDetectionNode(tag: tagArray[i])
+                addTagDetectionNode(tag: tagArray[i], cameraTransform: cameraTransform)
                 /// Update the root to map transform if the tag detected is in the map
-                if tagDictionary[Int(tagArray[i].number)] != nil {
-                    updateRootToMap(vertex: tagDictionary[Int(tagArray[i].number)]!)
-
+                if let tagVertex = tagDictionary[Int(tagArray[i].number)] {
+                    updateRootToMap(vertex: tagVertex)
                 }
             }
             
@@ -273,7 +274,7 @@ class ViewController: UIViewController {
     /// Adds or updates a tag node when a tag is detected
     ///
     /// - Parameter tag: the april tag detected by the visual servoing platform
-    func addTagDetectionNode(tag: AprilTags) {
+    func addTagDetectionNode(tag: AprilTags, cameraTransform: simd_float4x4) {
         let pose = tag.poseData
         var poseMatrix = SCNMatrix4.init(m11: Float(pose.0), m12: Float(pose.1), m13: Float(pose.2), m14: Float(pose.3), m21: Float(pose.4), m22: Float(pose.5), m23: Float(pose.6), m24: Float(pose.7), m31: Float(pose.8), m32: Float(pose.9), m33: Float(pose.10), m34: Float(pose.11), m41: Float(pose.12), m42: Float(pose.13), m43: Float(pose.14), m44: Float(pose.15))
         let rotate180aboutX = SCNMatrix4.init(m11: 1, m12: 0, m13: 0, m14: 0, m21: 0, m22: -1, m23: 0, m24: 0, m31: 0, m32: 0, m33: -1, m34: 0, m41: 0, m42: 0, m43: 0, m44: 1)
@@ -283,7 +284,9 @@ class ViewController: UIViewController {
         // SCNMatrix4 Transformations are stored transposed [R' 0; t' 1] from poseMatrix
         poseMatrix = poseMatrix.transpose()
         let num = String(tag.number)
-        
+        // TODO: remove dependency on SCNNode
+        // ensuring that the transform here is up to date
+        cameraNode.transform = SCNMatrix4(cameraTransform)
         let rootTag = cameraNode.convertTransform(poseMatrix, to: sceneView.scene.rootNode)
         let rootTagNode = SCNNode()
         rootTagNode.transform = rootTag
@@ -293,7 +296,8 @@ class ViewController: UIViewController {
             rootTagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
             sceneView.scene.rootNode.addChildNode(rootTagNode)
         } else {
-            if checkTagAxis(rootTagNode: rootTagNode){
+            // TODO: disabling tag axis check
+            if true || checkTagAxis(rootTagNode: rootTagNode){
                 sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.transform = rootTag
             }
 
@@ -354,6 +358,7 @@ class ViewController: UIViewController {
     /// - Parameter vertex: the tag vertex from firebase corresponding to the tag currently being detected
     func updateRootToMap(vertex: Map.Vertex) {
         var tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
+        // TODO: hopefully this will be obsoleted by new data collection pipeline
         tagMatrix = convertRosToIosCoordinates(matrix: tagMatrix)
         let tagNode = SCNNode(geometry: SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0))
         tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black

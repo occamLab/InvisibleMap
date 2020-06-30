@@ -12,7 +12,6 @@
 		86112CD3211B837200736960 /* ChooseMapTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */; };
 		8630963C21125E89003D4434 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8630963B21125E89003D4434 /* opencv2.framework */; };
 		86616BC52113369200DD565C /* visp3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86616BC42113369200DD565C /* visp3.framework */; };
-		8676735C211CE0A5001F77CA /* playButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 8676735B211CE0A5001F77CA /* playButton.png */; };
 		868CBA4821133939007343B4 /* ImageConversion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4521133939007343B4 /* ImageConversion.mm */; };
 		868CBA4921133939007343B4 /* ImageDisplay.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4721133939007343B4 /* ImageDisplay.mm */; };
 		868CBA4E2113394B007343B4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4A2113394B007343B4 /* main.m */; };
@@ -43,7 +42,6 @@
 		86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseMapTableViewCell.swift; sourceTree = "<group>"; };
 		8630963B21125E89003D4434 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		86616BC42113369200DD565C /* visp3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = visp3.framework; sourceTree = "<group>"; };
-		8676735B211CE0A5001F77CA /* playButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = playButton.png; path = ../../../Downloads/playButton.png; sourceTree = "<group>"; };
 		868CBA4421133939007343B4 /* ImageDisplay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageDisplay.h; sourceTree = "<group>"; };
 		868CBA4521133939007343B4 /* ImageConversion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageConversion.mm; sourceTree = "<group>"; };
 		868CBA4621133939007343B4 /* ImageConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageConversion.h; sourceTree = "<group>"; };
@@ -139,7 +137,6 @@
 				86F39540210FA42500F209EC /* ViewController.swift */,
 				86F39542210FA42500F209EC /* Main.storyboard */,
 				86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */,
-				8676735B211CE0A5001F77CA /* playButton.png */,
 				86F39545210FA42600F209EC /* Assets.xcassets */,
 				86F39547210FA42600F209EC /* LaunchScreen.storyboard */,
 				86F3954A210FA42600F209EC /* Info.plist */,
@@ -257,7 +254,6 @@
 				86A84772210FA6440004C325 /* GoogleService-Info.plist in Resources */,
 				86F39546210FA42600F209EC /* Assets.xcassets in Resources */,
 				86F39544210FA42500F209EC /* Main.storyboard in Resources */,
-				8676735C211CE0A5001F77CA /* playButton.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -519,10 +515,13 @@
 					"${PODS_ROOT}/Firebase/Core/Sources",
 					"\"${PODS_ROOT}/Headers/Public\"",
 					"\"${PODS_ROOT}/Headers/Public/Firebase\"",
-					"$SDKROOT/usr/include/libxml2",
+					$SDKROOT/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = InvisibleMap/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "InvisibleMap/TagFinder-Swift.h";
@@ -550,10 +549,13 @@
 					"${PODS_ROOT}/Firebase/Core/Sources",
 					"\"${PODS_ROOT}/Headers/Public\"",
 					"\"${PODS_ROOT}/Headers/Public/Firebase\"",
-					"$SDKROOT/usr/include/libxml2",
+					$SDKROOT/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = InvisibleMap/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "InvisibleMap/TagFinder-Swift.h";
@@ -571,7 +573,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				INFOPLIST_FILE = InvisibleMapTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMapTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -589,7 +595,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				INFOPLIST_FILE = InvisibleMapTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMapTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
