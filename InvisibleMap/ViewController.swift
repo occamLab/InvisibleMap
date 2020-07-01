@@ -95,8 +95,8 @@ class ViewController: UIViewController {
         for vertex in myMap.waypointsVertices{
             waypointDictionary[count] = vertex
             waypointKeyDictionary[vertex.id] = count
-            var waypointMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
-            waypointMatrix = convertRosToIosCoordinates(matrix: waypointMatrix)
+            let waypointMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
+            //waypointMatrix = convertRosToIosCoordinates(matrix: waypointMatrix)
             let waypointNode = SCNNode(geometry: SCNBox(width: 0.25, height: 0.25, length: 0.25, chamferRadius: 0))
             waypointNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
             waypointNode.transform = waypointMatrix
@@ -142,8 +142,8 @@ class ViewController: UIViewController {
     func storeTagsInDictionary() {
         for vertex in myMap.tagVertices{
             tagDictionary[vertex.id] = vertex
-            var tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
-            tagMatrix = convertRosToIosCoordinates(matrix: tagMatrix)
+            let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
+            //tagMatrix = convertRosToIosCoordinates(matrix: tagMatrix)
             let tagNode = SCNNode(geometry: SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0))
             tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
             tagNode.transform = tagMatrix
@@ -159,7 +159,7 @@ class ViewController: UIViewController {
     func scheduledLocalizationTimer() {
         tagFinderTimer.invalidate()
         tagFinderTimer = Timer()
-        tagFinderTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateLandmarks), userInfo: nil, repeats: true)
+        tagFinderTimer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(self.updateLandmarks), userInfo: nil, repeats: true)
     }
     
     
@@ -181,7 +181,7 @@ class ViewController: UIViewController {
     }
 
     
-    /// Processes the pose pose, april tags, and nearby waypoints.
+    /// Processes the pose, april tags, and nearby waypoints.
     @objc func updateLandmarks() {
         if isProcessingFrame {
             return
@@ -297,8 +297,7 @@ class ViewController: UIViewController {
             rootTagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
             sceneView.scene.rootNode.addChildNode(rootTagNode)
         } else {
-            // TODO: disabling tag axis check
-            if true || checkTagAxis(rootTagNode: rootTagNode){
+            if checkTagAxis(rootTagNode: rootTagNode){
                 sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.transform = rootTag
             }
 
@@ -358,9 +357,9 @@ class ViewController: UIViewController {
     ///
     /// - Parameter vertex: the tag vertex from firebase corresponding to the tag currently being detected
     func updateRootToMap(vertex: Map.Vertex) {
-        var tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
+        let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
         // TODO: hopefully this will be obsoleted by new data collection pipeline
-        tagMatrix = convertRosToIosCoordinates(matrix: tagMatrix)
+        //tagMatrix = convertRosToIosCoordinates(matrix: tagMatrix)
         let tagNode = SCNNode(geometry: SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0))
         tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
         tagNode.transform = tagMatrix

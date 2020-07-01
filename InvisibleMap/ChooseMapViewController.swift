@@ -26,7 +26,7 @@ class ChooseMapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let storageRef = Storage.storage().reference()
-        let mapsRef = Database.database().reference(withPath: "maps")
+        let mapsRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference(withPath: "maps")
         mapsRef.observe(.childAdded) { (snapshot) -> Void in
             let values = snapshot.value as! [String: Any]
             // only include in the list if it is processed
