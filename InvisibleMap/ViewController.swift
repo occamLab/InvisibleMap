@@ -234,6 +234,7 @@ class ViewController: UIViewController {
     ///   - timestamp: the timestamp of the current frame
     func checkTagDetection(rotatedImage: UIImage, timestamp: Double, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3) {
         let intrinsics = cameraIntrinsics.columns
+        // swapping x and y focal length and central pixel due to rotation of the image
         f.findTags(rotatedImage, intrinsics.1.y, intrinsics.0.x, intrinsics.2.y, intrinsics.2.x)
         var tagArray: Array<AprilTags> = Array()
         let numTags = f.getNumberOfTags()

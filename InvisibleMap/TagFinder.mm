@@ -21,7 +21,7 @@
         _tags = [[NSMutableArray alloc] init];
         vpDetectorAprilTag::vpAprilTagFamily tagFamily = vpDetectorAprilTag::TAG_36h11;
         detector = new vpDetectorAprilTag (tagFamily);
-        _cMo = *new std::vector<vpHomogeneousMatrix>();
+        _cMo = std::vector<vpHomogeneousMatrix>();
     }
     return self;
 }
@@ -79,7 +79,7 @@
      detector->setAprilTagQuadDecimate(quad_decimate);
      detector->setAprilTagPoseEstimationMethod(poseEstimationMethod);
      detector->setAprilTagNbThreads(nThreads);
-    
+     _cMo.clear();
      // Detect all the tags in the image
      detector->detect(I, tagSize, cam, _cMo);
 }

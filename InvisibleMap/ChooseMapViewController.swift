@@ -31,7 +31,8 @@ class ChooseMapViewController: UIViewController {
             let values = snapshot.value as! [String: Any]
             // only include in the list if it is processed
             if let processedMapFile = values["map_file"] as? String {
-                let imageRef = storageRef.child(values["image"] as! String)
+                // TODO: pick a sensible default image
+                let imageRef = storageRef.child((values["image"] as? String) ?? "olin_library.jpg")
                 imageRef.getData(maxSize: 10*1024*1024) { imageData, error in
                     if let error = error {
                         print(error.localizedDescription)
