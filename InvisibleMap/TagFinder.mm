@@ -60,8 +60,8 @@
      vpDetectorAprilTag::vpPoseEstimationMethod poseEstimationMethod = vpDetectorAprilTag::HOMOGRAPHY_VIRTUAL_VS;
      double tagSize = 0.168275; // Size of 8.5x11" printed april tags
      //double tagSize = 0.175; // Size of OccamLab april tags
-     float quad_decimate = 1.0; //3.0
-     int nThreads = 1; // 1
+     float quad_decimate = 3.0;
+     int nThreads = 1;
     
      // Set camera parameters
      vpCameraParameters cam;
@@ -71,8 +71,7 @@
      detector->setAprilTagQuadDecimate(quad_decimate);
      detector->setAprilTagPoseEstimationMethod(poseEstimationMethod);
      detector->setAprilTagNbThreads(nThreads);
-     detector->setAprilTagRefineEdges(false);
-     //detector->setZAlignedWithCameraAxis(true);
+     detector->setAprilTagRefineEdges(true);
      _cMo.clear();
      // Detect all the tags in the image
      detector->detect(I, tagSize, cam, _cMo);

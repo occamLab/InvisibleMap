@@ -60,6 +60,8 @@ class ViewController: UIViewController {
     /// Initialize the ARSession
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
+        configuration.planeDetection = [.horizontal, .vertical]
+        configuration.isAutoFocusEnabled = false
         sceneView.session.run(configuration)
     }
     
@@ -316,35 +318,7 @@ class ViewController: UIViewController {
         
         aprilTagDetectionDictionary[Int(tag.number)] = tagPose
     }
-    
-    /// Rotates an image clockwise by a given angle
-    ///
-    /// - Parameters:
-    ///   - oldImage: the original image
-    ///   - degrees: the angle by which the image is to be rotated
-    /// - Returns: the rotated image
-    func imageRotatedByDegrees(oldImage: UIImage, deg degrees: CGFloat) -> UIImage {
-        //Calculate the size of the rotated view's containing box for our drawing space
-        let rotatedViewBox: UIView = UIView(frame: CGRect(x: 0, y: 0, width: oldImage.size.width, height: oldImage.size.height))
-        let t: CGAffineTransform = CGAffineTransform(rotationAngle: degrees * CGFloat.pi / 180)
-        rotatedViewBox.transform = t
-        let rotatedSize: CGSize = rotatedViewBox.frame.size
-        //Create the bitmap context
-        UIGraphicsBeginImageContext(rotatedSize)
-        let bitmap: CGContext = UIGraphicsGetCurrentContext()!
-        //Move the origin to the middle of the image so we will rotate and scale around the center.
-        bitmap.translateBy(x: rotatedSize.width / 2, y: rotatedSize.height / 2)
-        //Rotate the image context
-        bitmap.rotate(by: (degrees * CGFloat.pi / 180))
-        //Now, draw the rotated/scaled image into the context
-        bitmap.scaleBy(x: 1.0, y: -1.0)
-        bitmap.draw(oldImage.cgImage!, in: CGRect(x: -oldImage.size.width / 2, y: -oldImage.size.height / 2, width: oldImage.size.width, height: oldImage.size.height))
-        let newImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        return newImage
-    }
-    
-    
+
     /// Updates the root to map transform if a tag currently being detected exists in the map
     ///
     /// - Parameter vertex: the tag vertex from firebase corresponding to the tag currently being detected
