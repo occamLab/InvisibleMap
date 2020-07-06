@@ -189,10 +189,8 @@ class ViewController: UIViewController {
         isProcessingFrame = true
         let (image, time, cameraTransform, cameraIntrinsics) = self.getVideoFrames()
         if let image = image, let time = time, let cameraTransform = cameraTransform, let cameraIntrinsics = cameraIntrinsics {
-            let rotatedImage = self.imageRotatedByDegrees(oldImage: image, deg: 90)
-
             aprilTagQueue.async {
-                self.checkTagDetection(rotatedImage: rotatedImage, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+                self.checkTagDetection(image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
                 self.detectNearbyWaypoints()
                 self.isProcessingFrame = false
             }
@@ -232,10 +230,9 @@ class ViewController: UIViewController {
     /// - Parameters:
     ///   - rotatedImage: the camera frame rotated by 90 degrees to enable accurate tag detection
     ///   - timestamp: the timestamp of the current frame
-    func checkTagDetection(rotatedImage: UIImage, timestamp: Double, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3) {
+    func checkTagDetection(image: UIImage, timestamp: Double, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3) {
         let intrinsics = cameraIntrinsics.columns
-        // swapping x and y focal length and central pixel due to rotation of the image
-        f.findTags(rotatedImage, intrinsics.1.y, intrinsics.0.x, intrinsics.2.y, intrinsics.2.x)
+        f.findTags(image, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y)
         var tagArray: Array<AprilTags> = Array()
         let numTags = f.getNumberOfTags()
         if numTags > 0 {
@@ -276,33 +273,30 @@ class ViewController: UIViewController {
     ///
     /// - Parameter tag: the april tag detected by the visual servoing platform
     func addTagDetectionNode(tag: AprilTags, cameraTransform: simd_float4x4) {
+        // TODO: for debugging make an impact
+        let generator = UIImpactFeedbackGenerator(style: .heavy)
+        generator.impactOccurred()
         let pose = tag.poseData
-        var poseMatrix = SCNMatrix4.init(m11: Float(pose.0), m12: Float(pose.1), m13: Float(pose.2), m14: Float(pose.3), m21: Float(pose.4), m22: Float(pose.5), m23: Float(pose.6), m24: Float(pose.7), m31: Float(pose.8), m32: Float(pose.9), m33: Float(pose.10), m34: Float(pose.11), m41: Float(pose.12), m42: Float(pose.13), m43: Float(pose.14), m44: Float(pose.15))
-        let rotate180aboutX = SCNMatrix4.init(m11: 1, m12: 0, m13: 0, m14: 0, m21: 0, m22: -1, m23: 0, m24: 0, m31: 0, m32: 0, m33: -1, m34: 0, m41: 0, m42: 0, m43: 0, m44: 1)
-        let rotate90aboutZ = SCNMatrix4.init(m11: 0, m12: -1, m13: 0, m14: 0, m21: 1, m22: 0, m23: 0, m24: 0, m31: 0, m32: 0, m33: 1, m34: 0, m41: 0, m42: 0, m43: 0, m44: 1)
-        poseMatrix = SCNMatrix4Mult(rotate180aboutX, poseMatrix)
-        poseMatrix = SCNMatrix4Mult(rotate90aboutZ, poseMatrix)
-        // SCNMatrix4 Transformations are stored transposed [R' 0; t' 1] from poseMatrix
-        poseMatrix = poseMatrix.transpose()
-        let num = String(tag.number)
-        // TODO: remove dependency on SCNNode
-        // ensuring that the transform here is up to date
-        cameraNode.transform = SCNMatrix4(cameraTransform)
-        let rootTag = cameraNode.convertTransform(poseMatrix, to: sceneView.scene.rootNode)
-        let rootTagNode = SCNNode()
-        rootTagNode.transform = rootTag
-        if sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false) == nil {
-            rootTagNode.geometry = SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0)
-            rootTagNode.name = "Tag_\(num)"
-            rootTagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
-            sceneView.scene.rootNode.addChildNode(rootTagNode)
-        } else {
-            if checkTagAxis(rootTagNode: rootTagNode){
-                sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.transform = rootTag
-            }
+        var simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+        // convert from April Tags conventions to Apple's (TODO: could this be done in one rotation?)
+        simdPose = simdPose.rotate(radians: Float.pi, 0, 1, 0)
+        simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
 
+        let tagNode: SCNNode
+        if let existingTagNode = sceneView.scene.rootNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
+             print("disable axis check")
+            // if true || checkTagAxis(rootTagNode: rootTagNode){
+            existingTagNode.transform = SCNMatrix4(cameraTransform*simdPose)
+            //}
+            tagNode = existingTagNode
+        } else {
+            tagNode = SCNNode()
+            tagNode.transform = SCNMatrix4(cameraTransform*simdPose)
+            tagNode.geometry = SCNBox(width: 0.165, height: 0.165, length: 0.05, chamferRadius: 0)
+            tagNode.name = "Tag_\(String(tag.number))"
+            tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
+            sceneView.scene.rootNode.addChildNode(tagNode)
         }
-        
         
         /// Adds axes to the tag to aid in the visualization
         let xAxis = SCNNode(geometry: SCNBox(width: 1.0, height: 0.1, length: 0.1, chamferRadius: 0))
@@ -314,15 +308,13 @@ class ViewController: UIViewController {
         let zAxis = SCNNode(geometry: SCNBox(width: 0.1, height: 0.1, length: 1.0, chamferRadius: 0))
         zAxis.position = SCNVector3.init(0, 0, 1)
         zAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
-        sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.addChildNode(xAxis)
-        sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.addChildNode(yAxis)
-        sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.addChildNode(zAxis)
+        tagNode.addChildNode(xAxis)
+        tagNode.addChildNode(yAxis)
+        tagNode.addChildNode(zAxis)
 
-        let quat2 = sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.orientation
-        let trans2 = sceneView.scene.rootNode.childNode(withName: "Tag_\(num)", recursively: false)?.position
-        let tagPose = [trans2?.x, trans2?.y, trans2?.z, quat2?.x, quat2?.y, quat2?.z, quat2?.w]
+        let tagPose = [tagNode.position.x, tagNode.position.y, tagNode.position.z, tagNode.orientation.x, tagNode.orientation.y, tagNode.orientation.z, tagNode.orientation.w]
         
-        aprilTagDetectionDictionary[Int(tag.number)] = tagPose as? [Float]
+        aprilTagDetectionDictionary[Int(tag.number)] = tagPose
     }
     
     /// Rotates an image clockwise by a given angle

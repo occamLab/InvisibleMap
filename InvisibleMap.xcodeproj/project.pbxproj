@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5C8C09F073123A79542121DA /* Pods_InvisibleMapTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */; };
+		82A8259F24B3854000AFC390 /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
 		86112CCD211B805300736960 /* ChooseMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86112CCC211B805300736960 /* ChooseMapViewController.swift */; };
 		86112CD3211B837200736960 /* ChooseMapTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */; };
 		8630963C21125E89003D4434 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8630963B21125E89003D4434 /* opencv2.framework */; };
@@ -38,6 +39,7 @@
 
 /* Begin PBXFileReference section */
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		82A8259E24B3854000AFC390 /* simd+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "simd+ext.swift"; sourceTree = "<group>"; };
 		86112CCC211B805300736960 /* ChooseMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseMapViewController.swift; sourceTree = "<group>"; };
 		86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseMapTableViewCell.swift; sourceTree = "<group>"; };
 		8630963B21125E89003D4434 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				868CBA4721133939007343B4 /* ImageDisplay.mm */,
 				86F3953E210FA42500F209EC /* AppDelegate.swift */,
 				86F39540210FA42500F209EC /* ViewController.swift */,
+				82A8259E24B3854000AFC390 /* simd+ext.swift */,
 				86F39542210FA42500F209EC /* Main.storyboard */,
 				86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */,
 				86F39545210FA42600F209EC /* Assets.xcassets */,
@@ -342,6 +345,7 @@
 				86F39541210FA42500F209EC /* ViewController.swift in Sources */,
 				868CBA4821133939007343B4 /* ImageConversion.mm in Sources */,
 				86F3953F210FA42500F209EC /* AppDelegate.swift in Sources */,
+				82A8259F24B3854000AFC390 /* simd+ext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
