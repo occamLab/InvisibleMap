@@ -84,40 +84,50 @@
     
     // reorder 3d points to conform with cv::SOLVEPNP_IPPE_SQUARE
     list_points3d = {list_points3d[3], list_points3d[2], list_points3d[1], list_points3d[0]};
-    bool correspondence = cv::solvePnP( list_points3d, list_points2d, A_matrix_, distCoeffs, rvec, tvec,
-                                        useExtrinsicGuess, cv::SOLVEPNP_IPPE_SQUARE);
+    cv::solvePnP( list_points3d, list_points2d, A_matrix_, distCoeffs, rvec, tvec, useExtrinsicGuess, cv::SOLVEPNP_IPPE_SQUARE);
 
     // Transforms Rotation Vector to Matrix
     Rodrigues(rvec, R_matrix_);
     t_matrix_ = tvec;
 
     // I know this is lame TODO: make it better
-    float tx = t_matrix_.at<float64_t>(0,0);
-    float ty = t_matrix_.at<float64_t>(1,0);
-    float tz = t_matrix_.at<float64_t>(2,0);
-    float R00 = R_matrix_.at<float64_t>(0,0);
-    float R01 = -R_matrix_.at<float64_t>(0,1);
-    float R02 = -R_matrix_.at<float64_t>(0,2);
-    float R10 = R_matrix_.at<float64_t>(1,0);
-    float R11 = -R_matrix_.at<float64_t>(1,1);
-    float R12 = -R_matrix_.at<float64_t>(1,2);
-    float R20 = R_matrix_.at<float64_t>(2,0);
-    float R21 = -R_matrix_.at<float64_t>(2,1);
-    float R22 = -R_matrix_.at<float64_t>(2,2);
+    april.poseData[0] = R_matrix_.at<float64_t>(0,0);
+    april.poseData[1] = -R_matrix_.at<float64_t>(0,1);
+    april.poseData[2] = -R_matrix_.at<float64_t>(0,2);
+    april.poseData[3] = t_matrix_.at<float64_t>(0,0);
+    april.poseData[4] = R_matrix_.at<float64_t>(1,0);
+    april.poseData[5] = -R_matrix_.at<float64_t>(1,1);
+    april.poseData[6] = -R_matrix_.at<float64_t>(1,2);
+    april.poseData[7] = t_matrix_.at<float64_t>(1,0);;
+    april.poseData[8] = R_matrix_.at<float64_t>(2,0);
+    april.poseData[9] = -R_matrix_.at<float64_t>(2,1);
+    april.poseData[10] = -R_matrix_.at<float64_t>(2,2);
+    april.poseData[11] = t_matrix_.at<float64_t>(2,0);
 
-    april.poseData[0] = R00;
-    april.poseData[1] = R01;
-    april.poseData[2] = R02;
-    april.poseData[3] = tx;
-    april.poseData[4] = R10;
-    april.poseData[5] = R11;
-    april.poseData[6] = R12;
-    april.poseData[7] = ty;
-    april.poseData[8] = R20;
-    april.poseData[9] = R21;
-    april.poseData[10] = R22;
-    april.poseData[11] = tz;
+    // Compute covariance matrix of rotation and translation using approach outlined at this link: https://stackoverflow.com/questions/14559382/solvepnp-returns-wrong-result
+    cv::Mat K = cv::Mat::eye(3, 3, CV_64FC1);
+    K.at<float64_t>(0,0) = cam.get_K().getCol(0).data[0];
+    K.at<float64_t>(0,2) = cam.get_K().getCol(2).data[0];
+    K.at<float64_t>(1,1) = cam.get_K().getCol(1).data[1];
+    K.at<float64_t>(1,2) = cam.get_K().getCol(2).data[1];
 
+    cv::Mat J;
+    std::vector<cv::Point2f> p;
+    cv::projectPoints(list_points3d, rvec, t_matrix_, K, cv::Mat(), p, J);
+    cv::Mat Sigma = cv::Mat(J.t() * J, cv::Rect(0,0,6,6)).inv();
+    // Compute standard deviation
+    cv::Mat std_dev;
+    // NOTE: the first 3 components are the standard deviations of the elements of the rotation vector, and the remaining three are the elements of the translation vector
+    cv::sqrt(Sigma.diag(), std_dev);
+    april.rotVecStdDev[0] = Sigma.diag().at<float64_t>(0);
+    april.rotVecStdDev[1] = Sigma.diag().at<float64_t>(1);
+    april.rotVecStdDev[2] = Sigma.diag().at<float64_t>(2);
+
+    april.transVecStdDev[0] = Sigma.diag().at<float64_t>(3);
+    april.transVecStdDev[1] = Sigma.diag().at<float64_t>(4);
+    april.transVecStdDev[2] = Sigma.diag().at<float64_t>(5);
+    
+    std::cout << "rvec1, tvec1 standard deviation:" << std::endl << std_dev << std::endl;
     return april;
 }
 

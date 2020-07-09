@@ -163,7 +163,7 @@ class ViewController: UIViewController {
     func scheduledLocalizationTimer() {
         tagFinderTimer.invalidate()
         tagFinderTimer = Timer()
-        tagFinderTimer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(self.updateLandmarks), userInfo: nil, repeats: true)
+        tagFinderTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.updateLandmarks), userInfo: nil, repeats: true)
     }
     
     

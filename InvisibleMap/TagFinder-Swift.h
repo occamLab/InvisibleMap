@@ -19,6 +19,8 @@ struct AprilTags{
     int number;
     double poseData[16];
     double imagePoints[8];
+    double rotVecStdDev[3];
+    double transVecStdDev[3];
 };
 
 @property struct AprilTags april;
