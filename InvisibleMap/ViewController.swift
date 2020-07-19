@@ -17,24 +17,23 @@ import FirebaseStorage
 class AprilTagTracker {
     let id: Int
     var scenePositions: Array<simd_float3> = []
-    var sceneRotVecs: Array<simd_float3> = []
+    var sceneQuats: Array<simd_quatf> = []
     var scenePositionCovariances: Array<simd_float3x3> = []
-    var sceneRotVecCovariances: Array<simd_float3x3> = []
+    var sceneQuatCovariances: Array<simd_float4x4> = []
     private(set) var tagPosition = simd_float3()
     private(set) var tagOrientation = simd_quatf()
 
-    func updateTagPoseMeans(id: Int, detectedPosition: simd_float3, detectedPositionVar: simd_float3x3, detectedRotVec: simd_float3, detectedRotVecVar: simd_float3x3) {
+    func updateTagPoseMeans(id: Int, detectedPosition: simd_float3, detectedPositionVar: simd_float3x3, detectedQuat: simd_quatf, detectedQuatVar: simd_float4x4) {
         scenePositions.append(detectedPosition)
         scenePositionCovariances.append(detectedPositionVar)
-        sceneRotVecs.append(detectedRotVec)
-        sceneRotVecCovariances.append(detectedRotVecVar)
+        sceneQuats.append(detectedQuat)
+        sceneQuatCovariances.append(detectedQuatVar)
 
-        // unweighted average
+        // unweighted average for comparison
         let tagPositionUnweighted = scenePositions.reduce(simd_float3(), {x,y in x+(1.0/Float(scenePositions.count))*y})
         tagPosition = uncertaintyWeightedAverage(zs: scenePositions, sigmas: scenePositionCovariances)
         print("tagShift", tagPositionUnweighted - tagPosition)
-        // TODO: for sceneRotVecVar we need to map this onto the quaternion representation (detectedOrientationVar is not currrently properly populated)
-        tagOrientation = averageQuaternions(rotVecs: sceneRotVecs, rotVecCovariances: sceneRotVecCovariances)
+        tagOrientation = averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
     }
     
     func uncertaintyWeightedAverage(zs: Array<simd_float3>, sigmas: Array<simd_float3x3>)->simd_float3 {
@@ -52,49 +51,10 @@ class AprilTagTracker {
         return xhat_kk
     }
     
-    private func getRotVecToQuatJacobian(v: float3)->simd_float3x4 {
-        // L = ||v||
-        // u = sin(L/2)/L
-        // q_x = u*v.x
-        // q_y = u*v.y
-        // q_z = u*v.z
-        // q_w = cos(L/2)
-        let L = simd_length(v)
-        let u = sin(L/2)/L
-        let dL_dv = 1.0/L*v
-        let du_dL = cos(L/2)/2/L - sin(L/2)/pow(L,2)
-
-        // TODO: we are probably not handling the case of a rotation vector of all zeros
-        return simd_float3x4(columns: (
-            simd_float4(du_dL*dL_dv.x*v.x + u,
-                        du_dL*dL_dv.x*v.y,
-                        du_dL*dL_dv.x*v.z,
-                        -sin(L/2)/2*dL_dv.x),
-            simd_float4(du_dL*dL_dv.y*v.x,
-                        du_dL*dL_dv.y*v.y + u,
-                        du_dL*dL_dv.y*v.z,
-                        -sin(L/2)/2*dL_dv.y),
-            simd_float4(du_dL*dL_dv.z*v.x,
-                        du_dL*dL_dv.z*v.y,
-                        du_dL*dL_dv.z*v.z + u,
-                        -sin(L/2)/2*dL_dv.z)
-                                       )
-                             )
-    }
-    
-    private func averageQuaternions(rotVecs: Array<simd_float3>, rotVecCovariances: Array<simd_float3x3>)->simd_quatf {
-        // TODO: it will probably be easier to convert the rotVecCovariances into quaternion covariances and get rid of the EKF
-        
+    private func averageQuaternions(quats: Array<simd_quatf>, quatCovariances: Array<simd_float4x4>)->simd_quatf {
         var quatAverage = simd_quatf(vector: simd_float4(0, 0, 0, 1))  // initialize with no rotation
         var converged = false
-        var epsilons = Array<Float>.init(repeating: 1.0, count: rotVecs.count)
-        // TODO: handle 0 vectors
-        let quats = rotVecs.map({simd_quatf(angle: simd_length($0), axis: simd_normalize($0)) })
-        // use approach TT1 from ref: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.504.6597&rep=rep1&type=pdf
-        //let quatCovariances = zip(quats, rotVecCovariances).map({getRotVecToQuatJacobian(v: $0.0.toRotVec())*$0.1*getRotVecToQuatJacobian(v: $0.0.toRotVec()).transpose})
-        
-        // Using a very simple approach of setting covariances based on trace of the covariance matricecs for the rotation vectors TODO: revisit this and see if there is a better way
-        let quatCovariances = rotVecCovariances.map({simd_float4x4(diagonal: simd_float4($0.trace()))})
+        var epsilons = Array<Float>.init(repeating: 1.0, count: quats.count)
         while !converged {
             var xhat_kk = simd_quatf(angle: 0, axis: simd_float3(0, 0, 1)).vector
             var Pkk = matrix_identity_float4x4
@@ -111,7 +71,7 @@ class AprilTagTracker {
             converged = zip(epsilons, newEpsilons).reduce(true, {x,y in x && y.0 == y.1})
             epsilons = newEpsilons
         }
-        return quatAverage.normalized
+        return quatAverage
     }
 
     init(tagId: Int) {
@@ -420,7 +380,7 @@ class ViewController: UIViewController {
         generator.impactOccurred()
         let pose = tag.poseData
         let transStd = simd_float3(x: Float(tag.transVecStdDev.0), y: Float(tag.transVecStdDev.1), z: Float(tag.transVecStdDev.2))
-        let rotVecStd = simd_float3(x: Float(tag.rotVecStdDev.0), y: Float(tag.rotVecStdDev.1), z: Float(tag.rotVecStdDev.2))
+        let quatStd = simd_float4(x: Float(tag.quatStdDev.0), y: Float(tag.quatStdDev.1), z: Float(tag.quatStdDev.2), w: Float(tag.quatStdDev.3))
 
         var simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
         
@@ -442,21 +402,28 @@ class ViewController: UIViewController {
             scenePose = scenePose*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
             axisMapping = axisMapping*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
         }
-        let transVarHomogenous = simd_float4x4(diagonal: simd_float4(pow(transStd.x, 2), pow(transStd.y, 2), pow(transStd.z, 2), 1))
-        let rotVecVarHomogenous = simd_float4x4(diagonal: simd_float4(pow(rotVecStd.x, 2), pow(rotVecStd.y, 2), pow(rotVecStd.z, 2), 1))
         
+
+        let transVarHomogenous = simd_float4x4(diagonal: simd_float4(pow(transStd.x, 2), pow(transStd.y, 2), pow(transStd.z, 2), 1))
+        let quatVar = simd_float4x4(diagonal: simd_float4(pow(quatStd.x, 2), pow(quatStd.y, 2), pow(quatStd.z, 2), pow(quatStd.w, 2)))
+        
+        let q = simd_quatf(axisMapping)
+
+        let quatMultiplyAsLinearTransform =
+            simd_float4x4(columns: (simd_float4(q.vector.w, q.vector.z, -q.vector.y, -q.vector.x),
+                                    simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
+                                    simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
+                                    simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
         let sceneTransVar = axisMapping*transVarHomogenous*axisMapping.transpose
-        // TODO: this is not connected to the orientation of the quaternion
-        let sceneRotVecVar = axisMapping*rotVecVarHomogenous*axisMapping.transpose
+        let sceneQuatVar = quatMultiplyAsLinearTransform*quatVar*quatMultiplyAsLinearTransform.transpose
 
         let scenePoseQuat = simd_quatf(scenePose.getRot())
-        let scenePoseRotVec = scenePoseQuat.toRotVec()
         let scenePoseTranslation = scenePose.getTrans()
         let aprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(tagId: Int(tag.number))]
         aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
 
         // TODO: need some sort of logic to discard old detections
-        aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar.getUpper3x3(), detectedRotVec: scenePoseRotVec, detectedRotVecVar: sceneRotVecVar.getUpper3x3())
+        aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar.getUpper3x3(), detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar)
         
         print(aprilTagTracker.tagOrientation)
         
@@ -479,14 +446,14 @@ class ViewController: UIViewController {
         }
         
         /// Adds axes to the tag to aid in the visualization
-        let xAxis = SCNNode(geometry: SCNBox(width: 1.0, height: 0.1, length: 0.1, chamferRadius: 0))
-        xAxis.position = SCNVector3.init(1, 0, 0)
+        let xAxis = SCNNode(geometry: SCNBox(width: 1.0, height: 0.05, length: 0.05, chamferRadius: 0))
+        xAxis.position = SCNVector3.init(0.75, 0, 0)
         xAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.red
-        let yAxis = SCNNode(geometry: SCNBox(width: 0.1, height: 1.0, length: 0.1, chamferRadius: 0))
-        yAxis.position = SCNVector3.init(0, 1, 0)
+        let yAxis = SCNNode(geometry: SCNBox(width: 0.05, height: 1.0, length: 0.05, chamferRadius: 0))
+        yAxis.position = SCNVector3.init(0, 0.75, 0)
         yAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.green
-        let zAxis = SCNNode(geometry: SCNBox(width: 0.1, height: 0.1, length: 1.0, chamferRadius: 0))
-        zAxis.position = SCNVector3.init(0, 0, 1)
+        let zAxis = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 1.0, chamferRadius: 0))
+        zAxis.position = SCNVector3.init(0, 0, 0.75)
         zAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
         tagNode.addChildNode(xAxis)
         tagNode.addChildNode(yAxis)
