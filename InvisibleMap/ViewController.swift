@@ -43,6 +43,9 @@ class AprilTagTracker {
             return float3(Float.nan, Float.nan, Float.nan)
         }
         for i in 1..<zs.count {
+            // Qk is the process noise.  Let's assume that there is a small drift of the tag position in the map frame over time
+            let Qk = matrix_identity_float3x3*1e-5
+            Pkk = Pkk + Qk;
             let Kk = Pkk*(Pkk + sigmas[i]).inverse
             Pkk = (matrix_identity_float3x3 - Kk)*Pkk
             xhat_kk = xhat_kk + Kk*(zs[i] - xhat_kk)
@@ -60,6 +63,9 @@ class AprilTagTracker {
             
             let epsilonTimesQuats = zip(quats, epsilons).map { $0.0*$0.1 }
             for (epsilonTimesQuat, quatCovariance) in zip(epsilonTimesQuats, quatCovariances) {
+                // Qk is the process noise.  Let's assume that there is a small drift of the tag orientation in the map frame over time
+                let Qk = matrix_identity_float4x4*1e-5
+                Pkk = Pkk + Qk;
                 let Kk = Pkk*(Pkk + quatCovariance).inverse
                 Pkk = (matrix_identity_float4x4 - Kk)*Pkk
                 xhat_kk = xhat_kk + Kk*(epsilonTimesQuat.vector - xhat_kk)

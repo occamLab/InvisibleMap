@@ -54,6 +54,7 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
 //! [return specificied april tag detected in an image]
 // int index = <the specified april tag to return>
 - (AprilTags)getTagAtIndex:(int)index {
+    float tagCornerNoiseStdDev = 3.0;        // This is the assumed standard deviation of April Tag detector.  This will square the covariance marices by tagCornerNoisestdDev^2
     april.number = detector->getTagsId()[index];
     for(unsigned int i=0; i < 4; i++) {
         for(unsigned int j=0; j < 4; j++) {
@@ -153,7 +154,7 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
             double yDeriv = (pPos[j].y - pNeg[j].y)/(2*step);
             totalDeriv += xDeriv*xDeriv + yDeriv*yDeriv;
         }
-        april.quatStdDev[i] = sqrt(1.0/totalDeriv);
+        april.quatStdDev[i] = sqrt(1.0/totalDeriv)*tagCornerNoiseStdDev;
     }
     std::vector<cv::Point2f> p;
     cv::projectPoints(list_points3d, rvec, t_matrix_, K, cv::Mat(), p, J);
@@ -185,9 +186,8 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
     
      // Detect AprilTag
      vpDetectorAprilTag::vpPoseEstimationMethod poseEstimationMethod = vpDetectorAprilTag::HOMOGRAPHY_VIRTUAL_VS;
-    double tagSize = 0.12065; // Size of 8.5x11" printed april tags
-     //double tagSize = 0.175; // Size of OccamLab april tags
-     float quad_decimate = 3.0;
+     double tagSize = 0.12065; // Size of 8.5x11" printed april tags
+     float quad_decimate = 2.0;
      int nThreads = 1;
     
      // Set camera parameters
