@@ -28,11 +28,7 @@ class AprilTagTracker {
         scenePositionCovariances.append(detectedPositionVar)
         sceneQuats.append(detectedQuat)
         sceneQuatCovariances.append(detectedQuatVar)
-
-        // unweighted average for comparison
-        let tagPositionUnweighted = scenePositions.reduce(simd_float3(), {x,y in x+(1.0/Float(scenePositions.count))*y})
         tagPosition = uncertaintyWeightedAverage(zs: scenePositions, sigmas: scenePositionCovariances)
-        print("tagShift", tagPositionUnweighted - tagPosition)
         tagOrientation = averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
     }
     
@@ -40,6 +36,9 @@ class AprilTagTracker {
         // Strategy is to use the Kalman equations (https://en.wikipedia.org/wiki/Kalman_filter#Predict) with F_k set to identity, H_k set to identity, Q_k set to zero matix, R_k set to sigmas[k]
         // TODO: allow incremental updating to save time
         // TODO: this might be numerically unstable when we have a lot of measurements
+        // DEBUG: this seems to drift all over the place when tag is far from origin
+        // DEBUG: I think it's fixed now.   Need to test more.
+        
         guard var xhat_kk = zs.first, var Pkk = sigmas.first else {
             return float3(Float.nan, Float.nan, Float.nan)
         }
@@ -404,7 +403,7 @@ class ViewController: UIViewController {
         }
         
 
-        let transVarHomogenous = simd_float4x4(diagonal: simd_float4(pow(transStd.x, 2), pow(transStd.y, 2), pow(transStd.z, 2), 1))
+        let transVar = simd_float3x3(diagonal: simd_float3(pow(transStd.x, 2), pow(transStd.y, 2), pow(transStd.z, 2)))
         let quatVar = simd_float4x4(diagonal: simd_float4(pow(quatStd.x, 2), pow(quatStd.y, 2), pow(quatStd.z, 2), pow(quatStd.w, 2)))
         
         let q = simd_quatf(axisMapping)
@@ -414,7 +413,7 @@ class ViewController: UIViewController {
                                     simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
                                     simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
                                     simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
-        let sceneTransVar = axisMapping*transVarHomogenous*axisMapping.transpose
+        let sceneTransVar = axisMapping.getUpper3x3()*transVar*axisMapping.getUpper3x3().transpose
         let sceneQuatVar = quatMultiplyAsLinearTransform*quatVar*quatMultiplyAsLinearTransform.transpose
 
         let scenePoseQuat = simd_quatf(scenePose.getRot())
@@ -422,8 +421,8 @@ class ViewController: UIViewController {
         let aprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(tagId: Int(tag.number))]
         aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
 
-        // TODO: need some sort of logic to discard old detections
-        aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar.getUpper3x3(), detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar)
+        // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
+        aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar)
         
         print(aprilTagTracker.tagOrientation)
         

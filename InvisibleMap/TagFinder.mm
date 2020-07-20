@@ -170,7 +170,6 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
     april.transVecStdDev[1] = Sigma.diag().at<float64_t>(4);
     april.transVecStdDev[2] = Sigma.diag().at<float64_t>(5);
     
-    std::cout << "rvec1, tvec1 standard deviation:" << std::endl << std_dev << std::endl;
     return april;
 }
 
