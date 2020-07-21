@@ -14,6 +14,76 @@ import FirebaseDatabase
 import FirebaseStorage
 
 
+class AprilTagTracker {
+    let id: Int
+    var scenePositions: Array<simd_float3> = []
+    var sceneQuats: Array<simd_quatf> = []
+    var scenePositionCovariances: Array<simd_float3x3> = []
+    var sceneQuatCovariances: Array<simd_float4x4> = []
+    private(set) var tagPosition = simd_float3()
+    private(set) var tagOrientation = simd_quatf()
+
+    func updateTagPoseMeans(id: Int, detectedPosition: simd_float3, detectedPositionVar: simd_float3x3, detectedQuat: simd_quatf, detectedQuatVar: simd_float4x4) {
+        scenePositions.append(detectedPosition)
+        scenePositionCovariances.append(detectedPositionVar)
+        sceneQuats.append(detectedQuat)
+        sceneQuatCovariances.append(detectedQuatVar)
+        tagPosition = uncertaintyWeightedAverage(zs: scenePositions, sigmas: scenePositionCovariances)
+        tagOrientation = averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
+    }
+    
+    func uncertaintyWeightedAverage(zs: Array<simd_float3>, sigmas: Array<simd_float3x3>)->simd_float3 {
+        // Strategy is to use the Kalman equations (https://en.wikipedia.org/wiki/Kalman_filter#Predict) with F_k set to identity, H_k set to identity, Q_k set to zero matix, R_k set to sigmas[k]
+        // TODO: allow incremental updating to save time
+        // TODO: this might be numerically unstable when we have a lot of measurements
+        // DEBUG: this seems to drift all over the place when tag is far from origin
+        // DEBUG: I think it's fixed now.   Need to test more.
+        
+        guard var xhat_kk = zs.first, var Pkk = sigmas.first else {
+            return float3(Float.nan, Float.nan, Float.nan)
+        }
+        for i in 1..<zs.count {
+            // Qk is the process noise.  Let's assume that there is a small drift of the tag position in the map frame over time
+            let Qk = matrix_identity_float3x3*1e-5
+            Pkk = Pkk + Qk;
+            let Kk = Pkk*(Pkk + sigmas[i]).inverse
+            Pkk = (matrix_identity_float3x3 - Kk)*Pkk
+            xhat_kk = xhat_kk + Kk*(zs[i] - xhat_kk)
+        }
+        return xhat_kk
+    }
+    
+    private func averageQuaternions(quats: Array<simd_quatf>, quatCovariances: Array<simd_float4x4>)->simd_quatf {
+        var quatAverage = simd_quatf(vector: simd_float4(0, 0, 0, 1))  // initialize with no rotation
+        var converged = false
+        var epsilons = Array<Float>.init(repeating: 1.0, count: quats.count)
+        while !converged {
+            var xhat_kk = simd_quatf(angle: 0, axis: simd_float3(0, 0, 1)).vector
+            var Pkk = matrix_identity_float4x4
+            
+            let epsilonTimesQuats = zip(quats, epsilons).map { $0.0*$0.1 }
+            for (epsilonTimesQuat, quatCovariance) in zip(epsilonTimesQuats, quatCovariances) {
+                // Qk is the process noise.  Let's assume that there is a small drift of the tag orientation in the map frame over time
+                let Qk = matrix_identity_float4x4*1e-5
+                Pkk = Pkk + Qk;
+                let Kk = Pkk*(Pkk + quatCovariance).inverse
+                Pkk = (matrix_identity_float4x4 - Kk)*Pkk
+                xhat_kk = xhat_kk + Kk*(epsilonTimesQuat.vector - xhat_kk)
+            }
+
+            quatAverage = simd_quatf(vector: xhat_kk).normalized
+            let newEpsilons = zip(epsilonTimesQuats, epsilons).map { simd_length($0.0 - quatAverage) < simd_length(-$0.0 - quatAverage) ? $0.1 : -$0.1 }
+            converged = zip(epsilons, newEpsilons).reduce(true, {x,y in x && y.0 == y.1})
+            epsilons = newEpsilons
+        }
+        return quatAverage
+    }
+
+    init(tagId: Int) {
+        id = tagId
+    }
+}
+
 /// The view controller for displaying a map and announcing waypoints
 class ViewController: UIViewController {
     
@@ -22,7 +92,7 @@ class ViewController: UIViewController {
     var myMap: Map!
     var mapNode: SCNNode!
     var cameraNode: SCNNode!
-    var aprilTagDetectionDictionary = Dictionary<Int, Array<Float>>()
+    var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
     var tagDictionary = [Int:ViewController.Map.Vertex]()
     var waypointDictionary = [Int:ViewController.Map.WaypointVertex]()
     var waypointKeyDictionary = [String:Int]()
@@ -39,6 +109,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var tagDebugging: UIImageView!
     var tagFinderTimer = Timer()
     
+    /// Speech synthesis objects (reuse these or memory will leak)
+    let synth = AVSpeechSynthesizer()
+    let voice = AVSpeechSynthesisVoice(language: "en-US")
+    var lastSpeechTime : [Int:Date] = [:]
 
     let f = imageToData()
     var isProcessingFrame = false
@@ -123,21 +197,25 @@ class ViewController: UIViewController {
     /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
     func detectNearbyWaypoints(){
         let curr_pose = cameraNode.position
+        var potentialAnnouncements : [Int:(String, Double)] = [:]
         for count in waypointDictionary.keys{
-            if mapNode.childNode(withName: "Waypoint_" + (waypointDictionary[count]?.id)!, recursively: false) != nil{
-                let waypoint_pose_map = mapNode.childNode(withName: "Waypoint_" + (waypointDictionary[count]?.id)!, recursively: false)?.position
-                let waypoint_pose = sceneView.scene.rootNode.convertPosition(waypoint_pose_map!, from: mapNode)
+            if let waypointName = waypointDictionary[count]?.id, let waypointNode = mapNode.childNode(withName: "Waypoint_" + waypointName, recursively: false) {
+                let waypoint_pose = sceneView.scene.rootNode.convertPosition(waypointNode.position, from: mapNode)
                 let distanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2) + pow((waypoint_pose.z - curr_pose.z),2))
-                if distanceToCurrPose < distanceToWaypoint{
+                if distanceToCurrPose < distanceToWaypoint, (lastSpeechTime[count] ?? Date.distantPast).timeIntervalSinceNow < -5.0, !synth.isSpeaking {
                     let twoDimensionalDistanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2))
-                    let announcement: String = (waypointDictionary[count]?.id)! + " is " + String(format: "%.1f", twoDimensionalDistanceToCurrPose) + " meters away."
-                    let utterance = AVSpeechUtterance(string: announcement)
-                    utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                    let synth = AVSpeechSynthesizer()
-                    synth.speak(utterance)
+                    let announcement: String = waypointName + " is " + String(format: "%.1f", twoDimensionalDistanceToCurrPose) + " meters away."
+                    potentialAnnouncements[count] = (announcement, (lastSpeechTime[count] ?? Date.distantPast).timeIntervalSinceNow)
+                }
             }
-            
-            }
+        }
+        // If multiple announcements are possible, pick the one that was least recently spoken
+        let leastRecentlyAnnounced = potentialAnnouncements.min { a, b in a.value.1 < b.value.1 }
+        if let leastRecentlyAnnounced = leastRecentlyAnnounced {
+            let utterance = AVSpeechUtterance(string: leastRecentlyAnnounced.value.0)
+            utterance.voice = voice
+            lastSpeechTime[leastRecentlyAnnounced.key] = Date()
+            synth.speak(utterance)
         }
     }
     
@@ -307,38 +385,73 @@ class ViewController: UIViewController {
         }
     }
     
-    
     /// Adds or updates a tag node when a tag is detected
     ///
     /// - Parameter tag: the april tag detected by the visual servoing platform
     func addTagDetectionNode(tag: AprilTags, cameraTransform: simd_float4x4) {
-        // TODO: for debugging make an impact
         let generator = UIImpactFeedbackGenerator(style: .heavy)
         generator.impactOccurred()
         let pose = tag.poseData
+        let transStd = simd_float3(x: Float(tag.transVecStdDev.0), y: Float(tag.transVecStdDev.1), z: Float(tag.transVecStdDev.2))
+        let quatStd = simd_float4(x: Float(tag.quatStdDev.0), y: Float(tag.quatStdDev.1), z: Float(tag.quatStdDev.2), w: Float(tag.quatStdDev.3))
+
         var simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+        
+        // the axis mapping is used to figure out how the standard deviations should map to the global coordinate system
+        var axisMapping = matrix_identity_float4x4
+        
+        axisMapping = axisMapping.rotate(radians: Float.pi, 0, 1, 0)
+        axisMapping = axisMapping.rotate(radians: Float.pi, 0, 0, 1)
+        
         // convert from April Tags conventions to Apple's (TODO: could this be done in one rotation?)
         simdPose = simdPose.rotate(radians: Float.pi, 0, 1, 0)
         simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
         var scenePose = cameraTransform*simdPose
+        axisMapping = cameraTransform*axisMapping
+
         if snapTagsToVertical {
             let angleAdjustment = atan2(scenePose.columns.2.y, scenePose.columns.1.y)
             // perform an intrinsic rotation about the x-axis to make sure the z-axis of the tag is flat with respect to gravity
             scenePose = scenePose*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
+            axisMapping = axisMapping*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
         }
+        
+
+        let transVar = simd_float3x3(diagonal: simd_float3(pow(transStd.x, 2), pow(transStd.y, 2), pow(transStd.z, 2)))
+        let quatVar = simd_float4x4(diagonal: simd_float4(pow(quatStd.x, 2), pow(quatStd.y, 2), pow(quatStd.z, 2), pow(quatStd.w, 2)))
+        
+        let q = simd_quatf(axisMapping)
+
+        let quatMultiplyAsLinearTransform =
+            simd_float4x4(columns: (simd_float4(q.vector.w, q.vector.z, -q.vector.y, -q.vector.x),
+                                    simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
+                                    simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
+                                    simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
+        let sceneTransVar = axisMapping.getUpper3x3()*transVar*axisMapping.getUpper3x3().transpose
+        let sceneQuatVar = quatMultiplyAsLinearTransform*quatVar*quatMultiplyAsLinearTransform.transpose
+
+        let scenePoseQuat = simd_quatf(scenePose.getRot())
+        let scenePoseTranslation = scenePose.getTrans()
+        let aprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(tagId: Int(tag.number))]
+        aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
+
+        // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
+        aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar)
+        
+        print(aprilTagTracker.tagOrientation)
+        
         DispatchQueue.main.async {
             self.axisDebugging.text = String(format: "%f, %f, %f", scenePose.columns.2.x, scenePose.columns.2.y, scenePose.columns.2.z)
         }
         let tagNode: SCNNode
         if let existingTagNode = sceneView.scene.rootNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
-             print("disable axis check")
-            // if true || checkTagAxis(rootTagNode: rootTagNode){
-            existingTagNode.transform = SCNMatrix4(scenePose)
-            //}
             tagNode = existingTagNode
+            tagNode.simdPosition = aprilTagTracker.tagPosition
+            tagNode.simdOrientation = aprilTagTracker.tagOrientation
         } else {
             tagNode = SCNNode()
-            tagNode.transform = SCNMatrix4(scenePose)
+            tagNode.simdPosition = aprilTagTracker.tagPosition
+            tagNode.simdOrientation = aprilTagTracker.tagOrientation
             tagNode.geometry = SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0)
             tagNode.name = "Tag_\(String(tag.number))"
             tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
@@ -346,22 +459,18 @@ class ViewController: UIViewController {
         }
         
         /// Adds axes to the tag to aid in the visualization
-        let xAxis = SCNNode(geometry: SCNBox(width: 1.0, height: 0.1, length: 0.1, chamferRadius: 0))
-        xAxis.position = SCNVector3.init(1, 0, 0)
+        let xAxis = SCNNode(geometry: SCNBox(width: 1.0, height: 0.05, length: 0.05, chamferRadius: 0))
+        xAxis.position = SCNVector3.init(0.75, 0, 0)
         xAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.red
-        let yAxis = SCNNode(geometry: SCNBox(width: 0.1, height: 1.0, length: 0.1, chamferRadius: 0))
-        yAxis.position = SCNVector3.init(0, 1, 0)
+        let yAxis = SCNNode(geometry: SCNBox(width: 0.05, height: 1.0, length: 0.05, chamferRadius: 0))
+        yAxis.position = SCNVector3.init(0, 0.75, 0)
         yAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.green
-        let zAxis = SCNNode(geometry: SCNBox(width: 0.1, height: 0.1, length: 1.0, chamferRadius: 0))
-        zAxis.position = SCNVector3.init(0, 0, 1)
+        let zAxis = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 1.0, chamferRadius: 0))
+        zAxis.position = SCNVector3.init(0, 0, 0.75)
         zAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
         tagNode.addChildNode(xAxis)
         tagNode.addChildNode(yAxis)
         tagNode.addChildNode(zAxis)
-
-        let tagPose = [tagNode.position.x, tagNode.position.y, tagNode.position.z, tagNode.orientation.x, tagNode.orientation.y, tagNode.orientation.z, tagNode.orientation.w]
-        
-        aprilTagDetectionDictionary[Int(tag.number)] = tagPose
     }
 
     /// Updates the root to map transform if a tag currently being detected exists in the map

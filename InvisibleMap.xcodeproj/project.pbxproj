@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5C8C09F073123A79542121DA /* Pods_InvisibleMapTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */; };
 		82A8259F24B3854000AFC390 /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
 		86112CCD211B805300736960 /* ChooseMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86112CCC211B805300736960 /* ChooseMapViewController.swift */; };
 		86112CD3211B837200736960 /* ChooseMapTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */; };
@@ -23,19 +22,8 @@
 		86F39544210FA42500F209EC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39542210FA42500F209EC /* Main.storyboard */; };
 		86F39546210FA42600F209EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86F39545210FA42600F209EC /* Assets.xcassets */; };
 		86F39549210FA42600F209EC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39547210FA42600F209EC /* LaunchScreen.storyboard */; };
-		86F39554210FA42600F209EC /* InvisibleMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F39553210FA42600F209EC /* InvisibleMapTests.swift */; };
 		C083FDE9792A57723D51077F /* Pods_InvisibleMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		86F39550210FA42600F209EC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 86F39533210FA42500F209EC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 86F3953A210FA42500F209EC;
-			remoteInfo = InvisibleMap;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -60,7 +48,6 @@
 		86F39545210FA42600F209EC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		86F39548210FA42600F209EC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		86F3954A210FA42600F209EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		86F3954F210FA42600F209EC /* InvisibleMapTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InvisibleMapTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		86F39553210FA42600F209EC /* InvisibleMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapTests.swift; sourceTree = "<group>"; };
 		86F39555210FA42600F209EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8833ECE2D199509ED373632C /* Pods-InvisibleMapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapTests/Pods-InvisibleMapTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -78,14 +65,6 @@
 				86616BC52113369200DD565C /* visp3.framework in Frameworks */,
 				8630963C21125E89003D4434 /* opencv2.framework in Frameworks */,
 				C083FDE9792A57723D51077F /* Pods_InvisibleMap.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		86F3954C210FA42600F209EC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5C8C09F073123A79542121DA /* Pods_InvisibleMapTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,7 +97,6 @@
 			isa = PBXGroup;
 			children = (
 				86F3953B210FA42500F209EC /* InvisibleMap.app */,
-				86F3954F210FA42600F209EC /* InvisibleMapTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -190,25 +168,6 @@
 			productReference = 86F3953B210FA42500F209EC /* InvisibleMap.app */;
 			productType = "com.apple.product-type.application";
 		};
-		86F3954E210FA42600F209EC /* InvisibleMapTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 86F3955B210FA42600F209EC /* Build configuration list for PBXNativeTarget "InvisibleMapTests" */;
-			buildPhases = (
-				8FA5348F10592648300A6EFC /* [CP] Check Pods Manifest.lock */,
-				86F3954B210FA42600F209EC /* Sources */,
-				86F3954C210FA42600F209EC /* Frameworks */,
-				86F3954D210FA42600F209EC /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				86F39551210FA42600F209EC /* PBXTargetDependency */,
-			);
-			name = InvisibleMapTests;
-			productName = InvisibleMapTests;
-			productReference = 86F3954F210FA42600F209EC /* InvisibleMapTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -222,10 +181,6 @@
 					86F3953A210FA42500F209EC = {
 						CreatedOnToolsVersion = 9.4.1;
 						LastSwiftMigration = 0940;
-					};
-					86F3954E210FA42600F209EC = {
-						CreatedOnToolsVersion = 9.4.1;
-						TestTargetID = 86F3953A210FA42500F209EC;
 					};
 				};
 			};
@@ -243,7 +198,6 @@
 			projectRoot = "";
 			targets = (
 				86F3953A210FA42500F209EC /* InvisibleMap */,
-				86F3954E210FA42600F209EC /* InvisibleMapTests */,
 			);
 		};
 /* End PBXProject section */
@@ -257,13 +211,6 @@
 				86A84772210FA6440004C325 /* GoogleService-Info.plist in Resources */,
 				86F39546210FA42600F209EC /* Assets.xcassets in Resources */,
 				86F39544210FA42500F209EC /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		86F3954D210FA42600F209EC /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,24 +239,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-InvisibleMap/Pods-InvisibleMap-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8FA5348F10592648300A6EFC /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-InvisibleMapTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		EB6B1BFC2B9302FA0168C6DD /* [CP] Check Pods Manifest.lock */ = {
@@ -349,23 +278,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		86F3954B210FA42600F209EC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				86F39554210FA42600F209EC /* InvisibleMapTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		86F39551210FA42600F209EC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 86F3953A210FA42500F209EC /* InvisibleMap */;
-			targetProxy = 86F39550210FA42600F209EC /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		86F39542210FA42500F209EC /* Main.storyboard */ = {
@@ -570,50 +483,6 @@
 			};
 			name = Release;
 		};
-		86F3955C210FA42600F209EC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8833ECE2D199509ED373632C /* Pods-InvisibleMapTests.debug.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 787TUDMR8Q;
-				INFOPLIST_FILE = InvisibleMapTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMapTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InvisibleMap.app/InvisibleMap";
-			};
-			name = Debug;
-		};
-		86F3955D210FA42600F209EC /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F874C32660D9A94E1C916A75 /* Pods-InvisibleMapTests.release.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 787TUDMR8Q;
-				INFOPLIST_FILE = InvisibleMapTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMapTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InvisibleMap.app/InvisibleMap";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -631,15 +500,6 @@
 			buildConfigurations = (
 				86F39559210FA42600F209EC /* Debug */,
 				86F3955A210FA42600F209EC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		86F3955B210FA42600F209EC /* Build configuration list for PBXNativeTarget "InvisibleMapTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				86F3955C210FA42600F209EC /* Debug */,
-				86F3955D210FA42600F209EC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
