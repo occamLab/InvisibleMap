@@ -187,7 +187,7 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
      // Detect AprilTag
      vpDetectorAprilTag::vpPoseEstimationMethod poseEstimationMethod = vpDetectorAprilTag::HOMOGRAPHY_VIRTUAL_VS;
      double tagSize = 0.12065; // Size of 8.5x11" printed april tags
-     float quad_decimate = 2.0;
+     float quad_decimate = 3.0;
      int nThreads = 1;
     
      // Set camera parameters

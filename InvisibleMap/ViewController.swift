@@ -109,6 +109,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var tagDebugging: UIImageView!
     var tagFinderTimer = Timer()
     
+    /// Speech synthesis objects (reuse these or memory will leak)
+    let synth = AVSpeechSynthesizer()
+    let voice = AVSpeechSynthesisVoice(language: "en-US")
+    var lastSpeechTime : [Int:Date] = [:]
 
     let f = imageToData()
     var isProcessingFrame = false
@@ -193,21 +197,25 @@ class ViewController: UIViewController {
     /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
     func detectNearbyWaypoints(){
         let curr_pose = cameraNode.position
+        var potentialAnnouncements : [Int:(String, Double)] = [:]
         for count in waypointDictionary.keys{
-            if mapNode.childNode(withName: "Waypoint_" + (waypointDictionary[count]?.id)!, recursively: false) != nil{
-                let waypoint_pose_map = mapNode.childNode(withName: "Waypoint_" + (waypointDictionary[count]?.id)!, recursively: false)?.position
-                let waypoint_pose = sceneView.scene.rootNode.convertPosition(waypoint_pose_map!, from: mapNode)
+            if let waypointName = waypointDictionary[count]?.id, let waypointNode = mapNode.childNode(withName: "Waypoint_" + waypointName, recursively: false) {
+                let waypoint_pose = sceneView.scene.rootNode.convertPosition(waypointNode.position, from: mapNode)
                 let distanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2) + pow((waypoint_pose.z - curr_pose.z),2))
-                if distanceToCurrPose < distanceToWaypoint{
+                if distanceToCurrPose < distanceToWaypoint, (lastSpeechTime[count] ?? Date.distantPast).timeIntervalSinceNow < -5.0, !synth.isSpeaking {
                     let twoDimensionalDistanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2))
-                    let announcement: String = (waypointDictionary[count]?.id)! + " is " + String(format: "%.1f", twoDimensionalDistanceToCurrPose) + " meters away."
-                    let utterance = AVSpeechUtterance(string: announcement)
-                    utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                    let synth = AVSpeechSynthesizer()
-                    synth.speak(utterance)
+                    let announcement: String = waypointName + " is " + String(format: "%.1f", twoDimensionalDistanceToCurrPose) + " meters away."
+                    potentialAnnouncements[count] = (announcement, (lastSpeechTime[count] ?? Date.distantPast).timeIntervalSinceNow)
+                }
             }
-            
-            }
+        }
+        // If multiple announcements are possible, pick the one that was least recently spoken
+        let leastRecentlyAnnounced = potentialAnnouncements.min { a, b in a.value.1 < b.value.1 }
+        if let leastRecentlyAnnounced = leastRecentlyAnnounced {
+            let utterance = AVSpeechUtterance(string: leastRecentlyAnnounced.value.0)
+            utterance.voice = voice
+            lastSpeechTime[leastRecentlyAnnounced.key] = Date()
+            synth.speak(utterance)
         }
     }
     
