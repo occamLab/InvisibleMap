@@ -1,0 +1,36 @@
+
+/* Class = "UIButton"; normalTitle = "Save Location"; ObjectID = "0zS-CR-G7o"; */
+"0zS-CR-G7o.normalTitle" = "Save Location";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "1JQ-mR-VPs"; */
+"1JQ-mR-VPs.text" = "Label";
+
+/* Class = "UINavigationItem"; title = "Main"; ObjectID = "3T2-xZ-qAk"; */
+"3T2-xZ-qAk.title" = "Main";
+
+/* Class = "UILabel"; text = "Hello, and Welcome to the April Tag Detector!"; ObjectID = "3ZM-4p-dPO"; */
+"3ZM-4p-dPO.text" = "Hello, and Welcome to the April Tag Detector!";
+
+/* Class = "UIButton"; normalTitle = "Get Location Info"; ObjectID = "GVg-5U-guA"; */
+"GVg-5U-guA.normalTitle" = "Get Location Info";
+
+/* Class = "UILabel"; text = "No Location Info"; ObjectID = "Ulm-4w-ciA"; */
+"Ulm-4w-ciA.text" = "No Location Info";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "agY-jh-mqA"; */
+"agY-jh-mqA.text" = "Label";
+
+/* Class = "UIButton"; normalTitle = "Manage Location List"; ObjectID = "lPg-Cp-1GN"; */
+"lPg-Cp-1GN.normalTitle" = "Manage Location List";
+
+/* Class = "UIButton"; normalTitle = "Enter Location Info"; ObjectID = "n2p-Sf-LRz"; */
+"n2p-Sf-LRz.normalTitle" = "Enter Location Info";
+
+/* Class = "UIButton"; normalTitle = "Start Recording"; ObjectID = "pG8-4h-oOJ"; */
+"pG8-4h-oOJ.normalTitle" = "Start Recording";
+
+/* Class = "UITextField"; placeholder = "Enter Location Name Here"; ObjectID = "smE-GQ-kMN"; */
+"smE-GQ-kMN.placeholder" = "Enter Location Name Here";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "znC-yk-QzW"; */
+"znC-yk-QzW.text" = "Label";

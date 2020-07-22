@@ -1,6 +1,0 @@
-framework module Pods_InvisibleMapTests {
-  umbrella header "Pods-InvisibleMapTests-umbrella.h"
-
-  export *
-  module * { export * }
-}

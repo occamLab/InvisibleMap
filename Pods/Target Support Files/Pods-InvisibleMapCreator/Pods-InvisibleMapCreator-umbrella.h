@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double Pods_InvisibleMapTestsVersionNumber;
-FOUNDATION_EXPORT const unsigned char Pods_InvisibleMapTestsVersionString[];
+FOUNDATION_EXPORT double Pods_InvisibleMapCreatorVersionNumber;
+FOUNDATION_EXPORT const unsigned char Pods_InvisibleMapCreatorVersionString[];
 
