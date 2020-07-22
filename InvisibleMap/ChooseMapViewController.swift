@@ -26,20 +26,24 @@ class ChooseMapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let storageRef = Storage.storage().reference()
-        let mapsRef = Database.database().reference(withPath: "maps")
+        let mapsRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference(withPath: "maps")
         mapsRef.observe(.childAdded) { (snapshot) -> Void in
             let values = snapshot.value as! [String: Any]
-            let imageRef = storageRef.child(values["image"] as! String)
-            imageRef.getData(maxSize: 10*1024*1024) { imageData, error in
-                if let error = error {
-                    print(error.localizedDescription)
-                    // Error occurred
-                } else {
-                    if let data = imageData {
-                        self.images.append(UIImage(data: data)!)
-                        self.files.append(values["map_file"] as! String)
-                        self.maps.append(snapshot.key)
-                        self.tableView.reloadData()
+            // only include in the list if it is processed
+            if let processedMapFile = values["map_file"] as? String {
+                // TODO: pick a sensible default image
+                let imageRef = storageRef.child((values["image"] as? String) ?? "olin_library.jpg")
+                imageRef.getData(maxSize: 10*1024*1024) { imageData, error in
+                    if let error = error {
+                        print(error.localizedDescription)
+                        // Error occurred
+                    } else {
+                        if let data = imageData {
+                            self.images.append(UIImage(data: data)!)
+                            self.files.append(processedMapFile)
+                            self.maps.append(snapshot.key)
+                            self.tableView.reloadData()
+                        }
                     }
                 }
             }
