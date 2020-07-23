@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C26609624C99ABB00D5406D /* EditInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C26609524C99ABB00D5406D /* EditInfoController.swift */; };
 		7AFFB8FB1F7230AC88C3A531 /* Pods_InvisibleMapCreator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */; };
 		82468A2824C88B6800FD31BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 82468A2724C88B6800FD31BC /* Assets.xcassets */; };
 		82468A2B24C88B6800FD31BC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 82468A2A24C88B6800FD31BC /* Preview Assets.xcassets */; };
@@ -44,6 +45,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0C26609524C99ABB00D5406D /* EditInfoController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditInfoController.swift; sourceTree = "<group>"; };
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		82468A1F24C88B6600FD31BC /* InvisibleMapCreator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisibleMapCreator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82468A2724C88B6800FD31BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 				82468A3A24C8901800FD31BC /* MainMapCreator.storyboard */,
 				82A567D224C893AF0066DA50 /* ViewController.swift */,
 				82A567D824C894640066DA50 /* ManageLocationController.swift */,
+				0C26609524C99ABB00D5406D /* EditInfoController.swift */,
 				82A567E524C89EAC0066DA50 /* AppDelegate.swift */,
 				82A567DA24C894930066DA50 /* SaveLocationController.swift */,
 				82468A2724C88B6800FD31BC /* Assets.xcassets */,
@@ -411,6 +414,7 @@
 				82A567D424C893FC0066DA50 /* main.m in Sources */,
 				82A567E624C89EAC0066DA50 /* AppDelegate.swift in Sources */,
 				82A567DD24C8976F0066DA50 /* simd+ext.swift in Sources */,
+				0C26609624C99ABB00D5406D /* EditInfoController.swift in Sources */,
 				82A567D724C8942D0066DA50 /* ImageConversion.mm in Sources */,
 				82A567D324C893AF0066DA50 /* ViewController.swift in Sources */,
 				82A567D924C894640066DA50 /* ManageLocationController.swift in Sources */,

@@ -20,7 +20,7 @@ class LocationTableViewCell: UITableViewCell {
     @IBOutlet weak var locationTextLabel: UILabel!
 }
 
-class ManageLocationController: UITableViewController {
+class ManageLocationController: UITableViewController, writeInfoBackDelegate {
     
     //List of locationData received from the main view
     var nodeList: [LocationData] = []
@@ -72,13 +72,39 @@ class ManageLocationController: UITableViewController {
         return true
     }
     
-    //enable deleting the cell by swiping
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            deleteNodeList.append(nodeList[indexPath.row])
-            nodeList.remove(at: indexPath.row)
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let delete = UIContextualAction(style: .destructive, title: "Delete", handler: {(action, view, completionHandler) in
+            self.deleteNodeList.append(self.nodeList[indexPath.row])
+            self.nodeList.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
+            completionHandler(true)
+        })
+        
+        let edit = UIContextualAction(style: .normal, title: "Edit", handler: {(action, view, completionHandler) in
+            self.performSegue(withIdentifier: "EditInfo", sender: self)
+            completionHandler(true)
+        })
+        
+        let place = UIContextualAction(style: .normal, title: "Place", handler: {(action, view, completionHandler) in
+            
+            completionHandler(true)
+        })
+        
+        let configuration = UISwipeActionsConfiguration(actions: [edit,place,delete])
+        return configuration
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "EditInfo" {
+            let editInfoController = segue.destination as! EditInfoController
+            editInfoController.delegate = self
         }
     }
+    
+    func writeValueBack(value: LocationData) {
+        print("check")
+    }
+    
 }
 
