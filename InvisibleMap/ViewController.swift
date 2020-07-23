@@ -103,10 +103,7 @@ class ViewController: UIViewController {
     /// We use the knowledge that the z-axis of the tag should be perpendicular to gravity to adjust the tag detection
     var snapTagsToVertical = true
     
-    @IBOutlet weak var axisDebugging: UILabel!
     @IBOutlet var sceneView: ARSCNView!
-    
-    @IBOutlet weak var tagDebugging: UIImageView!
     var tagFinderTimer = Timer()
     
     /// Speech synthesis objects (reuse these or memory will leak)
@@ -262,7 +259,40 @@ class ViewController: UIViewController {
         }
     }
 
-    
+    func createTagDebugImage(tagDetections: Array<AprilTags>, image:UIImage)->UIImage? {
+        // Create a context of the starting image size and set it as the current one
+        UIGraphicsBeginImageContext(image.size)
+        
+        // Draw the starting image in the current context as background
+        image.draw(at: CGPoint.zero)
+
+        // Get the current context
+        let context = UIGraphicsGetCurrentContext()!
+        context.setFillColor(UIColor.cyan.cgColor)
+        context.setAlpha(0.5)
+        context.setLineWidth(0.0)
+        let visualizationCirclesRadius = 10.0;
+        for tag in tagDetections {
+            // TODO: convert tuple to array to make this less janky (https://developer.apple.com/forums/thread/72120)
+            context.addEllipse(in: CGRect(x: Int(tag.imagePoints.0-visualizationCirclesRadius), y: Int(tag.imagePoints.1-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
+            context.drawPath(using: .fillStroke)
+
+            context.addEllipse(in: CGRect(x: Int(tag.imagePoints.2-visualizationCirclesRadius), y: Int(tag.imagePoints.3-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
+            context.drawPath(using: .fillStroke)
+
+            context.addEllipse(in: CGRect(x: Int(tag.imagePoints.4-visualizationCirclesRadius), y: Int(tag.imagePoints.5-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
+            context.drawPath(using: .fillStroke)
+
+            context.addEllipse(in: CGRect(x: Int(tag.imagePoints.6-visualizationCirclesRadius), y: Int(tag.imagePoints.7-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
+            context.drawPath(using: .fillStroke)
+        }
+        
+        // Save the context as a new UIImage
+        let myImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return myImage
+    }
+
     /// Processes the pose, april tags, and nearby waypoints.
     @objc func updateLandmarks() {
         if isProcessingFrame {
@@ -275,39 +305,6 @@ class ViewController: UIViewController {
                 let tagDetections = self.checkTagDetection(image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
                 self.detectNearbyWaypoints()
                 self.isProcessingFrame = false
-                DispatchQueue.main.async {
-                    // Create a context of the starting image size and set it as the current one
-                    UIGraphicsBeginImageContext(image.size)
-                    
-                    // Draw the starting image in the current context as background
-                    image.draw(at: CGPoint.zero)
-
-                    // Get the current context
-                    let context = UIGraphicsGetCurrentContext()!
-                    context.setFillColor(UIColor.cyan.cgColor)
-                    context.setAlpha(0.5)
-                    context.setLineWidth(0.0)
-                    let visualizationCirclesRadius = 10.0;
-                    for tag in tagDetections {
-                        // TODO: convert tuple to array to make this less janky (https://developer.apple.com/forums/thread/72120)
-                        context.addEllipse(in: CGRect(x: Int(tag.imagePoints.0-visualizationCirclesRadius), y: Int(tag.imagePoints.1-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
-                        context.drawPath(using: .fillStroke)
-
-                        context.addEllipse(in: CGRect(x: Int(tag.imagePoints.2-visualizationCirclesRadius), y: Int(tag.imagePoints.3-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
-                        context.drawPath(using: .fillStroke)
-
-                        context.addEllipse(in: CGRect(x: Int(tag.imagePoints.4-visualizationCirclesRadius), y: Int(tag.imagePoints.5-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
-                        context.drawPath(using: .fillStroke)
-
-                        context.addEllipse(in: CGRect(x: Int(tag.imagePoints.6-visualizationCirclesRadius), y: Int(tag.imagePoints.7-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
-                        context.drawPath(using: .fillStroke)
-                    }
-                    
-                    // Save the context as a new UIImage
-                    let myImage = UIGraphicsGetImageFromCurrentImageContext()
-                    UIGraphicsEndImageContext()
-                    self.tagDebugging.image = myImage
-                }
             }
         } else {
             isProcessingFrame = false
@@ -439,10 +436,6 @@ class ViewController: UIViewController {
         aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar)
         
         print(aprilTagTracker.tagOrientation)
-        
-        DispatchQueue.main.async {
-            self.axisDebugging.text = String(format: "%f, %f, %f", scenePose.columns.2.x, scenePose.columns.2.y, scenePose.columns.2.z)
-        }
         let tagNode: SCNNode
         if let existingTagNode = sceneView.scene.rootNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
             tagNode = existingTagNode

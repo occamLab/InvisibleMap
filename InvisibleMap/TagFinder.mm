@@ -107,25 +107,25 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
     t_matrix_ = tvec;
 
     // I know this is lame TODO: make it better
-    april.poseData[0] = R_matrix_.at<float64_t>(0,0);
-    april.poseData[1] = -R_matrix_.at<float64_t>(0,1);
-    april.poseData[2] = -R_matrix_.at<float64_t>(0,2);
-    april.poseData[3] = t_matrix_.at<float64_t>(0,0);
-    april.poseData[4] = R_matrix_.at<float64_t>(1,0);
-    april.poseData[5] = -R_matrix_.at<float64_t>(1,1);
-    april.poseData[6] = -R_matrix_.at<float64_t>(1,2);
-    april.poseData[7] = t_matrix_.at<float64_t>(1,0);;
-    april.poseData[8] = R_matrix_.at<float64_t>(2,0);
-    april.poseData[9] = -R_matrix_.at<float64_t>(2,1);
-    april.poseData[10] = -R_matrix_.at<float64_t>(2,2);
-    april.poseData[11] = t_matrix_.at<float64_t>(2,0);
+    april.poseData[0] = R_matrix_.at<double_t>(0,0);
+    april.poseData[1] = -R_matrix_.at<double_t>(0,1);
+    april.poseData[2] = -R_matrix_.at<double_t>(0,2);
+    april.poseData[3] = t_matrix_.at<double_t>(0,0);
+    april.poseData[4] = R_matrix_.at<double_t>(1,0);
+    april.poseData[5] = -R_matrix_.at<double_t>(1,1);
+    april.poseData[6] = -R_matrix_.at<double_t>(1,2);
+    april.poseData[7] = t_matrix_.at<double_t>(1,0);;
+    april.poseData[8] = R_matrix_.at<double_t>(2,0);
+    april.poseData[9] = -R_matrix_.at<double_t>(2,1);
+    april.poseData[10] = -R_matrix_.at<double_t>(2,2);
+    april.poseData[11] = t_matrix_.at<double_t>(2,0);
 
     // Compute covariance matrix of rotation and translation using approach outlined at this link: https://stackoverflow.com/questions/14559382/solvepnp-returns-wrong-result
     cv::Mat K = cv::Mat::eye(3, 3, CV_64FC1);
-    K.at<float64_t>(0,0) = cam.get_K().getCol(0).data[0];
-    K.at<float64_t>(0,2) = cam.get_K().getCol(2).data[0];
-    K.at<float64_t>(1,1) = cam.get_K().getCol(1).data[1];
-    K.at<float64_t>(1,2) = cam.get_K().getCol(2).data[1];
+    K.at<double_t>(0,0) = cam.get_K().getCol(0).data[0];
+    K.at<double_t>(0,2) = cam.get_K().getCol(2).data[0];
+    K.at<double_t>(1,1) = cam.get_K().getCol(1).data[1];
+    K.at<double_t>(1,2) = cam.get_K().getCol(2).data[1];
 
     cv::Mat J;
     
@@ -163,13 +163,13 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
     cv::Mat std_dev;
     // NOTE: the first 3 components are the standard deviations of the elements of the rotation vector, and the remaining three are the elements of the translation vector
     cv::sqrt(Sigma.diag(), std_dev);
-    april.rotVecStdDev[0] = Sigma.diag().at<float64_t>(0);
-    april.rotVecStdDev[1] = Sigma.diag().at<float64_t>(1);
-    april.rotVecStdDev[2] = Sigma.diag().at<float64_t>(2);
+    april.rotVecStdDev[0] = Sigma.diag().at<double_t>(0);
+    april.rotVecStdDev[1] = Sigma.diag().at<double_t>(1);
+    april.rotVecStdDev[2] = Sigma.diag().at<double_t>(2);
 
-    april.transVecStdDev[0] = Sigma.diag().at<float64_t>(3);
-    april.transVecStdDev[1] = Sigma.diag().at<float64_t>(4);
-    april.transVecStdDev[2] = Sigma.diag().at<float64_t>(5);
+    april.transVecStdDev[0] = Sigma.diag().at<double_t>(3);
+    april.transVecStdDev[1] = Sigma.diag().at<double_t>(4);
+    april.transVecStdDev[2] = Sigma.diag().at<double_t>(5);
     
     return april;
 }
