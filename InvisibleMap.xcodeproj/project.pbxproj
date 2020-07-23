@@ -479,7 +479,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator/Preview Content\"";
-				DEVELOPMENT_TEAM = 787TUDMR8Q;
+				DEVELOPMENT_TEAM = HH3FPP9PUS;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -507,7 +507,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator/Preview Content\"";
-				DEVELOPMENT_TEAM = 787TUDMR8Q;
+				DEVELOPMENT_TEAM = HH3FPP9PUS;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -650,7 +650,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 787TUDMR8Q;
+				DEVELOPMENT_TEAM = HH3FPP9PUS;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -669,7 +669,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMap;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMap2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "InvisibleMap/TagFinder-Swift.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -685,7 +685,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 787TUDMR8Q;
+				DEVELOPMENT_TEAM = HH3FPP9PUS;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -704,7 +704,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMap;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMap2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "InvisibleMap/TagFinder-Swift.h";
 				SWIFT_VERSION = 4.0;
