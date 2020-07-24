@@ -99,7 +99,6 @@
                                 <connections>
                                     <outlet property="mapName" destination="bL7-Tx-xuI" id="9iW-C9-ynf"/>
                                     <outlet property="mapPhoto" destination="8pd-7t-f57" id="X1K-7w-avs"/>
-                                    <segue destination="BYZ-38-t0r" kind="show" identifier="userSelectSegue" id="7mx-Th-vhh"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -109,6 +108,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="fTt-xX-dDY"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="show" identifier="userSelectSegue" id="1FM-Y9-YwB"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ShT-4G-NSl" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

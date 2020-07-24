@@ -115,15 +115,18 @@ class ViewController: UIViewController {
     var isProcessingFrame = false
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.invisiblemap", qos: DispatchQoS.userInitiated)
     
-    
-    /// Initializes the ARSession and downloads the selected map data from firebase
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewWillAppear(_ animated: Bool) {
         startSession()
         createMap()
     }
-    
-    
+
+    override func viewWillDisappear(_ animated: Bool) {
+        sceneView.scene.rootNode.enumerateChildNodes { (node, stop) in
+            node.removeFromParentNode()
+        }
+        sceneView.session.pause()
+        tagFinderTimer.invalidate()
+    }
     
     /// Initializes the map node, of which all of the tags and waypoints downloaded from firebase are children
     func createMapNode() {
@@ -186,7 +189,7 @@ class ViewController: UIViewController {
             waypointNode.addChildNode(textNode)
             waypointNode.name = String("Waypoint_\(vertex.id)")
             count = count + 1
-            
+            print(vertex.id)
         }
     }
     
@@ -435,7 +438,6 @@ class ViewController: UIViewController {
         // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
         aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar)
         
-        print(aprilTagTracker.tagOrientation)
         let tagNode: SCNNode
         if let existingTagNode = sceneView.scene.rootNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
             tagNode = existingTagNode
@@ -488,6 +490,8 @@ class ViewController: UIViewController {
             let tagToMap = SCNMatrix4Invert((mapNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform.transpose())!)
             let rootToMap = SCNMatrix4Mult(rootToTag, tagToMap)
             mapNode.transform = rootToMap.transpose()
+            // TODO: this correctly aligns the map, but breaks things like "snapToVertical" as well as our Kalman filtering.  We need something more robust, e.g., anchor points that would be updated whenever the world origin changes (the snap to route feature has something like this).
+            //sceneView.session.setWorldOrigin(relativeTransform: simd_float4x4(rootToMap.transpose()))
             mapNode.geometry = SCNBox(width: 0.25, height: 0.25, length: 0.25, chamferRadius: 0)
             mapNode.geometry?.firstMaterial?.diffuse.contents = UIColor.green
         }

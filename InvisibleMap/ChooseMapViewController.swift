@@ -29,7 +29,6 @@ class ChooseMapViewController: UITableViewController {
         mapsRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference(withPath: "maps")
         mapsRef.observe(.childAdded) { (snapshot) -> Void in
             self.processMap(key: snapshot.key, values: snapshot.value as! [String: Any])
-
         }
         mapsRef.observe(.childChanged) { (snapshot) -> Void in
             self.processMap(key: snapshot.key, values: snapshot.value as! [String: Any])
@@ -42,6 +41,16 @@ class ChooseMapViewController: UITableViewController {
                 self.tableView.reloadData()
             }
         }
+    }
+    
+    /// Handles the selection of a row in the table
+    ///
+    /// - Parameters:
+    ///   - tableView: the view for selecting a map
+    ///   - indexPath: the row selected by the user
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedRow = indexPath.row
+        performSegue(withIdentifier: "userSelectSegue", sender: self)
     }
     
     func processMap(key: String, values: [String: Any]) {
