@@ -137,14 +137,14 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
         std::vector<cv::Point2f> pPos, pNeg;
         cv::Matx41d quatNegStep = quat;
         quatNegStep(i) -= step;
-        // normalize the quaternion TODO: not sure that this is necessary to do.  It probably doesn't really matter
+        // normalize the quaternion TODO: not sure that this is necessary to do.  It probably makes sense for the interaction with g2o's MQT type (minimal quaternion)
         quatNegStep = quatNegStep*(1/sqrt(quatNegStep.dot(quatNegStep)));
         cv::Matx31d rvecNegStep = quaternionToRotvec(quatNegStep);
         cv::projectPoints(list_points3d, rvecNegStep, t_matrix_, K, cv::Mat(), pNeg);
 
         cv::Matx41d quatPosStep = quat;
         quatPosStep(i) += step;
-        // normalize the quaternion TODO: not sure that this is necessary to do.  It probably doesn't really matter
+        // normalize the quaternion TODO: not sure that this is necessary to do.  It probably makes sense for the interaction with g2o's MQT type (minimal quaternion)
         quatPosStep = quatPosStep*(1/sqrt(quatPosStep.dot(quatPosStep)));
         cv::Matx31d rvecPosStep = quaternionToRotvec(quatPosStep);
         cv::projectPoints(list_points3d, rvecPosStep, t_matrix_, K, cv::Mat(), pPos);
@@ -167,6 +167,7 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
     april.rotVecStdDev[1] = Sigma.diag().at<double_t>(1);
     april.rotVecStdDev[2] = Sigma.diag().at<double_t>(2);
 
+    // TODO: these values are super small (indicating high certainty).  I'm not sure if that makes much sense. Need to investigate.
     april.transVecStdDev[0] = Sigma.diag().at<double_t>(3);
     april.transVecStdDev[1] = Sigma.diag().at<double_t>(4);
     april.transVecStdDev[2] = Sigma.diag().at<double_t>(5);
