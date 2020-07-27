@@ -15,16 +15,19 @@ protocol writeInfoBackDelegate: class {
 
 class EditInfoController: UIViewController {
 
+    @IBOutlet var locationImage: UIImageView!
     // delegate to send data back
     weak var delegate: writeInfoBackDelegate?
     
+    var locationData: LocationData?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        locationImage.image = locationData!.picture
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    
 }
 

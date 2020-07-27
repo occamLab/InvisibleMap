@@ -128,7 +128,9 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     
     //move to manage location view when tapped
     @IBAction func manageButtonTapped(_ sender: Any) {
-        self.performSegue(withIdentifier: "LocationInfo", sender: self)
+        if isMovingBox == false {
+            self.performSegue(withIdentifier: "LocationInfo", sender: self)
+        }
     }
     
     // when moving to the other view, prepare delegate to get the data back
@@ -153,7 +155,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     
     // function called when dismissing the manage location view
     // updates the nodes according to how the user editted them
-    func writeNodeBack(nodes: [LocationData], deleteNodes: [LocationData]) {
+    func writeNodeBack(nodes: [LocationData], deleteNodes: [LocationData], replace: LocationData?) {
         nodeList = nodes
         for x in deleteNodes {
             x.node.removeFromParentNode()
@@ -163,6 +165,10 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
                     locationData.remove(at: index)
                 }
             }
+        }
+        if let replaceData = replace {
+            moveToButton.setTitle("Set Location", for: .normal)
+            addBox(locationName: replaceData.node.name!)
         }
     }
     

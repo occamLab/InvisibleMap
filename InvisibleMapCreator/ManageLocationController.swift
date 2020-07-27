@@ -11,7 +11,7 @@ import ARKit
 
 //protocol to send data back
 protocol writeNodeBackDelegate: class {
-    func writeNodeBack(nodes: [LocationData], deleteNodes: [LocationData])
+    func writeNodeBack(nodes: [LocationData], deleteNodes: [LocationData], replace: LocationData?)
 }
 
 //class for custom cell design with a imageView and a Label
@@ -29,6 +29,8 @@ class ManageLocationController: UITableViewController, writeInfoBackDelegate {
     
     //delegate used to send the data back
     weak var delegate: writeNodeBackDelegate?
+    var currentIndex: Int = 0
+    var replace: LocationData?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,7 +40,7 @@ class ManageLocationController: UITableViewController, writeInfoBackDelegate {
     
     //call the writeNodeBack function when dismissing the view.
     override func viewWillDisappear(_ animated: Bool) {
-        self.delegate?.writeNodeBack(nodes: nodeList, deleteNodes: deleteNodeList)
+        self.delegate?.writeNodeBack(nodes: nodeList, deleteNodes: deleteNodeList, replace: replace)
     }
     
     //number of sections in the tableView
@@ -82,16 +84,24 @@ class ManageLocationController: UITableViewController, writeInfoBackDelegate {
         })
         
         let edit = UIContextualAction(style: .normal, title: "Edit", handler: {(action, view, completionHandler) in
+            self.currentIndex = indexPath.row
             self.performSegue(withIdentifier: "EditInfo", sender: self)
             completionHandler(true)
         })
         
-        let place = UIContextualAction(style: .normal, title: "Place", handler: {(action, view, completionHandler) in
-            
+        let replace = UIContextualAction(style: .normal, title: "Replace", handler: {(action, view, completionHandler) in
+            self.replace = self.nodeList[indexPath.row]
+            self.deleteNodeList.append(self.nodeList[indexPath.row])
+            self.nodeList.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            self.navigationController?.popViewController(animated: true)
             completionHandler(true)
         })
         
-        let configuration = UISwipeActionsConfiguration(actions: [edit,place,delete])
+        edit.backgroundColor = UIColor.green
+        replace.backgroundColor = UIColor.magenta
+        
+        let configuration = UISwipeActionsConfiguration(actions: [delete, edit, replace])
         return configuration
     }
     
@@ -99,6 +109,7 @@ class ManageLocationController: UITableViewController, writeInfoBackDelegate {
         if segue.identifier == "EditInfo" {
             let editInfoController = segue.destination as! EditInfoController
             editInfoController.delegate = self
+            editInfoController.locationData = nodeList[currentIndex]
         }
     }
     

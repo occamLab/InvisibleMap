@@ -260,13 +260,43 @@
                     <view key="view" contentMode="scaleToFill" id="50p-8r-40a">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ouI-8k-J84">
+                                <rect key="frame" x="87.5" y="106" width="200" height="200"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="277-U8-FfD"/>
+                                    <constraint firstAttribute="width" constant="200" id="q0V-aK-LX6"/>
+                                </constraints>
+                            </imageView>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="lIC-H3-COO">
+                                <rect key="frame" x="171.5" y="350" width="32" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="RoT-Fe-VFK">
+                                <rect key="frame" x="171.5" y="401" width="32" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="RoT-Fe-VFK" firstAttribute="top" secondItem="lIC-H3-COO" secondAttribute="bottom" constant="17" id="FMj-u7-RH1"/>
+                            <constraint firstItem="ouI-8k-J84" firstAttribute="centerX" secondItem="50p-8r-40a" secondAttribute="centerX" id="GtK-E6-8Ra"/>
+                            <constraint firstItem="lIC-H3-COO" firstAttribute="top" secondItem="ouI-8k-J84" secondAttribute="bottom" constant="44" id="N1F-9g-QQz"/>
+                            <constraint firstItem="RoT-Fe-VFK" firstAttribute="centerX" secondItem="50p-8r-40a" secondAttribute="centerX" id="QC2-c1-Eyb"/>
+                            <constraint firstItem="ouI-8k-J84" firstAttribute="top" secondItem="eGV-74-XfJ" secondAttribute="bottom" constant="62" id="tst-gK-87t"/>
+                            <constraint firstItem="lIC-H3-COO" firstAttribute="centerX" secondItem="50p-8r-40a" secondAttribute="centerX" id="yNU-I3-ESS"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="3Ic-rr-zfy"/>
+                    <connections>
+                        <outlet property="locationImage" destination="ouI-8k-J84" id="cBO-FQ-e99"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V4R-GR-jYT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1782" y="627"/>
+            <point key="canvasLocation" x="1781.5999999999999" y="626.53673163418296"/>
         </scene>
     </scenes>
     <resources>
