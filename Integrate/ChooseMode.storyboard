@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="SfB-UO-DE9">
+    <device id="retina5_5" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Choose Mode Controller-->
+        <scene sceneID="3WF-CG-CXF">
+            <objects>
+                <viewController id="oCQ-Wu-H8c" customClass="ChooseModeController" customModule="InvisibleMapCreatorIntegrate" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="fJt-ER-gbF">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WAE-q3-Al6">
+                                <rect key="frame" x="184" y="155" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="InvisibleMapButtonPressed:" destination="oCQ-Wu-H8c" eventType="touchUpInside" id="VHP-gE-XGi"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VsA-5E-Y2s">
+                                <rect key="frame" x="184" y="519" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="MapCreatorButtonPressed:" destination="oCQ-Wu-H8c" eventType="touchUpInside" id="0Ec-6l-j2l"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="Fwk-h0-b0p"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="waD-KM-IjP"/>
+                    <connections>
+                        <segue destination="Ol6-Fm-Jtf" kind="show" identifier="InvisibleMap" id="Lbt-x5-7VX"/>
+                        <segue destination="Gr2-0n-e7z" kind="show" identifier="MapCreator" id="oDo-YD-6L3"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0vb-l1-dqb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="131.8840579710145" y="113.31521739130436"/>
+        </scene>
+        <!--ChooseMapView-->
+        <scene sceneID="oqt-DD-yhW">
+            <objects>
+                <viewControllerPlaceholder storyboardName="Main" referencedIdentifier="ChooseMapView" id="Ol6-Fm-Jtf" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="ePq-tu-eDk"/>
+                </viewControllerPlaceholder>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="8GK-pp-o5Q" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="762" y="-79"/>
+        </scene>
+        <!--ARViewController-->
+        <scene sceneID="5Ix-Eo-hAP">
+            <objects>
+                <viewControllerPlaceholder storyboardName="MainMapCreator" referencedIdentifier="ARViewController" id="Gr2-0n-e7z" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="8h6-mx-7by"/>
+                </viewControllerPlaceholder>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="H0X-OW-khq" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="779" y="252"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="oMr-dl-uTM">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ONU-lR-S7M" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <navigationController id="SfB-UO-DE9" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="lJ4-v0-qlD">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="oCQ-Wu-H8c" kind="relationship" relationship="rootViewController" id="Wpn-cs-wSi"/>
+                    </connections>
+                </navigationController>
+            </objects>
+            <point key="canvasLocation" x="-712" y="113"/>
+        </scene>
+    </scenes>
+</document>

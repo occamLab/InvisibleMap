@@ -25,7 +25,7 @@ class LocationData {
     }
 }
 
-class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDelegate {
+class TagController: UIViewController, writeValueBackDelegate, writeNodeBackDelegate {
     
     //MARK: Properties
 
