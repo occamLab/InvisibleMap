@@ -26,6 +26,7 @@ struct AprilTags{
     double imagePoints[8];
     double quatVar[4];
     double transVecVar[3];
+    double jointCovar[49];
 };
 
 

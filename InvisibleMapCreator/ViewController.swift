@@ -399,6 +399,8 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
                 tagDict["tagOrientationVariance"] = [tagArray[i].quatVar.0, tagArray[i].quatVar.1, tagArray[i].quatVar.2, tagArray[i].quatVar.3]
                 tagDict["timeStamp"] = timeStamp
                 tagDict["poseId"] = poseId
+                // TODO: resolve the unsafe dangling pointer warning
+                tagDict["jointCovar"] = [Double](UnsafeBufferPointer(start: &tagArray[i].jointCovar.0, count: MemoryLayout.size(ofValue: tagArray[i].jointCovar)/MemoryLayout.stride(ofValue: tagArray[i].jointCovar.0)))
                 allTags.append(tagDict)
             }
             DispatchQueue.main.async {

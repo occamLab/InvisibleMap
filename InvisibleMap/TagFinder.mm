@@ -175,6 +175,17 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
     for (int i = 0; i < 4; i++) {
         april.quatVar[i] = SigmaQuat.diag().at<double_t>(i);
     }
+
+    cv::Mat jointJacobian;
+    cv::hconcat(transJacobian, quatJacobian, jointJacobian);
+    cv::Mat SigmaJoint = cv::Mat(jointJacobian.t() * jointJacobian).inv();
+    
+    // unroll the covariance data into a matrix
+    for (int i = 0; i < SigmaJoint.size[0]; i++) {
+        for (int j = 0; j < SigmaJoint.size[1]; j++) {
+            april.jointCovar[i*SigmaJoint.size[1] + j] = SigmaJoint.at<double_t>(i, j);
+        }
+    }
     
     return april;
 }
