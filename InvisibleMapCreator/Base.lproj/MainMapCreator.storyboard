@@ -54,7 +54,7 @@
                                 </subviews>
                             </stackView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0zS-CR-G7o">
-                                <rect key="frame" x="128" y="556" width="119" height="35"/>
+                                <rect key="frame" x="128" y="536" width="119" height="35"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="19"/>
                                 <state key="normal" title="Save Location">
                                     <color key="titleColor" red="1" green="0.13211544471149328" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -64,19 +64,27 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lPg-Cp-1GN">
-                                <rect key="frame" x="106" y="621" width="163" height="33"/>
+                                <rect key="frame" x="106" y="581" width="163" height="33"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <state key="normal" title="Manage Location List"/>
                                 <connections>
                                     <action selector="manageButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="aXJ-NF-mwv"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pG8-4h-oOJ">
-                                <rect key="frame" x="78" y="487" width="219" height="49"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pG8-4h-oOJ">
+                                <rect key="frame" x="78" y="479" width="219" height="49"/>
                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="31"/>
                                 <state key="normal" title="Start Recording"/>
                                 <connections>
                                     <action selector="startButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="C1o-Gq-mTp"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iYO-2T-7yB">
+                                <rect key="frame" x="51.5" y="624" width="272" height="49"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="31"/>
+                                <state key="normal" title="Enable Tag Capture"/>
+                                <connections>
+                                    <action selector="tagCaptureButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="FOX-Di-mX3"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -84,16 +92,18 @@
                         <constraints>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Yim-aW-dZL" secondAttribute="bottom" constant="210" id="42W-cl-0sn"/>
                             <constraint firstItem="Dg2-sg-mPK" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="30" id="C1g-8d-H8u"/>
+                            <constraint firstItem="iYO-2T-7yB" firstAttribute="top" secondItem="lPg-Cp-1GN" secondAttribute="bottom" constant="10" id="FoF-sD-8fJ"/>
                             <constraint firstItem="Yim-aW-dZL" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="OUo-QF-iX0"/>
                             <constraint firstItem="pG8-4h-oOJ" firstAttribute="centerX" secondItem="Yim-aW-dZL" secondAttribute="centerX" id="P2Z-U2-Bfp"/>
-                            <constraint firstItem="0zS-CR-G7o" firstAttribute="top" secondItem="pG8-4h-oOJ" secondAttribute="bottom" constant="20" id="QQC-HD-bAk"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Yim-aW-dZL" secondAttribute="trailing" id="VDt-tB-9O9"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Dg2-sg-mPK" secondAttribute="trailing" id="WCv-UI-0GQ"/>
-                            <constraint firstItem="pG8-4h-oOJ" firstAttribute="top" secondItem="Yim-aW-dZL" secondAttribute="bottom" constant="30" id="b0O-WA-LRA"/>
+                            <constraint firstItem="pG8-4h-oOJ" firstAttribute="top" secondItem="Yim-aW-dZL" secondAttribute="bottom" constant="10" id="b0O-WA-LRA"/>
+                            <constraint firstItem="0zS-CR-G7o" firstAttribute="top" secondItem="pG8-4h-oOJ" secondAttribute="bottom" constant="20" id="czn-Zo-OuO"/>
                             <constraint firstItem="Dg2-sg-mPK" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="k7K-c2-va0"/>
                             <constraint firstItem="0zS-CR-G7o" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="ndf-il-H5P"/>
-                            <constraint firstItem="lPg-Cp-1GN" firstAttribute="top" secondItem="0zS-CR-G7o" secondAttribute="bottom" constant="30" id="pyO-qP-kMD"/>
+                            <constraint firstItem="lPg-Cp-1GN" firstAttribute="top" secondItem="0zS-CR-G7o" secondAttribute="bottom" constant="10" id="pyO-qP-kMD"/>
                             <constraint firstItem="lPg-Cp-1GN" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="tse-mf-34Y"/>
+                            <constraint firstItem="iYO-2T-7yB" firstAttribute="centerX" secondItem="lPg-Cp-1GN" secondAttribute="centerX" id="xW8-5G-nnr"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Main" id="3T2-xZ-qAk"/>
@@ -107,7 +117,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="63" y="115"/>
+            <point key="canvasLocation" x="61.600000000000001" y="114.69265367316342"/>
         </scene>
         <!--Manage Location Controller-->
         <scene sceneID="nqy-PK-K3q">

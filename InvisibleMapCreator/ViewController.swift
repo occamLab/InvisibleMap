@@ -38,6 +38,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     var timer = Timer()
     
     var isProcessingFrame = false
+    var tagCaptureAllowed = false
     let f = imageToData()
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.apriltagfinder", qos: DispatchQoS.userInitiated)
     var tagData:[[Any]] = []
@@ -78,8 +79,8 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     /// Initialize the ARSession
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
+        configuration.planeDetection = [.horizontal, .vertical]
         sceneView.session.run(configuration)
-        //sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
     }
     
     /// Initialize firebase reference
@@ -248,6 +249,18 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
         self.present(alert, animated: true, completion: nil)
     }
     
+    @IBAction func tagCaptureButtonPressed(_ sender: Any) {
+        guard let sender = sender as? UIButton else {
+            return
+        }
+        tagCaptureAllowed = !tagCaptureAllowed
+        if tagCaptureAllowed {
+            sender.setTitle("Disable Tag Capture", for: .normal)
+        } else {
+            sender.setTitle("Enable Tag Capture", for: .normal)
+        }
+    }
+
     /// Upload pose data, last image frame to Firebase under "maps" and "unprocessed_maps" nodes
     func sendToFirebase(mapName: String) {
         let (cameraFrame, timestamp) = getCameraFrame()
@@ -309,7 +322,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     
     /// Append new april tag data to list
     @objc func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
-        if isProcessingFrame {
+        if isProcessingFrame || !tagCaptureAllowed {
             return
         }
         isProcessingFrame = true
@@ -364,27 +377,29 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     }
     
     /// Finds all april tags in the frame
-    func getArTags(cameraFrame: ARFrame, image: UIImage, timeStamp: Double, poseId: Int) -> [Any] {
+    func getArTags(cameraFrame: ARFrame, image: UIImage, timeStamp: Double, poseId: Int) -> [[String:Any]] {
         let intrinsics = cameraFrame.camera.intrinsics.columns
         f.findTags(image, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y)
         var tagArray: Array<AprilTags> = Array()
+        var allTags: [[String:Any]] = []
         let numTags = f.getNumberOfTags()
-        var poseMatrix: [Any] = []
         if numTags > 0 {
             for i in 0...f.getNumberOfTags()-1 {
                 tagArray.append(f.getTagAt(i))
             }
 
             for i in 0...tagArray.count-1 {
+                var tagDict:[String:Any] = [:]
                 let pose = tagArray[i].poseData
-                let transStd = simd_float3(x: Float(tagArray[i].transVecStdDev.0), y: Float(tagArray[i].transVecStdDev.1), z: Float(tagArray[i].transVecStdDev.2))
-                let quatStd = simd_float4(x: Float(tagArray[i].quatStdDev.0), y: Float(tagArray[i].quatStdDev.1), z: Float(tagArray[i].quatStdDev.2), w: Float(tagArray[i].quatStdDev.3))
-                // TODO: we don't need this anymore (directly populate poseMatrix)
-                let simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
-                let transVar = simd_float3x3(diagonal: simd_float3(pow(transStd.x, 2), pow(transStd.y, 2), pow(transStd.z, 2)))
-                let quatVar = simd_float4x4(diagonal: simd_float4(pow(quatStd.x, 2), pow(quatStd.y, 2), pow(quatStd.z, 2), pow(quatStd.w, 2)))
-
-                poseMatrix += [tagArray[i].number, simdPose.columns.0.x, simdPose.columns.1.x, simdPose.columns.2.x, simdPose.columns.3.x, simdPose.columns.0.y, simdPose.columns.1.y, simdPose.columns.2.y, simdPose.columns.3.y, simdPose.columns.0.z, simdPose.columns.1.z, simdPose.columns.2.z, simdPose.columns.3.z, simdPose.columns.0.w, simdPose.columns.1.w, simdPose.columns.2.w, simdPose.columns.3.w, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y, tagArray[i].imagePoints.0, tagArray[i].imagePoints.1, tagArray[i].imagePoints.2, tagArray[i].imagePoints.3, tagArray[i].imagePoints.4, tagArray[i].imagePoints.5, tagArray[i].imagePoints.6, tagArray[i].imagePoints.7, transVar.columns.0.x, transVar.columns.1.y, transVar.columns.2.z, quatVar.columns.0.x, quatVar.columns.1.y, quatVar.columns.2.z, quatVar.columns.3.w, timeStamp, poseId]
+                tagDict["tagId"] = tagArray[i].number
+                tagDict["tagPose"] = [pose.0, pose.1, pose.2, pose.3, pose.4, pose.5, pose.6, pose.7, pose.8, pose.9, pose.10, pose.11, pose.12, pose.13, pose.14, pose.15]
+                tagDict["cameraIntrinsics"] = [intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y]
+                tagDict["tagCornersPixelCoordinates"] = [tagArray[i].imagePoints.0, tagArray[i].imagePoints.1, tagArray[i].imagePoints.2, tagArray[i].imagePoints.3, tagArray[i].imagePoints.4, tagArray[i].imagePoints.5, tagArray[i].imagePoints.6, tagArray[i].imagePoints.7]
+                tagDict["tagPositionVariance"] = [tagArray[i].transVecVar.0, tagArray[i].transVecVar.1, tagArray[i].transVecVar.2]
+                tagDict["tagOrientationVariance"] = [tagArray[i].quatVar.0, tagArray[i].quatVar.1, tagArray[i].quatVar.2, tagArray[i].quatVar.3]
+                tagDict["timeStamp"] = timeStamp
+                tagDict["poseId"] = poseId
+                allTags.append(tagDict)
             }
             DispatchQueue.main.async {
                 if self.foundTag == false {
@@ -395,7 +410,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
             }
             
         }
-        return poseMatrix
+        return allTags
     }
         
     /// Get the camera intrinsics

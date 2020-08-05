@@ -140,7 +140,6 @@ class ViewController: UIViewController {
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal, .vertical]
-        configuration.isAutoFocusEnabled = false
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -306,7 +305,7 @@ class ViewController: UIViewController {
         let (image, time, cameraTransform, cameraIntrinsics) = self.getVideoFrames()
         if let image = image, let time = time, let cameraTransform = cameraTransform, let cameraIntrinsics = cameraIntrinsics {
             aprilTagQueue.async {
-                let tagDetections = self.checkTagDetection(image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+                let _ = self.checkTagDetection(image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
                 self.detectNearbyWaypoints()
                 self.isProcessingFrame = false
             }
@@ -393,8 +392,8 @@ class ViewController: UIViewController {
         let generator = UIImpactFeedbackGenerator(style: .heavy)
         generator.impactOccurred()
         let pose = tag.poseData
-        let transStd = simd_float3(x: Float(tag.transVecStdDev.0), y: Float(tag.transVecStdDev.1), z: Float(tag.transVecStdDev.2))
-        let quatStd = simd_float4(x: Float(tag.quatStdDev.0), y: Float(tag.quatStdDev.1), z: Float(tag.quatStdDev.2), w: Float(tag.quatStdDev.3))
+        let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
+        let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
 
         var simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
         
@@ -418,8 +417,8 @@ class ViewController: UIViewController {
         }
         
 
-        let transVar = simd_float3x3(diagonal: simd_float3(pow(transStd.x, 2), pow(transStd.y, 2), pow(transStd.z, 2)))
-        let quatVar = simd_float4x4(diagonal: simd_float4(pow(quatStd.x, 2), pow(quatStd.y, 2), pow(quatStd.z, 2), pow(quatStd.w, 2)))
+        let transVarMatrix = simd_float3x3(diagonal: transVar)
+        let quatVarMatrix = simd_float4x4(diagonal: quatVar)
         
         let q = simd_quatf(axisMapping)
 
@@ -428,8 +427,8 @@ class ViewController: UIViewController {
                                     simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
                                     simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
                                     simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
-        let sceneTransVar = axisMapping.getUpper3x3()*transVar*axisMapping.getUpper3x3().transpose
-        let sceneQuatVar = quatMultiplyAsLinearTransform*quatVar*quatMultiplyAsLinearTransform.transpose
+        let sceneTransVar = axisMapping.getUpper3x3()*transVarMatrix*axisMapping.getUpper3x3().transpose
+        let sceneQuatVar = quatMultiplyAsLinearTransform*quatVarMatrix*quatMultiplyAsLinearTransform.transpose
 
         let scenePoseQuat = simd_quatf(scenePose.getRot())
         let scenePoseTranslation = scenePose.getTrans()
