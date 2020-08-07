@@ -31,6 +31,18 @@ class AprilTagTracker {
             return
         }
         sceneView?.session.add(anchor: ARAnchor(name: String(format: "tag_%d", id), transform:  relativeTransform.inverse*pendingPoseAnchorTransform))
+        self.pendingPoseAnchorTransform = nil
+        for i in 0 ..< scenePositionCovariances.count {
+            let q = simd_quatf(relativeTransform.inverse)
+            // this representation is useful for updating the covariances
+            let quatMultiplyAsLinearTransform = simd_float4x4(columns:
+                (simd_float4(q.vector.w, q.vector.z, -q.vector.y, -q.vector.x),
+                 simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
+                 simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
+                 simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
+            sceneQuatCovariances[i] = quatMultiplyAsLinearTransform*sceneQuatCovariances[i]*quatMultiplyAsLinearTransform.transpose
+            scenePositionCovariances[i] = relativeTransform.inverse.getUpper3x3()*scenePositionCovariances[i]*relativeTransform.inverse.getUpper3x3().transpose
+        }
     }
 
     func updateTagPoseMeans(id: Int, detectedPosition: simd_float3, detectedPositionVar: simd_float3x3, detectedQuat: simd_quatf, detectedQuatVar: simd_float4x4) {
@@ -400,6 +412,7 @@ class ViewController: UIViewController {
         f.findTags(image, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y)
         var tagArray: Array<AprilTags> = Array()
         let numTags = f.getNumberOfTags()
+        var lastAppliedOriginShift: simd_float4x4?
         if numTags > 0 {
             for i in 0...f.getNumberOfTags()-1 {
                 tagArray.append(f.getTagAt(i))
@@ -408,11 +421,16 @@ class ViewController: UIViewController {
             for i in 0...tagArray.count-1 {
                 addTagDetectionNode(tag: tagArray[i], cameraTransform: cameraTransform)
                 /// Update the root to map transform if the tag detected is in the map
-                if let tagVertex = tagDictionary[Int(tagArray[i].number)] {
-                    updateRootToMap(vertex: tagVertex)
+                if let tagVertex = tagDictionary[Int(tagArray[i].number)], let originShift = updateRootToMap(vertex: tagVertex) {
+                    lastAppliedOriginShift = originShift
                 }
             }
             
+        }
+        if let lastAppliedOriginShift = lastAppliedOriginShift {
+            for detector in aprilTagDetectionDictionary.values {
+                detector.willUpdateWorldOrigin(relativeTransform: lastAppliedOriginShift)
+            }
         }
         return tagArray;
     }
@@ -520,7 +538,7 @@ class ViewController: UIViewController {
     /// Updates the root to map transform if a tag currently being detected exists in the map
     ///
     /// - Parameter vertex: the tag vertex from firebase corresponding to the tag currently being detected
-    func updateRootToMap(vertex: Map.Vertex) {
+    func updateRootToMap(vertex: Map.Vertex)->simd_float4x4? {
         let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
         let tagNode = SCNNode(geometry: SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0))
         // TODO: we need to be doing something with setWorldOrigin here so corrections are not applied multiple times (also of interest is to look at the discrepancies between the turquoise square and the black square.  The turquoise square seems to track the AR session adjustments in a way that the black one doesn't).
@@ -529,13 +547,13 @@ class ViewController: UIViewController {
         tagNode.transform = tagMatrix
         mapNode.addChildNode(tagNode)
         tagNode.name = String("Tag_\(vertex.id)")
-        computeRootToMap(tagId: vertex.id)
+        return computeRootToMap(tagId: vertex.id)
     }
     
     /// Computes and updates the root to map transform
     ///
     /// - Parameter tagId: the id number of an april tag as an integer
-    func computeRootToMap(tagId: Int) {
+    func computeRootToMap(tagId: Int)->simd_float4x4? {
         if aprilTagDetectionDictionary[tagId] != nil {
             let rootToTag = (sceneView.scene.rootNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform)!.transpose()
             let tagToMap = SCNMatrix4Invert((mapNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform.transpose())!)
@@ -554,12 +572,11 @@ class ViewController: UIViewController {
             mapNode.transform = SCNMatrix4(originTransform)
             // TODO: this might not be working properly with anchors
             sceneView.session.setWorldOrigin(relativeTransform: originTransform)
-            // TODO: this won't work properly if multiple tags are tracked in one frame
-            aprilTagDetectionDictionary[tagId]?.willUpdateWorldOrigin(relativeTransform: originTransform)
-            
             mapNode.geometry = SCNBox(width: 0.25, height: 0.25, length: 0.25, chamferRadius: 0)
             mapNode.geometry?.firstMaterial?.diffuse.contents = UIColor.green
+            return originTransform
         }
+        return nil
     }
 
     
