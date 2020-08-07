@@ -65,6 +65,10 @@ extension float4x4 {
     func getTrans()->float3 {
         return float3(self.columns.3.x, self.columns.3.y, self.columns.3.z)
     }
+    
+    func toRowMajorOrder()->(Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double) {
+        return (Double(self.columns.0.x), Double(self.columns.1.x), Double(self.columns.2.x), Double(self.columns.3.x), Double(self.columns.0.y), Double(self.columns.1.y), Double(self.columns.2.y), Double(self.columns.3.y), Double(self.columns.0.z), Double(self.columns.1.z), Double(self.columns.2.z), Double(self.columns.3.z), Double(self.columns.0.w), Double(self.columns.1.w), Double(self.columns.2.w), Double(self.columns.3.w))
+    }
 }
 
 extension float3 {

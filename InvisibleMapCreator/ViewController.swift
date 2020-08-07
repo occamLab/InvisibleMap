@@ -37,6 +37,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
 
     var timer = Timer()
     
+    var snapTagsToVertical = true
     var isProcessingFrame = false
     var tagCaptureAllowed = false
     let f = imageToData()
@@ -79,7 +80,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     /// Initialize the ARSession
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal, .vertical]
+        //configuration.planeDetection = [.horizontal, .vertical]
         sceneView.session.run(configuration)
     }
     
@@ -390,7 +391,19 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
 
             for i in 0...tagArray.count-1 {
                 var tagDict:[String:Any] = [:]
-                let pose = tagArray[i].poseData
+                var pose = tagArray[i].poseData
+
+                if snapTagsToVertical {
+                    var simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+                    let originalPose = simdPose
+                    // convert from April Tags conventions to Apple's (TODO: could this be done in one rotation?)
+                    simdPose = simdPose.rotate(radians: Float.pi, 0, 1, 0)
+                    simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
+                    let worldPose = cameraFrame.camera.transform*simdPose
+                    let angleAdjustment = atan2(worldPose.columns.2.y, worldPose.columns.1.y)
+                    // perform an intrinsic rotation about the x-axis to make sure the z-axis of the tag is flat with respect to gravity
+                    pose = (originalPose*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)).toRowMajorOrder()
+                }
                 tagDict["tagId"] = tagArray[i].number
                 tagDict["tagPose"] = [pose.0, pose.1, pose.2, pose.3, pose.4, pose.5, pose.6, pose.7, pose.8, pose.9, pose.10, pose.11, pose.12, pose.13, pose.14, pose.15]
                 tagDict["cameraIntrinsics"] = [intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y]

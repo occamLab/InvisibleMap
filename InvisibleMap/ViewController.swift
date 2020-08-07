@@ -20,16 +20,48 @@ class AprilTagTracker {
     var sceneQuats: Array<simd_quatf> = []
     var scenePositionCovariances: Array<simd_float3x3> = []
     var sceneQuatCovariances: Array<simd_float4x4> = []
+    weak var sceneView: ARSCNView?
     private(set) var tagPosition = simd_float3()
     private(set) var tagOrientation = simd_quatf()
+    // staging variable for the new anchor that should be created.  This is needed to allow adjustment via setWorldOrigin
+    var pendingPoseAnchorTransform: simd_float4x4?
+
+    func willUpdateWorldOrigin(relativeTransform: simd_float4x4) {
+        guard let pendingPoseAnchorTransform = pendingPoseAnchorTransform else {
+            return
+        }
+        sceneView?.session.add(anchor: ARAnchor(name: String(format: "tag_%d", id), transform:  relativeTransform.inverse*pendingPoseAnchorTransform))
+    }
 
     func updateTagPoseMeans(id: Int, detectedPosition: simd_float3, detectedPositionVar: simd_float3x3, detectedQuat: simd_quatf, detectedQuatVar: simd_float4x4) {
-        scenePositions.append(detectedPosition)
+        // TODO: it's probably overkill, but we correct the covariances usign the anchor poses as well
         scenePositionCovariances.append(detectedPositionVar)
-        sceneQuats.append(detectedQuat)
         sceneQuatCovariances.append(detectedQuatVar)
+        var newPose = simd_float4x4(detectedQuat)
+        newPose.columns.3 = detectedPosition.toHomogeneous()
+        pendingPoseAnchorTransform = newPose
+        // TODO: check if we have to manually add these
+        var (scenePositions, sceneQuats) = getTrackedTagTransforms()
+        scenePositions.append(detectedPosition)
+        sceneQuats.append(detectedQuat)
+        print(scenePositions)
+
         tagPosition = uncertaintyWeightedAverage(zs: scenePositions, sigmas: scenePositionCovariances)
         tagOrientation = averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
+    }
+    
+    func getTrackedTagTransforms()->([simd_float3],[simd_quatf]) {
+        var positions: [simd_float3] = []
+        var orientations: [simd_quatf] = []
+        guard let transforms = sceneView?.session.currentFrame?.anchors.compactMap({$0.name != nil && $0.name! == String(format: "tag_%d", id) ? $0.transform : nil }) else {
+            return (positions, orientations)
+        }
+        for transform in transforms {
+            positions.append(simd_float3(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z))
+            orientations.append(simd_quatf(transform))
+        }
+        
+        return (positions, orientations)
     }
     
     func uncertaintyWeightedAverage(zs: Array<simd_float3>, sigmas: Array<simd_float3x3>)->simd_float3 {
@@ -80,8 +112,25 @@ class AprilTagTracker {
         return quatAverage
     }
 
-    init(tagId: Int) {
+    init(_ sceneView: ARSCNView, tagId: Int) {
         id = tagId
+        self.sceneView = sceneView
+    }
+    
+    
+    /// Removes all of the follow crumbs that have been built-up in the system
+    func clearAllMeasurements() {
+        guard let sceneView = sceneView else {
+            return
+        }
+        guard let anchors = sceneView.session.currentFrame?.anchors else {
+            return
+        }
+        for anchor in anchors {
+            if let name = anchor.name, name == String(format: "tag_%d", id) {
+                sceneView.session.remove(anchor: anchor)
+            }
+        }
     }
 }
 
@@ -432,7 +481,7 @@ class ViewController: UIViewController {
 
         let scenePoseQuat = simd_quatf(scenePose.getRot())
         let scenePoseTranslation = scenePose.getTrans()
-        let aprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(tagId: Int(tag.number))]
+        let aprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(sceneView, tagId: Int(tag.number))]
         aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
 
         // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
@@ -491,9 +540,23 @@ class ViewController: UIViewController {
             let rootToTag = (sceneView.scene.rootNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform)!.transpose()
             let tagToMap = SCNMatrix4Invert((mapNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform.transpose())!)
             let rootToMap = SCNMatrix4Mult(rootToTag, tagToMap)
-            mapNode.transform = rootToMap.transpose()
-            // TODO: this correctly aligns the map, but breaks things like "snapToVertical" as well as our Kalman filtering.  We need something more robust, e.g., anchor points that would be updated whenever the world origin changes (the snap to route feature has something like this).
-            //sceneView.session.setWorldOrigin(relativeTransform: simd_float4x4(rootToMap.transpose()))
+            var originTransform = simd_float4x4(rootToMap.transpose())
+            // TODO: this correctly aligns the map, but breaks our Kalman filtering.  We need something more robust, e.g., anchor points that would be updated whenever the world origin changes (the snap to route feature has something like this).
+            // make sure the transform does not move the y-axis by computing the angle of the transform axis to vertical
+            let angleFromVertical = atan2(sqrt(pow(originTransform.columns.1.x,2) + pow(originTransform.columns.1.z,2)), originTransform.columns.1.y)
+            if angleFromVertical != 0 {
+                // compute axis of rotation as perpendicular to the plane spanned by the y-axis of the room and the y-axis of the transform
+                let axisOfRotation = simd_cross(simd_float3(0, 1, 0), simd_float3(originTransform.columns.1.x, originTransform.columns.1.y, originTransform.columns.1.z))
+                let originTransformTranslationSaved = originTransform.columns.3
+                originTransform = originTransform.rotate(radians: -angleFromVertical, axisOfRotation.x, axisOfRotation.y, axisOfRotation.z)
+                originTransform.columns.3 = originTransformTranslationSaved
+            }
+            mapNode.transform = SCNMatrix4(originTransform)
+            // TODO: this might not be working properly with anchors
+            sceneView.session.setWorldOrigin(relativeTransform: originTransform)
+            // TODO: this won't work properly if multiple tags are tracked in one frame
+            aprilTagDetectionDictionary[tagId]?.willUpdateWorldOrigin(relativeTransform: originTransform)
+            
             mapNode.geometry = SCNBox(width: 0.25, height: 0.25, length: 0.25, chamferRadius: 0)
             mapNode.geometry?.firstMaterial?.diffuse.contents = UIColor.green
         }
