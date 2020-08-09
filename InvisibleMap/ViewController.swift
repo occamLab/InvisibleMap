@@ -13,6 +13,7 @@ import Firebase
 import FirebaseDatabase
 import FirebaseStorage
 
+// TODO: can probably just do 1d Kalman filtering for angle
 
 class AprilTagTracker {
     let id: Int
@@ -56,7 +57,6 @@ class AprilTagTracker {
         var (scenePositions, sceneQuats) = getTrackedTagTransforms()
         scenePositions.append(detectedPosition)
         sceneQuats.append(detectedQuat)
-        print(scenePositions)
 
         tagPosition = uncertaintyWeightedAverage(zs: scenePositions, sigmas: scenePositionCovariances)
         tagOrientation = averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
@@ -250,7 +250,6 @@ class ViewController: UIViewController {
             waypointNode.addChildNode(textNode)
             waypointNode.name = String("Waypoint_\(vertex.id)")
             count = count + 1
-            print(vertex.id)
         }
     }
     
@@ -284,7 +283,24 @@ class ViewController: UIViewController {
     
     /// Stores the april tags from firebase in a dictionary to speed up lookup of tags
     func storeTagsInDictionary() {
-        for vertex in myMap.tagVertices{
+        for (tagId, vertex) in myMap.tagVertices.enumerated() {
+            
+            var tagPose = simd_float4x4(translation: simd_float3( vertex.translation.x, vertex.translation.y, vertex.translation.z), rotation: simd_quatf(ix: vertex.rotation.x, iy: vertex.rotation.y, iz: vertex.rotation.z, r: vertex.rotation.w))
+            if snapTagsToVertical {
+                tagPose = tagPose.makeZFlat().alignY()
+                // Note that the process of leveling the tag doesn't change translation
+                var modifiedOrientation = simd_quatf(tagPose)
+                // make absolutely sure that we have a flat tag
+                modifiedOrientation = simd_quatf(angle: modifiedOrientation.angle, axis: simd_float3(0, 1*sign(modifiedOrientation.axis.y), 0))
+                var newVertex = vertex
+                newVertex.rotation.x = modifiedOrientation.imag.x
+                newVertex.rotation.y = modifiedOrientation.imag.y
+                newVertex.rotation.z = modifiedOrientation.imag.z
+                newVertex.rotation.w = modifiedOrientation.real
+                myMap.tagVertices[tagId] = newVertex
+            }
+            // rebind this variable in case it has changed (e.g., through snapTagsToVertical being true)
+            let vertex = myMap.tagVertices[tagId]
             tagDictionary[vertex.id] = vertex
             let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
             let tagNode = SCNNode(geometry: SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0))
@@ -470,7 +486,7 @@ class ViewController: UIViewController {
         axisMapping = axisMapping.rotate(radians: Float.pi, 0, 1, 0)
         axisMapping = axisMapping.rotate(radians: Float.pi, 0, 0, 1)
         
-        // convert from April Tags conventions to Apple's (TODO: could this be done in one rotation?)
+        // convert from April Tags convention to Apple's convention
         simdPose = simdPose.rotate(radians: Float.pi, 0, 1, 0)
         simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
         var scenePose = cameraTransform*simdPose
@@ -481,6 +497,10 @@ class ViewController: UIViewController {
             // perform an intrinsic rotation about the x-axis to make sure the z-axis of the tag is flat with respect to gravity
             scenePose = scenePose*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
             axisMapping = axisMapping*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
+            // map the y-axis of the tag to the y-axis of the room by rotating about the z axis of the tag
+            let alignYTransform = simd_quatf(from: scenePose.columns.1.dropw(), to: simd_float3(0, 1, 0))
+            scenePose = simd_float4x4(translation: scenePose.getTrans(), rotation: alignYTransform*simd_quatf(scenePose))
+            axisMapping = simd_float4x4(translation: axisMapping.getTrans(), rotation: alignYTransform*simd_quatf(axisMapping))
         }
         
 
@@ -497,7 +517,7 @@ class ViewController: UIViewController {
         let sceneTransVar = axisMapping.getUpper3x3()*transVarMatrix*axisMapping.getUpper3x3().transpose
         let sceneQuatVar = quatMultiplyAsLinearTransform*quatVarMatrix*quatMultiplyAsLinearTransform.transpose
 
-        let scenePoseQuat = simd_quatf(scenePose.getRot())
+        let scenePoseQuat = simd_quatf(scenePose)
         let scenePoseTranslation = scenePose.getTrans()
         let aprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(sceneView, tagId: Int(tag.number))]
         aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
@@ -555,22 +575,12 @@ class ViewController: UIViewController {
     /// - Parameter tagId: the id number of an april tag as an integer
     func computeRootToMap(tagId: Int)->simd_float4x4? {
         if aprilTagDetectionDictionary[tagId] != nil {
-            let rootToTag = (sceneView.scene.rootNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform)!.transpose()
-            let tagToMap = SCNMatrix4Invert((mapNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform.transpose())!)
-            let rootToMap = SCNMatrix4Mult(rootToTag, tagToMap)
-            var originTransform = simd_float4x4(rootToMap.transpose())
-            // TODO: this correctly aligns the map, but breaks our Kalman filtering.  We need something more robust, e.g., anchor points that would be updated whenever the world origin changes (the snap to route feature has something like this).
-            // make sure the transform does not move the y-axis by computing the angle of the transform axis to vertical
-            let angleFromVertical = atan2(sqrt(pow(originTransform.columns.1.x,2) + pow(originTransform.columns.1.z,2)), originTransform.columns.1.y)
-            if angleFromVertical != 0 {
-                // compute axis of rotation as perpendicular to the plane spanned by the y-axis of the room and the y-axis of the transform
-                let axisOfRotation = simd_cross(simd_float3(0, 1, 0), simd_float3(originTransform.columns.1.x, originTransform.columns.1.y, originTransform.columns.1.z))
-                let originTransformTranslationSaved = originTransform.columns.3
-                originTransform = originTransform.rotate(radians: -angleFromVertical, axisOfRotation.x, axisOfRotation.y, axisOfRotation.z)
-                originTransform.columns.3 = originTransformTranslationSaved
-            }
+            let rootToTag = simd_float4x4(sceneView.scene.rootNode.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
+            let mapToTag = simd_float4x4(mapNode.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
+            // the call to .alignY() flattens the transform so that it only rotates about the glboal y-axis (translation can happen along all dimensions)
+            let originTransform = (rootToTag*mapToTag.inverse).alignY(allowNegativeY: true)
             mapNode.transform = SCNMatrix4(originTransform)
-            // TODO: this might not be working properly with anchors
+            // TODO: there still seems to be a little ringing going on
             sceneView.session.setWorldOrigin(relativeTransform: originTransform)
             mapNode.geometry = SCNBox(width: 0.25, height: 0.25, length: 0.25, chamferRadius: 0)
             mapNode.geometry?.firstMaterial?.diffuse.contents = UIColor.green
@@ -582,7 +592,7 @@ class ViewController: UIViewController {
     
     /// Automatically decodes the map Json files from firebase
     struct Map: Decodable {
-        let tagVertices: [Vertex]
+        var tagVertices: [Vertex]
         let odometryVertices: [Vertex]
         let waypointsVertices: [WaypointVertex]
         
@@ -634,7 +644,7 @@ class ViewController: UIViewController {
             struct Vertex: Decodable {
                 let id: Int
                 let translation: vector3
-                let rotation: quaternion
+                var rotation: quaternion
                 
                 enum CodingKeys: String, CodingKey {
                     case id
@@ -655,10 +665,10 @@ class ViewController: UIViewController {
                 }
                 
                 struct quaternion:Decodable {
-                    let x: Float
-                    let y: Float
-                    let z: Float
-                    let w: Float
+                    var x: Float
+                    var y: Float
+                    var z: Float
+                    var w: Float
                     
                     
                     enum CodingKeys: String, CodingKey {
