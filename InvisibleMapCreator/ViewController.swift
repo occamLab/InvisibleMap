@@ -399,13 +399,13 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
                     simdPose = simdPose.rotate(radians: Float.pi, 0, 1, 0)
                     simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
                     let worldPose = cameraFrame.camera.transform*simdPose
-                    let worldPoseFlat = worldPose.makeZFlat().alignY()
+                    // TODO: the alignY() seems to break things, possibly because we aren't properly remapping the covariance matrices.  I made an attempt to try to do this using LASwift, but ran into issues with conflicts with VISP3
+                    let worldPoseFlat = worldPose.makeZFlat()//.alignY()
                     // back calculate what the camera pose should be so that the pose in the global frame is flat
                     var correctedCameraPose = cameraFrame.camera.transform.inverse*worldPoseFlat
                     // go back to April Tag Conventions
                     correctedCameraPose = correctedCameraPose.rotate(radians: Float.pi, 0, 0, 1)
                     correctedCameraPose = correctedCameraPose.rotate(radians: Float.pi, 0, 1, 0)
-                    // TODO: this was different than what we had, which was working well.  Make sure everything check out
                     pose = correctedCameraPose.toRowMajorOrder()
                 }
                 tagDict["tagId"] = tagArray[i].number
