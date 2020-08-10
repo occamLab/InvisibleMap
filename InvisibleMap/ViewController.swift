@@ -284,14 +284,12 @@ class ViewController: UIViewController {
     /// Stores the april tags from firebase in a dictionary to speed up lookup of tags
     func storeTagsInDictionary() {
         for (tagId, vertex) in myMap.tagVertices.enumerated() {
-            
-            var tagPose = simd_float4x4(translation: simd_float3( vertex.translation.x, vertex.translation.y, vertex.translation.z), rotation: simd_quatf(ix: vertex.rotation.x, iy: vertex.rotation.y, iz: vertex.rotation.z, r: vertex.rotation.w))
             if snapTagsToVertical {
-                tagPose = tagPose.makeZFlat().alignY()
+                let tagPose = simd_float4x4(translation: simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z), rotation: simd_quatf(ix: vertex.rotation.x, iy: vertex.rotation.y, iz: vertex.rotation.z, r: vertex.rotation.w))
+                
                 // Note that the process of leveling the tag doesn't change translation
-                var modifiedOrientation = simd_quatf(tagPose)
-                // make absolutely sure that we have a flat tag
-                modifiedOrientation = simd_quatf(angle: modifiedOrientation.angle, axis: simd_float3(0, 1*sign(modifiedOrientation.axis.y), 0))
+                let modifiedOrientation = simd_quatf(tagPose.makeZFlat().alignY())
+
                 var newVertex = vertex
                 newVertex.rotation.x = modifiedOrientation.imag.x
                 newVertex.rotation.y = modifiedOrientation.imag.y
@@ -478,43 +476,29 @@ class ViewController: UIViewController {
         let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
         let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
 
-        var simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
-        
-        // the axis mapping is used to figure out how the standard deviations should map to the global coordinate system
-        var axisMapping = matrix_identity_float4x4
-        
-        axisMapping = axisMapping.rotate(radians: Float.pi, 0, 1, 0)
-        axisMapping = axisMapping.rotate(radians: Float.pi, 0, 0, 1)
+        let originalTagPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
         
         // convert from April Tags convention to Apple's convention
-        simdPose = simdPose.rotate(radians: Float.pi, 0, 1, 0)
-        simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
-        var scenePose = cameraTransform*simdPose
-        axisMapping = cameraTransform*axisMapping
+        let tagPoseApple = simd_float4x4(diagonal:simd_float4(1, -1, -1, 1))*originalTagPose
+        // project into world coordinates
+        var scenePose = cameraTransform*tagPoseApple
 
         if snapTagsToVertical {
-            let angleAdjustment = atan2(scenePose.columns.2.y, scenePose.columns.1.y)
-            // perform an intrinsic rotation about the x-axis to make sure the z-axis of the tag is flat with respect to gravity
-            scenePose = scenePose*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
-            axisMapping = axisMapping*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
-            // map the y-axis of the tag to the y-axis of the room by rotating about the z axis of the tag
-            let alignYTransform = simd_quatf(from: scenePose.columns.1.dropw(), to: simd_float3(0, 1, 0))
-            scenePose = simd_float4x4(translation: scenePose.getTrans(), rotation: alignYTransform*simd_quatf(scenePose))
-            axisMapping = simd_float4x4(translation: axisMapping.getTrans(), rotation: alignYTransform*simd_quatf(axisMapping))
+            scenePose = scenePose.makeZFlat().alignY()
         }
-        
-
         let transVarMatrix = simd_float3x3(diagonal: transVar)
         let quatVarMatrix = simd_float4x4(diagonal: quatVar)
-        
-        let q = simd_quatf(axisMapping)
+
+        // this is the linear transform that takes the original tag pose to the final world pose
+        let linearTransform = scenePose*originalTagPose.inverse
+        let q = simd_quatf(linearTransform)
 
         let quatMultiplyAsLinearTransform =
             simd_float4x4(columns: (simd_float4(q.vector.w, q.vector.z, -q.vector.y, -q.vector.x),
                                     simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
                                     simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
                                     simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
-        let sceneTransVar = axisMapping.getUpper3x3()*transVarMatrix*axisMapping.getUpper3x3().transpose
+        let sceneTransVar = linearTransform.getUpper3x3()*transVarMatrix*linearTransform.getUpper3x3().transpose
         let sceneQuatVar = quatMultiplyAsLinearTransform*quatVarMatrix*quatMultiplyAsLinearTransform.transpose
 
         let scenePoseQuat = simd_quatf(scenePose)
@@ -577,8 +561,8 @@ class ViewController: UIViewController {
         if aprilTagDetectionDictionary[tagId] != nil {
             let rootToTag = simd_float4x4(sceneView.scene.rootNode.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
             let mapToTag = simd_float4x4(mapNode.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
-            // the call to .alignY() flattens the transform so that it only rotates about the glboal y-axis (translation can happen along all dimensions)
-            let originTransform = (rootToTag*mapToTag.inverse).alignY(allowNegativeY: true)
+            // the call to .alignY() flattens the transform so that it only rotates about the globoal y-axis (translation can happen along all dimensions)
+            let originTransform = (rootToTag*mapToTag.inverse).alignY()
             mapNode.transform = SCNMatrix4(originTransform)
             // TODO: there still seems to be a little ringing going on
             sceneView.session.setWorldOrigin(relativeTransform: originTransform)
