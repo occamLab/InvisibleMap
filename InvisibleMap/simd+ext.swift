@@ -48,8 +48,11 @@ extension float4x4 {
     
     func makeZFlat()->simd_float4x4 {
         // perform an intrinsic rotation about the x-axis to make sure the z-axis is flat with respect to the y-axis (gravity in an ARSession)
-        let angleAdjustment = atan2(columns.2.y, columns.1.y)
-        return self*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
+        return self*simd_float4x4.makeRotate(radians: getZTilt(), 1, 0, 0)
+    }
+    
+    func getZTilt()->Float {
+        return atan2(columns.2.y, columns.1.y)
     }
     
     func alignY(allowNegativeY: Bool = false)->simd_float4x4 {

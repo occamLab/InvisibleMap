@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		7AFFB8FB1F7230AC88C3A531 /* Pods_InvisibleMapCreator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */; };
+		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
+		822FA78424E2FB000001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
+		822FA78624E2FB3E0001F463 /* AprilTagTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */; };
+		822FA78724E2FB3E0001F463 /* AprilTagTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */; };
 		82468A2824C88B6800FD31BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 82468A2724C88B6800FD31BC /* Assets.xcassets */; };
 		82468A2B24C88B6800FD31BC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 82468A2A24C88B6800FD31BC /* Preview Assets.xcassets */; };
 		82468A2E24C88B6800FD31BC /* LaunchScreenMapCreator.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 82468A2C24C88B6800FD31BC /* LaunchScreenMapCreator.storyboard */; };
@@ -45,6 +49,8 @@
 
 /* Begin PBXFileReference section */
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		822FA78224E2F9750001F463 /* DebugHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugHelpers.swift; sourceTree = "<group>"; };
+		822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AprilTagTracker.swift; sourceTree = "<group>"; };
 		82468A1F24C88B6600FD31BC /* InvisibleMapCreator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisibleMapCreator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82468A2724C88B6800FD31BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		82468A2A24C88B6800FD31BC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -185,6 +191,8 @@
 				86112CCC211B805300736960 /* ChooseMapViewController.swift */,
 				86F3953E210FA42500F209EC /* AppDelegate.swift */,
 				86F39540210FA42500F209EC /* ViewController.swift */,
+				822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */,
+				822FA78224E2F9750001F463 /* DebugHelpers.swift */,
 				82A8259E24B3854000AFC390 /* simd+ext.swift */,
 				86F39542210FA42500F209EC /* Main.storyboard */,
 				86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */,
@@ -407,12 +415,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				82A567D524C894070066DA50 /* TagFinder.mm in Sources */,
+				822FA78424E2FB000001F463 /* DebugHelpers.swift in Sources */,
 				82A567DB24C894930066DA50 /* SaveLocationController.swift in Sources */,
 				82A567D424C893FC0066DA50 /* main.m in Sources */,
 				82A567E624C89EAC0066DA50 /* AppDelegate.swift in Sources */,
 				82A567DD24C8976F0066DA50 /* simd+ext.swift in Sources */,
 				82A567D724C8942D0066DA50 /* ImageConversion.mm in Sources */,
 				82A567D324C893AF0066DA50 /* ViewController.swift in Sources */,
+				822FA78724E2FB3E0001F463 /* AprilTagTracker.swift in Sources */,
 				82A567D924C894640066DA50 /* ManageLocationController.swift in Sources */,
 				82A567D624C894120066DA50 /* ImageDisplay.mm in Sources */,
 			);
@@ -423,12 +433,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				868CBA4F2113394B007343B4 /* TagFinder.mm in Sources */,
+				822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */,
 				86112CD3211B837200736960 /* ChooseMapTableViewCell.swift in Sources */,
 				86112CCD211B805300736960 /* ChooseMapViewController.swift in Sources */,
 				868CBA4E2113394B007343B4 /* main.m in Sources */,
 				868CBA4921133939007343B4 /* ImageDisplay.mm in Sources */,
 				86F39541210FA42500F209EC /* ViewController.swift in Sources */,
 				868CBA4821133939007343B4 /* ImageConversion.mm in Sources */,
+				822FA78624E2FB3E0001F463 /* AprilTagTracker.swift in Sources */,
 				86F3953F210FA42500F209EC /* AppDelegate.swift in Sources */,
 				82A8259F24B3854000AFC390 /* simd+ext.swift in Sources */,
 			);

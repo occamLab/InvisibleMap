@@ -46,7 +46,8 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     var poseData:[[Any]] = []
     var locationData:[[Any]] = []
     var poseId: Int = 0
-    
+    var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
+
     var firebaseRef: DatabaseReference!
     var firebaseStorage: Storage!
     var firebaseStorageRef: StorageReference!
@@ -390,6 +391,8 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
             }
 
             for i in 0...tagArray.count-1 {
+                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraFrame.camera.transform)
+
                 var tagDict:[String:Any] = [:]
                 var pose = tagArray[i].poseData
 
