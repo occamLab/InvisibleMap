@@ -56,7 +56,7 @@ class AprilTagTracker {
         sceneQuats.append(detectedQuat)
 
         tagPosition = uncertaintyWeightedAverage(zs: scenePositions, sigmas: scenePositionCovariances)
-        tagOrientation = averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
+        tagOrientation = AprilTagTracker.averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
     }
     
     func getTrackedTagTransforms()->([simd_float3],[simd_quatf]) {
@@ -94,7 +94,71 @@ class AprilTagTracker {
         return xhat_kk
     }
     
-    private func averageQuaternions(quats: Array<simd_quatf>, quatCovariances: Array<simd_float4x4>)->simd_quatf {
+    func adjustBasedOnDepth(scenePose: simd_float4x4, tag: inout AprilTags, depthImage: CVPixelBuffer, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3)->simd_float4x4 {
+        guard let sceneView = sceneView else {
+            return scenePose
+        }
+        var imagePointsArray = [Double](UnsafeBufferPointer(start: &tag.imagePoints.0, count: MemoryLayout.size(ofValue: tag.imagePoints)/MemoryLayout.stride(ofValue: tag.imagePoints.0)))
+        // Depth image is not currently used directly
+        let width = CVPixelBufferGetWidth(depthImage)
+        let height = CVPixelBufferGetHeight(depthImage)
+        CVPixelBufferLockBaseAddress(depthImage, CVPixelBufferLockFlags(rawValue: 0))
+        let floatBuffer = unsafeBitCast(CVPixelBufferGetBaseAddress(depthImage), to: UnsafeMutablePointer<Float32>.self)
+        var quats : [simd_quatf] = []
+        var positions: [simd_float3] = []
+        
+        // shift points outwards from tag to see if it makes the plane detection more stable
+        let bLToUR = simd_double2(imagePointsArray[4] - imagePointsArray[0], imagePointsArray[5] - imagePointsArray[1])
+        let brToUL = simd_double2(imagePointsArray[6] - imagePointsArray[2], imagePointsArray[7] - imagePointsArray[3])
+        let pixelShift = 1.0
+        imagePointsArray[0] -= pixelShift*bLToUR.x
+        imagePointsArray[1] -= pixelShift*bLToUR.y
+        imagePointsArray[2] -= pixelShift*brToUL.x
+        imagePointsArray[3] -= pixelShift*brToUL.y
+        imagePointsArray[4] += pixelShift*bLToUR.x
+        imagePointsArray[5] += pixelShift*bLToUR.y
+        imagePointsArray[6] += pixelShift*brToUL.x
+        imagePointsArray[7] += pixelShift*brToUL.y
+        
+        for i in 0..<4 {
+            let cornerRay = cameraTransform.getRot()*simd_float3x3(diagonal: float3(1, -1, -1))*(cameraIntrinsics.inverse*simd_float3(Float(imagePointsArray[2*i]), Float(imagePointsArray[2*i+1]), 1))
+            let q = ARRaycastQuery(origin: cameraTransform.getTrans(), direction: cornerRay, allowing: .estimatedPlane,  alignment: .vertical)
+            for r in sceneView.session.raycast(q) {
+                let scenePoseCorner = r.worldTransform*simd_float4x4(columns:(float4(1, 0, 0, 0), float4(0, 0, -1, 0), float4(0, 1, 0, 0), float4(0, 0, 0, 1)))
+                positions.append(scenePoseCorner.getTrans())
+                quats.append(simd_quatf(scenePoseCorner))
+            }
+        }
+        if quats.count == 4 {
+            let averagePosition = positions.reduce(simd_float3(), { $0 + $1/Float(positions.count) })
+            let meanCenteredPositions = positions.map({$0 - averagePosition})
+            var crossProductScheme = simd_cross(meanCenteredPositions[2] - meanCenteredPositions[0], meanCenteredPositions[3] - meanCenteredPositions[1])
+            crossProductScheme.y = 0
+            crossProductScheme = crossProductScheme / simd_length(crossProductScheme)
+            let angle = atan2(crossProductScheme.x, crossProductScheme.z)
+            let averageOrientation = simd_quatf(angle: angle, axis: simd_float3(0, 1, 0))
+            print("updated using depth")
+            return simd_float4x4(translation: scenePose.getTrans(), rotation: averageOrientation)
+        }
+        return scenePose
+    }
+    
+    static func averageQuaternions(quats: Array<simd_quatf>)->simd_quatf {
+        var quatAverage = simd_quatf(vector: simd_float4(0, 0, 0, 1))
+        var converged = false
+        var epsilons = Array<Float>.init(repeating: 1.0, count: quats.count)
+        while !converged {
+            let epsilonTimesQuats = zip(quats, epsilons).map { $0.0*$0.1 }
+
+            quatAverage = simd_quatf(vector: epsilonTimesQuats.reduce(simd_float4(), { $0 + $1.vector/Float(quats.count) }))
+            let newEpsilons = zip(epsilonTimesQuats, epsilons).map { simd_length($0.0 - quatAverage) < simd_length(-$0.0 - quatAverage) ? $0.1 : -$0.1 }
+            converged = zip(epsilons, newEpsilons).reduce(true, {x,y in x && y.0 == y.1})
+            epsilons = newEpsilons
+        }
+        return quatAverage
+    }
+    
+    static func averageQuaternions(quats: Array<simd_quatf>, quatCovariances: Array<simd_float4x4>)->simd_quatf {
         var quatAverage = simd_quatf(vector: simd_float4(0, 0, 0, 1))  // initialize with no rotation
         var converged = false
         var epsilons = Array<Float>.init(repeating: 1.0, count: quats.count)

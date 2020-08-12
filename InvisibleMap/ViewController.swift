@@ -69,7 +69,12 @@ class ViewController: UIViewController {
     /// Initialize the ARSession
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal, .vertical]
+        //configuration.planeDetection = [.horizontal, .vertical]
+        configuration.frameSemantics = .sceneDepth
+        configuration.isAutoFocusEnabled = false
+        
+        // The screen shouldn't dim during AR experiences.
+        UIApplication.shared.isIdleTimerDisabled = true
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -206,50 +211,16 @@ class ViewController: UIViewController {
         }
     }
 
-    func createTagDebugImage(tagDetections: Array<AprilTags>, image:UIImage)->UIImage? {
-        // Create a context of the starting image size and set it as the current one
-        UIGraphicsBeginImageContext(image.size)
-        
-        // Draw the starting image in the current context as background
-        image.draw(at: CGPoint.zero)
-
-        // Get the current context
-        let context = UIGraphicsGetCurrentContext()!
-        context.setFillColor(UIColor.cyan.cgColor)
-        context.setAlpha(0.5)
-        context.setLineWidth(0.0)
-        let visualizationCirclesRadius = 10.0;
-        for tag in tagDetections {
-            // TODO: convert tuple to array to make this less janky (https://developer.apple.com/forums/thread/72120)
-            context.addEllipse(in: CGRect(x: Int(tag.imagePoints.0-visualizationCirclesRadius), y: Int(tag.imagePoints.1-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
-            context.drawPath(using: .fillStroke)
-
-            context.addEllipse(in: CGRect(x: Int(tag.imagePoints.2-visualizationCirclesRadius), y: Int(tag.imagePoints.3-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
-            context.drawPath(using: .fillStroke)
-
-            context.addEllipse(in: CGRect(x: Int(tag.imagePoints.4-visualizationCirclesRadius), y: Int(tag.imagePoints.5-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
-            context.drawPath(using: .fillStroke)
-
-            context.addEllipse(in: CGRect(x: Int(tag.imagePoints.6-visualizationCirclesRadius), y: Int(tag.imagePoints.7-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
-            context.drawPath(using: .fillStroke)
-        }
-        
-        // Save the context as a new UIImage
-        let myImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return myImage
-    }
-
     /// Processes the pose, april tags, and nearby waypoints.
     @objc func updateLandmarks() {
         if isProcessingFrame {
             return
         }
         isProcessingFrame = true
-        let (image, time, cameraTransform, cameraIntrinsics) = self.getVideoFrames()
+        let (image, depthImage, time, cameraTransform, cameraIntrinsics) = self.getVideoFrames()
         if let image = image, let time = time, let cameraTransform = cameraTransform, let cameraIntrinsics = cameraIntrinsics {
             aprilTagQueue.async {
-                let _ = self.checkTagDetection(image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+                let _ = self.checkTagDetection(image: image, depthImage: depthImage, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
                 self.detectNearbyWaypoints()
                 self.isProcessingFrame = false
             }
@@ -261,9 +232,9 @@ class ViewController: UIViewController {
     /// Gets the current frames from the camera
     ///
     /// - Returns: the current camera frame as a UIImage and its timestamp
-    func getVideoFrames() -> (UIImage?, Double?, simd_float4x4?, simd_float3x3?) {
+    func getVideoFrames() -> (UIImage?, CVPixelBuffer?, Double?, simd_float4x4?, simd_float3x3?) {
         guard let cameraFrame = sceneView.session.currentFrame, let cameraTransform = sceneView.session.currentFrame?.camera.transform else {
-            return (nil, nil, nil, nil)
+            return (nil, nil, nil, nil, nil)
         }
         let scene = SCNMatrix4(cameraTransform)
         if sceneView.scene.rootNode.childNode(withName: "camera", recursively: false) == nil {
@@ -277,12 +248,13 @@ class ViewController: UIViewController {
         }
         
         // Convert ARFrame to a UIImage
+        let depthImage = cameraFrame.sceneDepth?.depthMap
         let pixelBuffer = cameraFrame.capturedImage
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         let context = CIContext(options: nil)
         let cgImage = context.createCGImage(ciImage, from: ciImage.extent)
         let uiImage = UIImage(cgImage: cgImage!)
-        return (uiImage, cameraFrame.timestamp, cameraTransform, cameraFrame.camera.intrinsics)
+        return (uiImage, depthImage, cameraFrame.timestamp, cameraTransform, cameraFrame.camera.intrinsics)
     }
     
     /// Check if tag is detected and update the tag and map transforms
@@ -290,7 +262,7 @@ class ViewController: UIViewController {
     /// - Parameters:
     ///   - rotatedImage: the camera frame rotated by 90 degrees to enable accurate tag detection
     ///   - timestamp: the timestamp of the current frame
-    func checkTagDetection(image: UIImage, timestamp: Double, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3)->Array<AprilTags> {
+    func checkTagDetection(image: UIImage, depthImage: CVPixelBuffer?, timestamp: Double, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3)->Array<AprilTags> {
         let intrinsics = cameraIntrinsics.columns
         f.findTags(image, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y)
         var tagArray: Array<AprilTags> = Array()
@@ -301,8 +273,8 @@ class ViewController: UIViewController {
                 tagArray.append(f.getTagAt(i))
             }
             /// Add or update the tags that are detected
-            for i in 0...tagArray.count-1 {
-                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
+            for i in 0..<tagArray.count {
+                addTagDetectionNode(sceneView: sceneView, capturedImage: image, depthImage: depthImage, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: &tagArray[i], cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
                 /// Update the root to map transform if the tag detected is in the map
                 if let tagVertex = tagDictionary[Int(tagArray[i].number)], let originShift = updateRootToMap(vertex: tagVertex) {
                     lastAppliedOriginShift = originShift
@@ -341,8 +313,6 @@ class ViewController: UIViewController {
     func updateRootToMap(vertex: Map.Vertex)->simd_float4x4? {
         let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
         let tagNode = SCNNode(geometry: SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0))
-        // TODO: we need to be doing something with setWorldOrigin here so corrections are not applied multiple times (also of interest is to look at the discrepancies between the turquoise square and the black square.  The turquoise square seems to track the AR session adjustments in a way that the black one doesn't).
-        
         tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
         tagNode.transform = tagMatrix
         mapNode.addChildNode(tagNode)

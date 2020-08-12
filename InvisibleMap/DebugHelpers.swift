@@ -14,12 +14,10 @@ import GLKit
 /// Adds or updates a tag node when a tag is detected
 ///
 /// - Parameter tag: the april tag detected by the visual servoing platform
-func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, aprilTagDetectionDictionary: inout Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4) {
+func addTagDetectionNode(sceneView: ARSCNView, capturedImage: UIImage, depthImage: CVPixelBuffer?, snapTagsToVertical: Bool, aprilTagDetectionDictionary: inout Dictionary<Int, AprilTagTracker>, tag: inout AprilTags, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3) {
  //   let generator = UIImpactFeedbackGenerator(style: .heavy)
 //    generator.impactOccurred()
     let pose = tag.poseData
-    let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
-    let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
 
     let originalTagPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
     
@@ -28,6 +26,14 @@ func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, aprilTa
     let tagPoseARKit = aprilTagToARKit*originalTagPose
     // project into world coordinates
     var scenePose = cameraTransform*tagPoseARKit
+    let aprilTagTracker:AprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(sceneView, tagId: Int(tag.number))]
+
+    if let depthImage = depthImage {
+        scenePose = aprilTagTracker.adjustBasedOnDepth(scenePose: scenePose, tag: &tag, depthImage: depthImage, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+    }
+
+    let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
+    let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
 
     if snapTagsToVertical {
         scenePose = scenePose.makeZFlat().alignY()
@@ -49,7 +55,6 @@ func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, aprilTa
 
     let scenePoseQuat = simd_quatf(scenePose)
     let scenePoseTranslation = scenePose.getTrans()
-    let aprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(sceneView, tagId: Int(tag.number))]
     aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
 
     // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
@@ -83,4 +88,38 @@ func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, aprilTa
     tagNode.addChildNode(xAxis)
     tagNode.addChildNode(yAxis)
     tagNode.addChildNode(zAxis)
+}
+
+func createTagDebugImage(tagDetections: Array<AprilTags>, image:UIImage)->UIImage? {
+    // Create a context of the starting image size and set it as the current one
+    UIGraphicsBeginImageContext(image.size)
+    
+    // Draw the starting image in the current context as background
+    image.draw(at: CGPoint.zero)
+
+    // Get the current context
+    let context = UIGraphicsGetCurrentContext()!
+    context.setFillColor(UIColor.cyan.cgColor)
+    context.setAlpha(0.5)
+    context.setLineWidth(0.0)
+    let visualizationCirclesRadius = 10.0;
+    for tag in tagDetections {
+        // TODO: convert tuple to array to make this less janky (https://developer.apple.com/forums/thread/72120)
+        context.addEllipse(in: CGRect(x: Int(tag.imagePoints.0-visualizationCirclesRadius), y: Int(tag.imagePoints.1-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
+        context.drawPath(using: .fillStroke)
+
+        context.addEllipse(in: CGRect(x: Int(tag.imagePoints.2-visualizationCirclesRadius), y: Int(tag.imagePoints.3-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
+        context.drawPath(using: .fillStroke)
+
+        context.addEllipse(in: CGRect(x: Int(tag.imagePoints.4-visualizationCirclesRadius), y: Int(tag.imagePoints.5-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
+        context.drawPath(using: .fillStroke)
+
+        context.addEllipse(in: CGRect(x: Int(tag.imagePoints.6-visualizationCirclesRadius), y: Int(tag.imagePoints.7-visualizationCirclesRadius), width: Int(visualizationCirclesRadius)*2, height: Int(visualizationCirclesRadius)*2))
+        context.drawPath(using: .fillStroke)
+    }
+    
+    // Save the context as a new UIImage
+    let myImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    return myImage
 }

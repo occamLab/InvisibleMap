@@ -81,6 +81,9 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     /// Initialize the ARSession
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
+        configuration.frameSemantics = .sceneDepth
+        configuration.isAutoFocusEnabled = false
+        // TODO: not sure if we can remove this to prevent relocalizations (which is good for building the map)
         //configuration.planeDetection = [.horizontal, .vertical]
         sceneView.session.run(configuration)
     }
@@ -391,7 +394,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
             }
 
             for i in 0...tagArray.count-1 {
-                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraFrame.camera.transform)
+                addTagDetectionNode(sceneView: sceneView,  capturedImage: image, depthImage: cameraFrame.sceneDepth?.depthMap, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: &tagArray[i], cameraTransform: cameraFrame.camera.transform, cameraIntrinsics: cameraFrame.camera.intrinsics)
 
                 var tagDict:[String:Any] = [:]
                 var pose = tagArray[i].poseData
@@ -403,7 +406,12 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
                     simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
                     let worldPose = cameraFrame.camera.transform*simdPose
                     // TODO: the alignY() seems to break things, possibly because we aren't properly remapping the covariance matrices.  I made an attempt to try to do this using LASwift, but ran into issues with conflicts with VISP3
-                    let worldPoseFlat = worldPose.makeZFlat()//.alignY()
+                    var worldPoseFlat = worldPose.makeZFlat()//.alignY()
+                    
+                    if let depthImage = cameraFrame.sceneDepth?.depthMap, let aprilTagTracker = aprilTagDetectionDictionary[Int(tagArray[i].number)] {
+                        worldPoseFlat = aprilTagTracker.adjustBasedOnDepth(scenePose: worldPoseFlat, tag: &tagArray[i], depthImage: depthImage, cameraTransform: cameraFrame.camera.transform, cameraIntrinsics: cameraFrame.camera.intrinsics)
+                    }
+
                     // back calculate what the camera pose should be so that the pose in the global frame is flat
                     var correctedCameraPose = cameraFrame.camera.transform.inverse*worldPoseFlat
                     // go back to April Tag Conventions
