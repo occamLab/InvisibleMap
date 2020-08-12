@@ -37,14 +37,17 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
 
     var timer = Timer()
     
+    var snapTagsToVertical = true
     var isProcessingFrame = false
+    var tagCaptureAllowed = false
     let f = imageToData()
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.apriltagfinder", qos: DispatchQoS.userInitiated)
     var tagData:[[Any]] = []
     var poseData:[[Any]] = []
     var locationData:[[Any]] = []
     var poseId: Int = 0
-    
+    var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
+
     var firebaseRef: DatabaseReference!
     var firebaseStorage: Storage!
     var firebaseStorageRef: StorageReference!
@@ -78,8 +81,8 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     /// Initialize the ARSession
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
+        //configuration.planeDetection = [.horizontal, .vertical]
         sceneView.session.run(configuration)
-        //sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
     }
     
     /// Initialize firebase reference
@@ -248,12 +251,24 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
         self.present(alert, animated: true, completion: nil)
     }
     
+    @IBAction func tagCaptureButtonPressed(_ sender: Any) {
+        guard let sender = sender as? UIButton else {
+            return
+        }
+        tagCaptureAllowed = !tagCaptureAllowed
+        if tagCaptureAllowed {
+            sender.setTitle("Disable Tag Capture", for: .normal)
+        } else {
+            sender.setTitle("Enable Tag Capture", for: .normal)
+        }
+    }
+
     /// Upload pose data, last image frame to Firebase under "maps" and "unprocessed_maps" nodes
     func sendToFirebase(mapName: String) {
         let (cameraFrame, timestamp) = getCameraFrame()
         let mapImage = convertToUIImage(cameraFrame: cameraFrame!)
         let mapId = String(timestamp!).replacingOccurrences(of: ".", with: "") + mapName
-        let mapJsonFile: [String: Any] = ["map_id": mapId, "camera_intrinsics": getCameraIntrinsics(), "pose_data": poseData, "tag_data": tagData, "location_data": locationData]
+        let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData]
         
         let imagePath = "myTestFolder/" + mapId + ".jpg"
         let filePath = "myTestFolder/" + mapId + ".json"
@@ -309,7 +324,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     
     /// Append new april tag data to list
     @objc func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
-        if isProcessingFrame {
+        if isProcessingFrame || !tagCaptureAllowed {
             return
         }
         isProcessingFrame = true
@@ -364,42 +379,49 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     }
     
     /// Finds all april tags in the frame
-    func getArTags(cameraFrame: ARFrame, image: UIImage, timeStamp: Double, poseId: Int) -> [Any] {
+    func getArTags(cameraFrame: ARFrame, image: UIImage, timeStamp: Double, poseId: Int) -> [[String:Any]] {
         let intrinsics = cameraFrame.camera.intrinsics.columns
         f.findTags(image, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y)
         var tagArray: Array<AprilTags> = Array()
+        var allTags: [[String:Any]] = []
         let numTags = f.getNumberOfTags()
-        var poseMatrix: [Any] = []
         if numTags > 0 {
             for i in 0...f.getNumberOfTags()-1 {
                 tagArray.append(f.getTagAt(i))
             }
 
             for i in 0...tagArray.count-1 {
-                let pose = tagArray[i].poseData
-                let transStd = simd_float3(x: Float(tagArray[i].transVecStdDev.0), y: Float(tagArray[i].transVecStdDev.1), z: Float(tagArray[i].transVecStdDev.2))
-                let quatStd = simd_float4(x: Float(tagArray[i].quatStdDev.0), y: Float(tagArray[i].quatStdDev.1), z: Float(tagArray[i].quatStdDev.2), w: Float(tagArray[i].quatStdDev.3))
-                var axisMapping = matrix_identity_float4x4
-                var simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
-                // TODO: investigate if we could get rid of this.  This interacts with the camera_to_odom_transform in convert_json.py of the invisible-map-generation repository.  We can probably get rid of the need for this rotation if we compensate in that file
-                simdPose = simdPose.rotate(radians: Float.pi/2, 0, 0, 1)
-                axisMapping = axisMapping.rotate(radians: Float.pi/2, 0, 0, 1)
+                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraFrame.camera.transform)
 
-                let transVar = simd_float3x3(diagonal: simd_float3(pow(transStd.x, 2), pow(transStd.y, 2), pow(transStd.z, 2)))
-                let quatVar = simd_float4x4(diagonal: simd_float4(pow(quatStd.x, 2), pow(quatStd.y, 2), pow(quatStd.z, 2), pow(quatStd.w, 2)))
+                var tagDict:[String:Any] = [:]
+                var pose = tagArray[i].poseData
 
-                let q = simd_quatf(axisMapping)
-
-                let quatMultiplyAsLinearTransform =
-                    simd_float4x4(columns: (simd_float4(q.vector.w, q.vector.z, -q.vector.y, -q.vector.x),
-                                            simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
-                                            simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
-                                            simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
-                let adjustedTransVar = axisMapping.getUpper3x3()*transVar*axisMapping.getUpper3x3().transpose
-                // Note that this is not purely diagonal TODO: pass the whole matrix back?
-                let adjustedQuatVar = quatMultiplyAsLinearTransform*quatVar*quatMultiplyAsLinearTransform.transpose
-
-                poseMatrix += [tagArray[i].number, simdPose.columns.0.x, simdPose.columns.1.x, simdPose.columns.2.x, simdPose.columns.3.x, simdPose.columns.0.y, simdPose.columns.1.y, simdPose.columns.2.y, simdPose.columns.3.y, simdPose.columns.0.z, simdPose.columns.1.z, simdPose.columns.2.z, simdPose.columns.3.z, simdPose.columns.0.w, simdPose.columns.1.w, simdPose.columns.2.w, simdPose.columns.3.w, adjustedTransVar.columns.0.x, adjustedTransVar.columns.1.y, adjustedTransVar.columns.2.z, adjustedQuatVar.columns.0.x, adjustedQuatVar.columns.1.y, adjustedQuatVar.columns.2.z, adjustedQuatVar.columns.3.w, timeStamp, poseId]
+                if snapTagsToVertical {
+                    var simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+                    // convert from April Tags conventions to Apple's (TODO: could this be done in one rotation?)
+                    simdPose = simdPose.rotate(radians: Float.pi, 0, 1, 0)
+                    simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
+                    let worldPose = cameraFrame.camera.transform*simdPose
+                    // TODO: the alignY() seems to break things, possibly because we aren't properly remapping the covariance matrices.  I made an attempt to try to do this using LASwift, but ran into issues with conflicts with VISP3
+                    let worldPoseFlat = worldPose.makeZFlat()//.alignY()
+                    // back calculate what the camera pose should be so that the pose in the global frame is flat
+                    var correctedCameraPose = cameraFrame.camera.transform.inverse*worldPoseFlat
+                    // go back to April Tag Conventions
+                    correctedCameraPose = correctedCameraPose.rotate(radians: Float.pi, 0, 0, 1)
+                    correctedCameraPose = correctedCameraPose.rotate(radians: Float.pi, 0, 1, 0)
+                    pose = correctedCameraPose.toRowMajorOrder()
+                }
+                tagDict["tagId"] = tagArray[i].number
+                tagDict["tagPose"] = [pose.0, pose.1, pose.2, pose.3, pose.4, pose.5, pose.6, pose.7, pose.8, pose.9, pose.10, pose.11, pose.12, pose.13, pose.14, pose.15]
+                tagDict["cameraIntrinsics"] = [intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y]
+                tagDict["tagCornersPixelCoordinates"] = [tagArray[i].imagePoints.0, tagArray[i].imagePoints.1, tagArray[i].imagePoints.2, tagArray[i].imagePoints.3, tagArray[i].imagePoints.4, tagArray[i].imagePoints.5, tagArray[i].imagePoints.6, tagArray[i].imagePoints.7]
+                tagDict["tagPositionVariance"] = [tagArray[i].transVecVar.0, tagArray[i].transVecVar.1, tagArray[i].transVecVar.2]
+                tagDict["tagOrientationVariance"] = [tagArray[i].quatVar.0, tagArray[i].quatVar.1, tagArray[i].quatVar.2, tagArray[i].quatVar.3]
+                tagDict["timeStamp"] = timeStamp
+                tagDict["poseId"] = poseId
+                // TODO: resolve the unsafe dangling pointer warning
+                tagDict["jointCovar"] = [Double](UnsafeBufferPointer(start: &tagArray[i].jointCovar.0, count: MemoryLayout.size(ofValue: tagArray[i].jointCovar)/MemoryLayout.stride(ofValue: tagArray[i].jointCovar.0)))
+                allTags.append(tagDict)
             }
             DispatchQueue.main.async {
                 if self.foundTag == false {
@@ -410,7 +432,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
             }
             
         }
-        return poseMatrix
+        return allTags
     }
         
     /// Get the camera intrinsics

@@ -13,77 +13,7 @@ import Firebase
 import FirebaseDatabase
 import FirebaseStorage
 
-
-class AprilTagTracker {
-    let id: Int
-    var scenePositions: Array<simd_float3> = []
-    var sceneQuats: Array<simd_quatf> = []
-    var scenePositionCovariances: Array<simd_float3x3> = []
-    var sceneQuatCovariances: Array<simd_float4x4> = []
-    private(set) var tagPosition = simd_float3()
-    private(set) var tagOrientation = simd_quatf()
-
-    func updateTagPoseMeans(id: Int, detectedPosition: simd_float3, detectedPositionVar: simd_float3x3, detectedQuat: simd_quatf, detectedQuatVar: simd_float4x4) {
-        scenePositions.append(detectedPosition)
-        scenePositionCovariances.append(detectedPositionVar)
-        sceneQuats.append(detectedQuat)
-        sceneQuatCovariances.append(detectedQuatVar)
-        tagPosition = uncertaintyWeightedAverage(zs: scenePositions, sigmas: scenePositionCovariances)
-        tagOrientation = averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
-    }
-    
-    func uncertaintyWeightedAverage(zs: Array<simd_float3>, sigmas: Array<simd_float3x3>)->simd_float3 {
-        // Strategy is to use the Kalman equations (https://en.wikipedia.org/wiki/Kalman_filter#Predict) with F_k set to identity, H_k set to identity, Q_k set to zero matix, R_k set to sigmas[k]
-        // TODO: allow incremental updating to save time
-        // TODO: this might be numerically unstable when we have a lot of measurements
-        // DEBUG: this seems to drift all over the place when tag is far from origin
-        // DEBUG: I think it's fixed now.   Need to test more.
-        
-        guard var xhat_kk = zs.first, var Pkk = sigmas.first else {
-            return float3(Float.nan, Float.nan, Float.nan)
-        }
-        for i in 1..<zs.count {
-            // Qk is the process noise.  Let's assume that there is a small drift of the tag position in the map frame over time
-            let Qk = matrix_identity_float3x3*1e-9
-            Pkk = Pkk + Qk;
-            let Kk = Pkk*(Pkk + sigmas[i]).inverse
-            Pkk = (matrix_identity_float3x3 - Kk)*Pkk
-            xhat_kk = xhat_kk + Kk*(zs[i] - xhat_kk)
-        }
-        return xhat_kk
-    }
-    
-    private func averageQuaternions(quats: Array<simd_quatf>, quatCovariances: Array<simd_float4x4>)->simd_quatf {
-        var quatAverage = simd_quatf(vector: simd_float4(0, 0, 0, 1))  // initialize with no rotation
-        var converged = false
-        var epsilons = Array<Float>.init(repeating: 1.0, count: quats.count)
-        while !converged {
-            var xhat_kk = simd_quatf(angle: 0, axis: simd_float3(0, 0, 1)).vector
-            var Pkk = matrix_identity_float4x4
-            
-            let epsilonTimesQuats = zip(quats, epsilons).map { $0.0*$0.1 }
-            for (epsilonTimesQuat, quatCovariance) in zip(epsilonTimesQuats, quatCovariances) {
-                // Qk is the process noise.  Let's assume that there is a small drift of the tag orientation in the map frame over time
-                // TODO: this is not well calibrated right now (it is artifically low due to over confidence in tag detections.  Also it should depend on time elapsed rather than be constant for each tag detection event
-                let Qk = matrix_identity_float4x4*1e-8
-                Pkk = Pkk + Qk;
-                let Kk = Pkk*(Pkk + quatCovariance).inverse
-                Pkk = (matrix_identity_float4x4 - Kk)*Pkk
-                xhat_kk = xhat_kk + Kk*(epsilonTimesQuat.vector - xhat_kk)
-            }
-
-            quatAverage = simd_quatf(vector: xhat_kk).normalized
-            let newEpsilons = zip(epsilonTimesQuats, epsilons).map { simd_length($0.0 - quatAverage) < simd_length(-$0.0 - quatAverage) ? $0.1 : -$0.1 }
-            converged = zip(epsilons, newEpsilons).reduce(true, {x,y in x && y.0 == y.1})
-            epsilons = newEpsilons
-        }
-        return quatAverage
-    }
-
-    init(tagId: Int) {
-        id = tagId
-    }
-}
+// TODO: can probably just do 1d Kalman filtering for angle
 
 /// The view controller for displaying a map and announcing waypoints
 class ViewController: UIViewController {
@@ -140,8 +70,7 @@ class ViewController: UIViewController {
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal, .vertical]
-        configuration.isAutoFocusEnabled = false
-        sceneView.session.run(configuration)
+        sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
     /// Downloads the selected map from firebase
@@ -190,7 +119,6 @@ class ViewController: UIViewController {
             waypointNode.addChildNode(textNode)
             waypointNode.name = String("Waypoint_\(vertex.id)")
             count = count + 1
-            print(vertex.id)
         }
     }
     
@@ -224,7 +152,22 @@ class ViewController: UIViewController {
     
     /// Stores the april tags from firebase in a dictionary to speed up lookup of tags
     func storeTagsInDictionary() {
-        for vertex in myMap.tagVertices{
+        for (tagId, vertex) in myMap.tagVertices.enumerated() {
+            if snapTagsToVertical {
+                let tagPose = simd_float4x4(translation: simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z), rotation: simd_quatf(ix: vertex.rotation.x, iy: vertex.rotation.y, iz: vertex.rotation.z, r: vertex.rotation.w))
+                
+                // Note that the process of leveling the tag doesn't change translation
+                let modifiedOrientation = simd_quatf(tagPose.makeZFlat().alignY())
+
+                var newVertex = vertex
+                newVertex.rotation.x = modifiedOrientation.imag.x
+                newVertex.rotation.y = modifiedOrientation.imag.y
+                newVertex.rotation.z = modifiedOrientation.imag.z
+                newVertex.rotation.w = modifiedOrientation.real
+                myMap.tagVertices[tagId] = newVertex
+            }
+            // rebind this variable in case it has changed (e.g., through snapTagsToVertical being true)
+            let vertex = myMap.tagVertices[tagId]
             tagDictionary[vertex.id] = vertex
             let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
             let tagNode = SCNNode(geometry: SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0))
@@ -306,7 +249,7 @@ class ViewController: UIViewController {
         let (image, time, cameraTransform, cameraIntrinsics) = self.getVideoFrames()
         if let image = image, let time = time, let cameraTransform = cameraTransform, let cameraIntrinsics = cameraIntrinsics {
             aprilTagQueue.async {
-                let tagDetections = self.checkTagDetection(image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+                let _ = self.checkTagDetection(image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
                 self.detectNearbyWaypoints()
                 self.isProcessingFrame = false
             }
@@ -352,19 +295,25 @@ class ViewController: UIViewController {
         f.findTags(image, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y)
         var tagArray: Array<AprilTags> = Array()
         let numTags = f.getNumberOfTags()
+        var lastAppliedOriginShift: simd_float4x4?
         if numTags > 0 {
             for i in 0...f.getNumberOfTags()-1 {
                 tagArray.append(f.getTagAt(i))
             }
             /// Add or update the tags that are detected
             for i in 0...tagArray.count-1 {
-                addTagDetectionNode(tag: tagArray[i], cameraTransform: cameraTransform)
+                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
                 /// Update the root to map transform if the tag detected is in the map
-                if let tagVertex = tagDictionary[Int(tagArray[i].number)] {
-                    updateRootToMap(vertex: tagVertex)
+                if let tagVertex = tagDictionary[Int(tagArray[i].number)], let originShift = updateRootToMap(vertex: tagVertex) {
+                    lastAppliedOriginShift = originShift
                 }
             }
             
+        }
+        if let lastAppliedOriginShift = lastAppliedOriginShift {
+            for detector in aprilTagDetectionDictionary.values {
+                detector.willUpdateWorldOrigin(relativeTransform: lastAppliedOriginShift)
+            }
         }
         return tagArray;
     }
@@ -385,123 +334,45 @@ class ViewController: UIViewController {
             return true
         }
     }
-    
-    /// Adds or updates a tag node when a tag is detected
-    ///
-    /// - Parameter tag: the april tag detected by the visual servoing platform
-    func addTagDetectionNode(tag: AprilTags, cameraTransform: simd_float4x4) {
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
-        let pose = tag.poseData
-        let transStd = simd_float3(x: Float(tag.transVecStdDev.0), y: Float(tag.transVecStdDev.1), z: Float(tag.transVecStdDev.2))
-        let quatStd = simd_float4(x: Float(tag.quatStdDev.0), y: Float(tag.quatStdDev.1), z: Float(tag.quatStdDev.2), w: Float(tag.quatStdDev.3))
-
-        var simdPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
-        
-        // the axis mapping is used to figure out how the standard deviations should map to the global coordinate system
-        var axisMapping = matrix_identity_float4x4
-        
-        axisMapping = axisMapping.rotate(radians: Float.pi, 0, 1, 0)
-        axisMapping = axisMapping.rotate(radians: Float.pi, 0, 0, 1)
-        
-        // convert from April Tags conventions to Apple's (TODO: could this be done in one rotation?)
-        simdPose = simdPose.rotate(radians: Float.pi, 0, 1, 0)
-        simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
-        var scenePose = cameraTransform*simdPose
-        axisMapping = cameraTransform*axisMapping
-
-        if snapTagsToVertical {
-            let angleAdjustment = atan2(scenePose.columns.2.y, scenePose.columns.1.y)
-            // perform an intrinsic rotation about the x-axis to make sure the z-axis of the tag is flat with respect to gravity
-            scenePose = scenePose*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
-            axisMapping = axisMapping*simd_float4x4.makeRotate(radians: angleAdjustment, 1, 0, 0)
-        }
-        
-
-        let transVar = simd_float3x3(diagonal: simd_float3(pow(transStd.x, 2), pow(transStd.y, 2), pow(transStd.z, 2)))
-        let quatVar = simd_float4x4(diagonal: simd_float4(pow(quatStd.x, 2), pow(quatStd.y, 2), pow(quatStd.z, 2), pow(quatStd.w, 2)))
-        
-        let q = simd_quatf(axisMapping)
-
-        let quatMultiplyAsLinearTransform =
-            simd_float4x4(columns: (simd_float4(q.vector.w, q.vector.z, -q.vector.y, -q.vector.x),
-                                    simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
-                                    simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
-                                    simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
-        let sceneTransVar = axisMapping.getUpper3x3()*transVar*axisMapping.getUpper3x3().transpose
-        let sceneQuatVar = quatMultiplyAsLinearTransform*quatVar*quatMultiplyAsLinearTransform.transpose
-
-        let scenePoseQuat = simd_quatf(scenePose.getRot())
-        let scenePoseTranslation = scenePose.getTrans()
-        let aprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(tagId: Int(tag.number))]
-        aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
-
-        // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
-        aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar)
-        
-        let tagNode: SCNNode
-        if let existingTagNode = sceneView.scene.rootNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
-            tagNode = existingTagNode
-            tagNode.simdPosition = aprilTagTracker.tagPosition
-            tagNode.simdOrientation = aprilTagTracker.tagOrientation
-        } else {
-            tagNode = SCNNode()
-            tagNode.simdPosition = aprilTagTracker.tagPosition
-            tagNode.simdOrientation = aprilTagTracker.tagOrientation
-            tagNode.geometry = SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0)
-            tagNode.name = "Tag_\(String(tag.number))"
-            tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
-            sceneView.scene.rootNode.addChildNode(tagNode)
-        }
-        
-        /// Adds axes to the tag to aid in the visualization
-        let xAxis = SCNNode(geometry: SCNBox(width: 1.0, height: 0.05, length: 0.05, chamferRadius: 0))
-        xAxis.position = SCNVector3.init(0.75, 0, 0)
-        xAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.red
-        let yAxis = SCNNode(geometry: SCNBox(width: 0.05, height: 1.0, length: 0.05, chamferRadius: 0))
-        yAxis.position = SCNVector3.init(0, 0.75, 0)
-        yAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.green
-        let zAxis = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 1.0, chamferRadius: 0))
-        zAxis.position = SCNVector3.init(0, 0, 0.75)
-        zAxis.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
-        tagNode.addChildNode(xAxis)
-        tagNode.addChildNode(yAxis)
-        tagNode.addChildNode(zAxis)
-    }
 
     /// Updates the root to map transform if a tag currently being detected exists in the map
     ///
     /// - Parameter vertex: the tag vertex from firebase corresponding to the tag currently being detected
-    func updateRootToMap(vertex: Map.Vertex) {
+    func updateRootToMap(vertex: Map.Vertex)->simd_float4x4? {
         let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
         let tagNode = SCNNode(geometry: SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0))
+        // TODO: we need to be doing something with setWorldOrigin here so corrections are not applied multiple times (also of interest is to look at the discrepancies between the turquoise square and the black square.  The turquoise square seems to track the AR session adjustments in a way that the black one doesn't).
+        
         tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
         tagNode.transform = tagMatrix
         mapNode.addChildNode(tagNode)
         tagNode.name = String("Tag_\(vertex.id)")
-        computeRootToMap(tagId: vertex.id)
+        return computeRootToMap(tagId: vertex.id)
     }
     
     /// Computes and updates the root to map transform
     ///
     /// - Parameter tagId: the id number of an april tag as an integer
-    func computeRootToMap(tagId: Int) {
+    func computeRootToMap(tagId: Int)->simd_float4x4? {
         if aprilTagDetectionDictionary[tagId] != nil {
-            let rootToTag = (sceneView.scene.rootNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform)!.transpose()
-            let tagToMap = SCNMatrix4Invert((mapNode.childNode(withName: "Tag_\(tagId)", recursively: false)?.transform.transpose())!)
-            let rootToMap = SCNMatrix4Mult(rootToTag, tagToMap)
-            mapNode.transform = rootToMap.transpose()
-            // TODO: this correctly aligns the map, but breaks things like "snapToVertical" as well as our Kalman filtering.  We need something more robust, e.g., anchor points that would be updated whenever the world origin changes (the snap to route feature has something like this).
-            //sceneView.session.setWorldOrigin(relativeTransform: simd_float4x4(rootToMap.transpose()))
+            let rootToTag = simd_float4x4(sceneView.scene.rootNode.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
+            let mapToTag = simd_float4x4(mapNode.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
+            // the call to .alignY() flattens the transform so that it only rotates about the globoal y-axis (translation can happen along all dimensions)
+            let originTransform = (rootToTag*mapToTag.inverse).alignY()
+            mapNode.transform = SCNMatrix4(originTransform)
+            // TODO: there still seems to be a little ringing going on
+            sceneView.session.setWorldOrigin(relativeTransform: originTransform)
             mapNode.geometry = SCNBox(width: 0.25, height: 0.25, length: 0.25, chamferRadius: 0)
             mapNode.geometry?.firstMaterial?.diffuse.contents = UIColor.green
+            return originTransform
         }
+        return nil
     }
 
     
     /// Automatically decodes the map Json files from firebase
     struct Map: Decodable {
-        let tagVertices: [Vertex]
+        var tagVertices: [Vertex]
         let odometryVertices: [Vertex]
         let waypointsVertices: [WaypointVertex]
         
@@ -553,7 +424,7 @@ class ViewController: UIViewController {
             struct Vertex: Decodable {
                 let id: Int
                 let translation: vector3
-                let rotation: quaternion
+                var rotation: quaternion
                 
                 enum CodingKeys: String, CodingKey {
                     case id
@@ -574,10 +445,10 @@ class ViewController: UIViewController {
                 }
                 
                 struct quaternion:Decodable {
-                    let x: Float
-                    let y: Float
-                    let z: Float
-                    let w: Float
+                    var x: Float
+                    var y: Float
+                    var z: Float
+                    var w: Float
                     
                     
                     enum CodingKeys: String, CodingKey {

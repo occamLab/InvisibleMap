@@ -24,9 +24,9 @@ struct AprilTags{
     int number;
     double poseData[16];
     double imagePoints[8];
-    double quatStdDev[4];
-    double rotVecStdDev[3];
-    double transVecStdDev[3];
+    double quatVar[4];
+    double transVecVar[3];
+    double jointCovar[49];
 };
 
 

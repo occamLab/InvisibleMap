@@ -39,6 +39,26 @@ extension float4x4 {
         return unsafeBitCast(GLKMatrix4MakeLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ), to: float4x4.self)
     }
 
+    init(translation: simd_float3, rotation: simd_quatf) {
+        self = simd_float4x4(rotation)
+        self.columns.3.x = translation.x
+        self.columns.3.y = translation.y
+        self.columns.3.z = translation.z
+    }
+    
+    func makeZFlat()->simd_float4x4 {
+        // perform an intrinsic rotation about the x-axis to make sure the z-axis is flat with respect to the y-axis (gravity in an ARSession)
+        return self*simd_float4x4.makeRotate(radians: getZTilt(), 1, 0, 0)
+    }
+    
+    func getZTilt()->Float {
+        return atan2(columns.2.y, columns.1.y)
+    }
+    
+    func alignY(allowNegativeY: Bool = false)->simd_float4x4 {
+        let yAxisVal = !allowNegativeY || simd_quatf(self).axis.y >= 0 ? Float(1.0) : Float(-1.0)
+        return simd_float4x4(translation: columns.3.dropw(), rotation: simd_quatf(from: columns.1.dropw(), to: simd_float3(0, yAxisVal, 0))*simd_quatf(self))
+    }
 
     func scale(x: Float, y: Float, z: Float) -> float4x4 {
         return float4x4.makeScale(x, y, z) * self
@@ -64,6 +84,16 @@ extension float4x4 {
 
     func getTrans()->float3 {
         return float3(self.columns.3.x, self.columns.3.y, self.columns.3.z)
+    }
+    
+    func toRowMajorOrder()->(Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double) {
+        return (Double(self.columns.0.x), Double(self.columns.1.x), Double(self.columns.2.x), Double(self.columns.3.x), Double(self.columns.0.y), Double(self.columns.1.y), Double(self.columns.2.y), Double(self.columns.3.y), Double(self.columns.0.z), Double(self.columns.1.z), Double(self.columns.2.z), Double(self.columns.3.z), Double(self.columns.0.w), Double(self.columns.1.w), Double(self.columns.2.w), Double(self.columns.3.w))
+    }
+}
+
+extension float4 {
+    func dropw()->float3 {
+        return float3(self.x, self.y, self.z)
     }
 }
 

@@ -1,3 +1,4 @@
+*.mov
 /opencv2.framework
 /visp3.framework
 /Frameworks
