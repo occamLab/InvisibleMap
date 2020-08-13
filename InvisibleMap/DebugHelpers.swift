@@ -19,7 +19,7 @@ func addTagDetectionNode(sceneView: ARSCNView, capturedImage: UIImage, depthImag
 //    generator.impactOccurred()
     let pose = tag.poseData
 
-    let originalTagPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+    let originalTagPose = simd_float4x4(rows: [simd_float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), simd_float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), simd_float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), simd_float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
     
     let aprilTagToARKit = simd_float4x4(diagonal:simd_float4(1, -1, -1, 1))
     // convert from April Tag's convention to ARKit's convention
@@ -29,7 +29,7 @@ func addTagDetectionNode(sceneView: ARSCNView, capturedImage: UIImage, depthImag
     let aprilTagTracker:AprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(sceneView, tagId: Int(tag.number))]
 
     if let depthImage = depthImage {
-        scenePose = aprilTagTracker.adjustBasedOnDepth(scenePose: scenePose, tag: &tag, depthImage: depthImage, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+        scenePose = aprilTagTracker.adjustBasedOnDepth(scenePose: scenePose, tag: &tag, cameraImage: capturedImage, depthImage: depthImage, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
     }
 
     let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))

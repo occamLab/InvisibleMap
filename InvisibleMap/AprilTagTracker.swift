@@ -81,7 +81,7 @@ class AprilTagTracker {
         // DEBUG: I think it's fixed now.   Need to test more.
         
         guard var xhat_kk = zs.first, var Pkk = sigmas.first else {
-            return float3(Float.nan, Float.nan, Float.nan)
+            return simd_float3(Float.nan, Float.nan, Float.nan)
         }
         for i in 1..<zs.count {
             // Qk is the process noise.  Let's assume that there is a small drift of the tag position in the map frame over time
@@ -94,7 +94,53 @@ class AprilTagTracker {
         return xhat_kk
     }
     
-    func adjustBasedOnDepth(scenePose: simd_float4x4, tag: inout AprilTags, depthImage: CVPixelBuffer, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3)->simd_float4x4 {
+    func RGBPixelCoordinateToDepth(_ x: Double, _ y: Double, RGBWidth: Int, RGBHeight: Int, depthWidth: Int, depthHeight: Int, depthBuffer: UnsafeMutablePointer<Float32>)->Float {
+        // TODO: maybe we need interpolation?  Even though the function is simple, it may serve a purpose later (e.g., doing interpolation)
+        let (depthX, depthY) = (Float(x)*Float(depthWidth)/Float(RGBWidth), Float(y)*Float(depthHeight)/Float(RGBHeight))
+        
+        // do bilinear interpolation
+        var validX:[Float] = []
+        var validY:[Float] = []
+        if Int(floor(depthX)) >= 0 {
+            validX.append(floor(depthX))
+        }
+        if Int(ceil(depthX)) < depthWidth {
+            validX.append(ceil(depthX))
+        }
+        if Int(floor(depthY)) >= 0 {
+            validY.append(floor(depthY))
+        }
+        if Int(ceil(depthY)) < depthHeight {
+            validY.append(ceil(depthY))
+        }
+        if validX.count == 0 || validY.count == 0 {
+            return Float.nan
+        } else if validX.count == 1 && validY.count == 1 {
+            return depthBuffer[Int(validY[0])*depthWidth + Int(validX[0])]
+        } else if validX.count == 1 {
+            // linear interpolation on y (x is fixed)
+            let f0 = depthBuffer[Int(validY[0])*depthWidth + Int(validX[0])]
+            let f1 = depthBuffer[Int(validY[1])*depthWidth + Int(validX[0])]
+            return f0*(Float(validY[1]) - depthY) + f1*(depthY - Float(validY[0]))
+        } else if validY.count == 1 {
+            // linear interpolation on x (y is fixed)
+            let f0 = depthBuffer[Int(validY[0])*depthWidth + Int(validX[0])]
+            let f1 = depthBuffer[Int(validY[0])*depthWidth + Int(validX[1])]
+            return f0*(Float(validX[1]) - depthX) + f1*(depthX - Float(validX[0]))
+        } else {
+            // bilinear interpolation
+            let f00 = depthBuffer[Int(validY[0])*depthWidth + Int(validX[0])]
+            let f01 = depthBuffer[Int(validY[1])*depthWidth + Int(validX[0])]
+            let f10 = depthBuffer[Int(validY[0])*depthWidth + Int(validX[1])]
+            let f11 = depthBuffer[Int(validY[1])*depthWidth + Int(validX[1])]
+            let F = simd_float2x2(columns: (simd_float2(f00, f10), simd_float2(f01, f11)))
+            let rhsVec = simd_float2(validY[1] - depthY, depthY - validY[0])
+            let lhsVec = simd_float2(validX[1] - depthX, depthX - validX[0])
+            return simd_dot(rhsVec, F*lhsVec)
+        }
+    }
+    
+    func adjustBasedOnDepth(scenePose: simd_float4x4, tag: inout AprilTags, cameraImage: UIImage, depthImage: CVPixelBuffer, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3)->simd_float4x4 {
         guard let sceneView = sceneView else {
             return scenePose
         }
@@ -111,6 +157,16 @@ class AprilTagTracker {
         let bLToUR = simd_double2(imagePointsArray[4] - imagePointsArray[0], imagePointsArray[5] - imagePointsArray[1])
         let brToUL = simd_double2(imagePointsArray[6] - imagePointsArray[2], imagePointsArray[7] - imagePointsArray[3])
         let pixelShift = 1.0
+        
+        // DEBUG: testing
+        let cornerRay = cameraTransform.getRot()*simd_float3x3(diagonal: simd_float3(1, -1, -1))*(cameraIntrinsics.inverse*simd_float3(Float(imagePointsArray[0]), Float(imagePointsArray[1]), 1))
+        let depth = RGBPixelCoordinateToDepth(imagePointsArray[0], imagePointsArray[1], RGBWidth: Int(cameraImage.size.width), RGBHeight:  Int(cameraImage.size.width), depthWidth: width, depthHeight: height, depthBuffer: floatBuffer)
+        let q = ARRaycastQuery(origin: cameraTransform.getTrans(), direction: cornerRay, allowing: .estimatedPlane,  alignment: .any)
+        for r in sceneView.session.raycast(q) {
+            let scenePoseCorner = r.worldTransform*simd_float4x4(columns:(simd_float4(1, 0, 0, 0), simd_float4(0, 0, -1, 0), simd_float4(0, 1, 0, 0), simd_float4(0, 0, 0, 1)))
+            print(scenePoseCorner.getTrans() - (cornerRay*depth + cameraTransform.getTrans()))
+        }
+        
         imagePointsArray[0] -= pixelShift*bLToUR.x
         imagePointsArray[1] -= pixelShift*bLToUR.y
         imagePointsArray[2] -= pixelShift*brToUL.x
@@ -121,10 +177,10 @@ class AprilTagTracker {
         imagePointsArray[7] += pixelShift*brToUL.y
         
         for i in 0..<4 {
-            let cornerRay = cameraTransform.getRot()*simd_float3x3(diagonal: float3(1, -1, -1))*(cameraIntrinsics.inverse*simd_float3(Float(imagePointsArray[2*i]), Float(imagePointsArray[2*i+1]), 1))
+            let cornerRay = cameraTransform.getRot()*simd_float3x3(diagonal: simd_float3(1, -1, -1))*(cameraIntrinsics.inverse*simd_float3(Float(imagePointsArray[2*i]), Float(imagePointsArray[2*i+1]), 1))
             let q = ARRaycastQuery(origin: cameraTransform.getTrans(), direction: cornerRay, allowing: .estimatedPlane,  alignment: .vertical)
             for r in sceneView.session.raycast(q) {
-                let scenePoseCorner = r.worldTransform*simd_float4x4(columns:(float4(1, 0, 0, 0), float4(0, 0, -1, 0), float4(0, 1, 0, 0), float4(0, 0, 0, 1)))
+                let scenePoseCorner = r.worldTransform*simd_float4x4(columns:(simd_float4(1, 0, 0, 0), simd_float4(0, 0, -1, 0), simd_float4(0, 1, 0, 0), simd_float4(0, 0, 0, 1)))
                 positions.append(scenePoseCorner.getTrans())
                 quats.append(simd_quatf(scenePoseCorner))
             }

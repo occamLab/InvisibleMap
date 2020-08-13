@@ -34,7 +34,7 @@ class ChooseMapViewController: UITableViewController {
             self.processMap(key: snapshot.key, values: snapshot.value as! [String: Any])
         }
         mapsRef.observe(.childRemoved) { (snapshot) -> Void in
-            if let existingMapIndex = self.maps.index(of: snapshot.key) {
+            if let existingMapIndex = self.maps.firstIndex(of: snapshot.key) {
                 self.maps.remove(at: existingMapIndex)
                 self.images.remove(at: existingMapIndex)
                 self.files.remove(at: existingMapIndex)
