@@ -6,6 +6,8 @@
 //  Copyright © 2020 OccamLab. All rights reserved.
 //
 
+// TODO: ARAnchors appear to move around even without calls to setWorldOrigin (this means we need to use them for map recording).  Currently we are using them for setting tag position in global frame.  We probably also want them for camera poses.  We should see if the relative transform of the two is actually changing (tag to odom) and also odom to odom.
+
 import UIKit
 import ARKit
 import FirebaseDatabase
@@ -38,6 +40,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     var timer = Timer()
     
     var snapTagsToVertical = true
+    var refreshFromAnchors = false
     var isProcessingFrame = false
     var tagCaptureAllowed = false
     let f = imageToData()
@@ -84,7 +87,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
         configuration.frameSemantics = .sceneDepth
         configuration.isAutoFocusEnabled = false
         // TODO: not sure if we can remove this to prevent relocalizations (which is good for building the map)
-        //configuration.planeDetection = [.horizontal, .vertical]
+        configuration.planeDetection = [.horizontal, .vertical]
         sceneView.session.run(configuration)
     }
     
@@ -237,6 +240,47 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
         foundTag = false
     }
     
+    func refreshDataFromAnchors() {
+        var nameToARAnchorTransform: [String: simd_float4x4] = [:]
+
+        guard let anchors = sceneView.session.currentFrame?.anchors else {
+            return
+        }
+        for anchor in anchors {
+            if let name = anchor.name {
+                nameToARAnchorTransform[name] = anchor.transform
+            }
+        }
+        for i in 0..<tagData.count {
+            for j in 0..<tagData[i].count {
+                if var tag = tagData[i][j] as? [String: Any], let tagId = tag["tagId"] as? NSNumber, let poseId = tag["poseId"] as? Int {
+                    if let newTransform = nameToARAnchorTransform[String(format: "tag_%d_%d", Int(tagId), poseId)], let newPose = nameToARAnchorTransform[String(format: "pose_%d", poseId)] {
+                        var updatedRelativePose = newPose.inverse*newTransform
+                        // back to April Tag Convention
+                        updatedRelativePose = updatedRelativePose.rotate(radians: Float.pi, 0, 0, 1)
+                        updatedRelativePose = updatedRelativePose.rotate(radians: Float.pi, 0, 1, 0)
+                        
+                        tag["tagPose"] = updatedRelativePose.toRowMajorOrderArray()
+                        tagData[i][j] = tag
+                        print("refreshing tag")
+                    }
+                }
+            }
+        }
+        for i in 0..<poseData.count {
+            if let newTransform = nameToARAnchorTransform[String(format: "pose_%d", poseData[i].last as! Int)] {
+                let rowMajorPose = newTransform.transpose.toRowMajorOrderArray()
+                // TODO could do with slices probably
+                print("beforePose", poseData[i])
+                for j in 0..<16 {
+                    poseData[i][j] = rowMajorPose[j]
+                }
+                print("refreshing pose", poseData[i])
+            }
+        }
+        // TODO: waypoints
+    }
+    
     /// Pop up a view to let the user name their map.
     @objc func popUpSaveView() {
         var mapName = "-"
@@ -244,9 +288,12 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
         alert.addTextField { (textField) in
             textField.placeholder = "Enter Recording Name Here"
         }
-        alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: {[weak alert] (_) in
+        alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: {[self, weak alert] (_) in
             guard let textField = alert?.textFields?[0], let userText = textField.text else {return}
             mapName = mapName + userText
+            if self.refreshFromAnchors {
+                self.refreshDataFromAnchors()
+            }
             self.sendToFirebase(mapName: mapName)
             self.clearData()
         }))
@@ -310,7 +357,9 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     
     /// Append new pose data to list
     @objc func recordPoseData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
-        poseData.append(getCameraCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId))
+        let (pose, transform) = getCameraCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
+        sceneView.session.add(anchor: ARAnchor(name: String(format: "pose_%d", poseId), transform: transform))
+        poseData.append(pose)
     }
     
     @objc func recordLocationData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
@@ -361,7 +410,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     }
     
     /// Get pose data (transformation matrix, time)
-    func getCameraCoordinates(cameraFrame: ARFrame, timestamp: Double, poseId: Int) -> [Any] {
+    func getCameraCoordinates(cameraFrame: ARFrame, timestamp: Double, poseId: Int) -> ([Any], simd_float4x4) {
         let camera = cameraFrame.camera
         let cameraTransform = camera.transform
         currentFrameTransform = cameraTransform
@@ -369,7 +418,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
         
         let fullMatrix: [Any] = [scene.m11, scene.m12, scene.m13, scene.m14, scene.m21, scene.m22, scene.m23, scene.m24, scene.m31, scene.m32, scene.m33, scene.m34, scene.m41, scene.m42, scene.m43, scene.m44, timestamp, poseId]
         
-        return fullMatrix
+        return (fullMatrix, currentFrameTransform)
     }
     
     func getLocationCoordinates(cameraFrame: ARFrame, timestamp: Double, poseId: Int) -> [Any] {
@@ -395,6 +444,8 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
 
             for i in 0...tagArray.count-1 {
                 addTagDetectionNode(sceneView: sceneView,  capturedImage: image, depthImage: cameraFrame.sceneDepth?.depthMap, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: &tagArray[i], cameraTransform: cameraFrame.camera.transform, cameraIntrinsics: cameraFrame.camera.intrinsics)
+                print("faking update to add anchor")
+                aprilTagDetectionDictionary[Int(tagArray[i].number)]!.willUpdateWorldOrigin(relativeTransform: matrix_identity_float4x4, poseId: poseId)
 
                 var tagDict:[String:Any] = [:]
                 var pose = tagArray[i].poseData
@@ -409,7 +460,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
                     var worldPoseFlat = worldPose.makeZFlat()//.alignY()
                     
                     if let depthImage = cameraFrame.sceneDepth?.depthMap, let aprilTagTracker = aprilTagDetectionDictionary[Int(tagArray[i].number)] {
-                        worldPoseFlat = aprilTagTracker.adjustBasedOnDepth(scenePose: worldPoseFlat, tag: &tagArray[i], depthImage: depthImage, cameraTransform: cameraFrame.camera.transform, cameraIntrinsics: cameraFrame.camera.intrinsics)
+                        worldPoseFlat = aprilTagTracker.adjustBasedOnDepth(scenePose: worldPoseFlat, tag: &tagArray[i], cameraImage: image, depthImage: depthImage, cameraTransform: cameraFrame.camera.transform, cameraIntrinsics: cameraFrame.camera.intrinsics)
                     }
 
                     // back calculate what the camera pose should be so that the pose in the global frame is flat

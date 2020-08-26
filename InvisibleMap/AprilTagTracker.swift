@@ -24,11 +24,17 @@ class AprilTagTracker {
     // staging variable for the new anchor that should be created.  This is needed to allow adjustment via setWorldOrigin
     var pendingPoseAnchorTransform: simd_float4x4?
 
-    func willUpdateWorldOrigin(relativeTransform: simd_float4x4) {
+    func willUpdateWorldOrigin(relativeTransform: simd_float4x4, poseId: Int?=nil) {
         guard let pendingPoseAnchorTransform = pendingPoseAnchorTransform else {
             return
         }
-        sceneView?.session.add(anchor: ARAnchor(name: String(format: "tag_%d", id), transform:  relativeTransform.inverse*pendingPoseAnchorTransform))
+        let anchorName: String
+        if let poseId = poseId {
+            anchorName = String(format: "tag_%d_%d", id, poseId)
+        } else {
+            anchorName = String(format: "tag_%d", id)
+        }
+        sceneView?.session.add(anchor: ARAnchor(name: anchorName, transform:  relativeTransform.inverse*pendingPoseAnchorTransform))
         self.pendingPoseAnchorTransform = nil
         for i in 0 ..< scenePositionCovariances.count {
             let q = simd_quatf(relativeTransform.inverse)
@@ -51,7 +57,7 @@ class AprilTagTracker {
         newPose.columns.3 = detectedPosition.toHomogeneous()
         pendingPoseAnchorTransform = newPose
         // TODO: check if we have to manually add these
-        var (scenePositions, sceneQuats) = getTrackedTagTransforms()
+        var (scenePositions, sceneQuats, _) = getTrackedTagTransforms()
         scenePositions.append(detectedPosition)
         sceneQuats.append(detectedQuat)
 
@@ -59,26 +65,27 @@ class AprilTagTracker {
         tagOrientation = AprilTagTracker.averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
     }
     
-    func getTrackedTagTransforms()->([simd_float3],[simd_quatf]) {
+    func getTrackedTagTransforms()->([simd_float3],[simd_quatf], [String]) {
         var positions: [simd_float3] = []
         var orientations: [simd_quatf] = []
-        guard let transforms = sceneView?.session.currentFrame?.anchors.compactMap({$0.name != nil && $0.name! == String(format: "tag_%d", id) ? $0.transform : nil }) else {
-            return (positions, orientations)
+        var names: [String] = []
+        guard let anchors = sceneView?.session.currentFrame?.anchors.compactMap({$0.name != nil && $0.name!.starts(with: String(format: "tag_%d_", id))  ? $0 : nil }) else {
+            return (positions, orientations, names)
         }
-        for transform in transforms {
+        for anchor in anchors {
+            let transform = anchor.transform
+            names.append(anchor.name!)
             positions.append(simd_float3(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z))
             orientations.append(simd_quatf(transform))
         }
         
-        return (positions, orientations)
+        return (positions, orientations, names)
     }
     
     func uncertaintyWeightedAverage(zs: Array<simd_float3>, sigmas: Array<simd_float3x3>)->simd_float3 {
         // Strategy is to use the Kalman equations (https://en.wikipedia.org/wiki/Kalman_filter#Predict) with F_k set to identity, H_k set to identity, Q_k set to zero matix, R_k set to sigmas[k]
         // TODO: allow incremental updating to save time
         // TODO: this might be numerically unstable when we have a lot of measurements
-        // DEBUG: this seems to drift all over the place when tag is far from origin
-        // DEBUG: I think it's fixed now.   Need to test more.
         
         guard var xhat_kk = zs.first, var Pkk = sigmas.first else {
             return simd_float3(Float.nan, Float.nan, Float.nan)
