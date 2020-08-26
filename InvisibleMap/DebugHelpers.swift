@@ -69,7 +69,7 @@ func addTagDetectionNode(sceneView: ARSCNView, capturedImage: UIImage, depthImag
         tagNode = SCNNode()
         tagNode.simdPosition = aprilTagTracker.tagPosition
         tagNode.simdOrientation = aprilTagTracker.tagOrientation
-        tagNode.geometry = SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0)
+        tagNode.geometry = SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0)
         tagNode.name = "Tag_\(String(tag.number))"
         tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
         sceneView.scene.rootNode.addChildNode(tagNode)
