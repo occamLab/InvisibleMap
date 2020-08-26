@@ -43,7 +43,7 @@ class AprilTagTracker {
         }
     }
 
-    func updateTagPoseMeans(id: Int, detectedPosition: simd_float3, detectedPositionVar: simd_float3x3, detectedQuat: simd_quatf, detectedQuatVar: simd_float4x4) {
+    func updateTagPoseMeans(id: Int, detectedPosition: simd_float3, detectedPositionVar: simd_float3x3, detectedQuat: simd_quatf, detectedQuatVar: simd_float4x4, doKalman: Bool) {
         // TODO: it's probably overkill, but we correct the covariances usign the anchor poses as well
         scenePositionCovariances.append(detectedPositionVar)
         sceneQuatCovariances.append(detectedQuatVar)
@@ -55,8 +55,13 @@ class AprilTagTracker {
         scenePositions.append(detectedPosition)
         sceneQuats.append(detectedQuat)
 
-        tagPosition = uncertaintyWeightedAverage(zs: scenePositions, sigmas: scenePositionCovariances)
-        tagOrientation = averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
+        if doKalman {
+            tagPosition = uncertaintyWeightedAverage(zs: scenePositions, sigmas: scenePositionCovariances)
+            tagOrientation = averageQuaternions(quats: sceneQuats, quatCovariances: sceneQuatCovariances)
+        } else {
+            tagPosition = detectedPosition
+            tagOrientation = detectedQuat
+        }
     }
     
     func getTrackedTagTransforms()->([simd_float3],[simd_quatf]) {

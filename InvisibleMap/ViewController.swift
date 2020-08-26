@@ -170,7 +170,7 @@ class ViewController: UIViewController {
             let vertex = myMap.tagVertices[tagId]
             tagDictionary[vertex.id] = vertex
             let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
-            let tagNode = SCNNode(geometry: SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0))
+            let tagNode = SCNNode(geometry: SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0))
             tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
             tagNode.transform = tagMatrix
             mapNode.addChildNode(tagNode)
@@ -302,7 +302,7 @@ class ViewController: UIViewController {
             }
             /// Add or update the tags that are detected
             for i in 0...tagArray.count-1 {
-                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
+                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, doKalman: true, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
                 /// Update the root to map transform if the tag detected is in the map
                 if let tagVertex = tagDictionary[Int(tagArray[i].number)], let originShift = updateRootToMap(vertex: tagVertex) {
                     lastAppliedOriginShift = originShift
@@ -340,7 +340,7 @@ class ViewController: UIViewController {
     /// - Parameter vertex: the tag vertex from firebase corresponding to the tag currently being detected
     func updateRootToMap(vertex: Map.Vertex)->simd_float4x4? {
         let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
-        let tagNode = SCNNode(geometry: SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0))
+        let tagNode = SCNNode(geometry: SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0))
         // TODO: we need to be doing something with setWorldOrigin here so corrections are not applied multiple times (also of interest is to look at the discrepancies between the turquoise square and the black square.  The turquoise square seems to track the AR session adjustments in a way that the black one doesn't).
         
         tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black

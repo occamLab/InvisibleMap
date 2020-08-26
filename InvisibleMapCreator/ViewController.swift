@@ -391,7 +391,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
             }
 
             for i in 0...tagArray.count-1 {
-                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraFrame.camera.transform)
+                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, doKalman: false, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraFrame.camera.transform)
 
                 var tagDict:[String:Any] = [:]
                 var pose = tagArray[i].poseData

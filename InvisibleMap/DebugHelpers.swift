@@ -14,7 +14,7 @@ import GLKit
 /// Adds or updates a tag node when a tag is detected
 ///
 /// - Parameter tag: the april tag detected by the visual servoing platform
-func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, aprilTagDetectionDictionary: inout Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4) {
+func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, doKalman: Bool, aprilTagDetectionDictionary: inout Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4) {
  //   let generator = UIImpactFeedbackGenerator(style: .heavy)
 //    generator.impactOccurred()
     let pose = tag.poseData
@@ -53,7 +53,7 @@ func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, aprilTa
     aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
 
     // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
-    aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar)
+    aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar, doKalman: doKalman)
     
     let tagNode: SCNNode
     if let existingTagNode = sceneView.scene.rootNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
@@ -64,7 +64,7 @@ func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, aprilTa
         tagNode = SCNNode()
         tagNode.simdPosition = aprilTagTracker.tagPosition
         tagNode.simdOrientation = aprilTagTracker.tagOrientation
-        tagNode.geometry = SCNBox(width: 0.11, height: 0.11, length: 0.05, chamferRadius: 0)
+        tagNode.geometry = SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0)
         tagNode.name = "Tag_\(String(tag.number))"
         tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
         sceneView.scene.rootNode.addChildNode(tagNode)
