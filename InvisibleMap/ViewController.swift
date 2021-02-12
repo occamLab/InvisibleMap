@@ -373,7 +373,7 @@ class ViewController: UIViewController {
     /// Automatically decodes the map Json files from firebase
     struct Map: Decodable {
         var tagVertices: [Vertex]
-        let odometryVertices: [Vertex]
+        let odometryVertices: [OdomVertex]
         let waypointsVertices: [WaypointVertex]
         
         enum CodingKeys: String, CodingKey {
@@ -428,6 +428,45 @@ class ViewController: UIViewController {
                 
                 enum CodingKeys: String, CodingKey {
                     case id
+                    case translation = "translation"
+                    case rotation = "rotation"
+                }
+                
+                struct vector3: Decodable {
+                    let x: Float
+                    let y: Float
+                    let z: Float
+                    
+                    enum CodingKeys: String, CodingKey {
+                        case x = "x"
+                        case y = "y"
+                        case z = "z"
+                    }
+                }
+                
+                struct quaternion:Decodable {
+                    var x: Float
+                    var y: Float
+                    var z: Float
+                    var w: Float
+                    
+                    
+                    enum CodingKeys: String, CodingKey {
+                        case x = "x"
+                        case y = "y"
+                        case z = "z"
+                        case w = "w"
+                    }
+                }
+                
+            }
+        
+        
+            struct OdomVertex: Decodable {
+                let translation: vector3
+                var rotation: quaternion
+                
+                enum CodingKeys: String, CodingKey {
                     case translation = "translation"
                     case rotation = "rotation"
                 }
