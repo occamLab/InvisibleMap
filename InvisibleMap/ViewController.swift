@@ -463,10 +463,12 @@ class ViewController: UIViewController {
         
         
             struct OdomVertex: Decodable {
+                let poseId: Int
                 let translation: vector3
                 var rotation: quaternion
                 
                 enum CodingKeys: String, CodingKey {
+                    case poseId
                     case translation = "translation"
                     case rotation = "rotation"
                 }
