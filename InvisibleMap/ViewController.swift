@@ -14,6 +14,7 @@ import FirebaseDatabase
 import FirebaseStorage
 
 // TODO: can probably just do 1d Kalman filtering for angle
+// TODO: if we use ARPlaneAnchor instead of the raw depth data, will that lead to better plane detection accuracy?  This doesn't seem to be the case when we tried to use the depth data directly (also note that we were not using the smoothed depth data)
 
 /// The view controller for displaying a map and announcing waypoints
 class ViewController: UIViewController {
