@@ -34,7 +34,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     @IBOutlet var moveToButton: UIButton!
     // label to print needed messages
     @IBOutlet var explainLabel: UILabel!
-
+    @IBOutlet weak var poseNumber: UILabel!
     var timer = Timer()
     
     var snapTagsToVertical = true
@@ -297,6 +297,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
             recordPoseData(cameraFrame: cameraFrame!, timestamp: timestamp!, poseId: poseId)
             recordTags(cameraFrame: cameraFrame!, timestamp: timestamp!, poseId: poseId)
             recordLocationData(cameraFrame: cameraFrame!, timestamp: timestamp!, poseId: poseId)
+            poseNumber.text = "Pose #: \(poseId)"
             poseId += 1
             
             if isMovingBox == true {
