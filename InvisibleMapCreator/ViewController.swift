@@ -5,6 +5,10 @@
 //  Created by djconnolly27 on 7/11/18.
 //  Copyright © 2020 OccamLab. All rights reserved.
 //
+//
+// TODO: it would be pretty interesting to anchor the April Tags to detected planes during map creation.  In this way we could potentially leverage any SLAM updates that happen within ARKit and wind up with an ARWorldMap that is coherent with what we infer ourselves
+//
+
 
 import UIKit
 import ARKit
