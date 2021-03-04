@@ -11,12 +11,52 @@ import UIKit
 import ARKit
 import GLKit
 
+extension simd_float4x4 {
+    /// Get the rotation component of the transform.
+    func rotation() -> float3x3 {
+        return simd_float3x3(simd_float3(self[0, 0], self[0, 1], self[0, 2]),
+                             simd_float3(self[1, 0], self[1, 1], self[1, 2]),
+                             simd_float3(self[2, 0], self[2, 1], self[2, 2]))
+    }
+    var translation: simd_float3 {
+        return simd_float3(self.columns.3.x, self.columns.3.y, self.columns.3.z)
+    }
+}
+
+extension ARFrame {
+    func getRay(forPixel pixel: CGPoint)->(simd_float3, simd_float3){
+        return getRayHelper(forPixel: pixel, withIntrinsics: self.camera.intrinsics, withCameraTransform: self.camera.transform)
+    }
+}
+
+func getRayHelper(forPixel: CGPoint, withIntrinsics intrinsics: simd_float3x3, withCameraTransform transform: simd_float4x4)->(simd_float3, simd_float3) {
+    let rayDirection = intrinsics.inverse * simd_float3(Float(forPixel.x), Float(forPixel.y), 1.0)
+    
+    // The camera coordinates for ARKit have x going across the image, positive y going up and negative z going away from the camera (see https://developer.apple.com/documentation/arkit/arworldalignment/arworldalignmentcamera?language=objc)
+    let rayDirectionTransformed = simd_float3(rayDirection.x, -rayDirection.y, -rayDirection.z)
+
+    let castOrigin = transform.translation
+    let castDirection = transform.rotation() * rayDirectionTransformed
+    return (castOrigin, castDirection)
+}
+
+
+private func doRayCast(sceneView: ARSCNView, detectedPosition: simd_float3, arFrame: ARFrame)->ARRaycastResult? {
+    let castOrigin = arFrame.camera.transform.translation
+    let castDirection = simd_normalize(detectedPosition - castOrigin)
+    let query = ARRaycastQuery(origin: castOrigin, direction: castDirection, allowing: .existingPlaneGeometry, alignment: .vertical)
+    let results = sceneView.session.raycast(query).filter({$0.anchor is ARPlaneAnchor})
+    let closestHit = results.min(by: {simd_length($0.worldTransform.translation - arFrame.camera.transform.translation) < simd_length($1.worldTransform.translation - arFrame.camera.transform.translation)})
+    return closestHit
+}
+
 /// Adds or updates a tag node when a tag is detected
 ///
 /// - Parameter tag: the april tag detected by the visual servoing platform
-func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, doKalman: Bool, aprilTagDetectionDictionary: inout Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4) {
+func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, doKalman: Bool, aprilTagDetectionDictionary: inout Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4, frame: ARFrame) {
  //   let generator = UIImpactFeedbackGenerator(style: .heavy)
 //    generator.impactOccurred()
+    let anchorToPlane = false
     let pose = tag.poseData
     let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
     let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
@@ -28,7 +68,11 @@ func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, doKalma
     let tagPoseARKit = aprilTagToARKit*originalTagPose
     // project into world coordinates
     var scenePose = cameraTransform*tagPoseARKit
-
+    guard let cast = doRayCast(sceneView: sceneView, detectedPosition: scenePose.translation, arFrame: frame), let anchor = cast.anchor, let anchorNode = sceneView.node(for: anchor) else {
+        return
+    }
+    scenePose = cast.worldTransform
+    let anchorPose = anchor.transform.inverse*scenePose
     if snapTagsToVertical {
         scenePose = scenePose.makeZFlat().alignY()
     }
@@ -48,15 +92,22 @@ func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, doKalma
     let sceneQuatVar = quatMultiplyAsLinearTransform*quatVarMatrix*quatMultiplyAsLinearTransform.transpose
 
     let scenePoseQuat = simd_quatf(scenePose)
-    let scenePoseTranslation = scenePose.getTrans()
+    let anchorPoseQuat = simd_quatf(anchorPose)*simd_quatf(angle: -Float.pi/2, axis:simd_float3(1,0,0))
+
     let aprilTagTracker = aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(sceneView, tagId: Int(tag.number))]
     aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
 
     // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
-    aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar, doKalman: doKalman)
+    if anchorToPlane {
+        // TODO: this is testing anchoring to planes instead of to positions, but I don't know that it is really any better (it might just interfere with deleting old planes)
+
+        aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: anchorPose.getTrans(), detectedPositionVar: sceneTransVar, detectedQuat: anchorPoseQuat, detectedQuatVar: sceneQuatVar, doKalman: doKalman)
+    } else {
+        aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePose.getTrans(), detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar, doKalman: doKalman)
+    }
     
     let tagNode: SCNNode
-    if let existingTagNode = sceneView.scene.rootNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
+    if let existingTagNode = sceneView.scene.rootNode.childNode(withName: "Tag_\(String(tag.number))", recursively: anchorToPlane)  {
         tagNode = existingTagNode
         tagNode.simdPosition = aprilTagTracker.tagPosition
         tagNode.simdOrientation = aprilTagTracker.tagOrientation
@@ -67,7 +118,11 @@ func addTagDetectionNode(sceneView: ARSCNView, snapTagsToVertical: Bool, doKalma
         tagNode.geometry = SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0)
         tagNode.name = "Tag_\(String(tag.number))"
         tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
-        sceneView.scene.rootNode.addChildNode(tagNode)
+        if anchorToPlane {
+            anchorNode.addChildNode(tagNode)
+        } else {
+            sceneView.scene.rootNode.addChildNode(tagNode)
+        }
     }
     
     /// Adds axes to the tag to aid in the visualization
