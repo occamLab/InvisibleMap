@@ -17,7 +17,6 @@
 		82468A2E24C88B6800FD31BC /* LaunchScreenMapCreator.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 82468A2C24C88B6800FD31BC /* LaunchScreenMapCreator.storyboard */; };
 		82468A3824C8901800FD31BC /* MainMapCreator.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 82468A3A24C8901800FD31BC /* MainMapCreator.storyboard */; };
 		82A567D124C892F40066DA50 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
-		82A567D324C893AF0066DA50 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A567D224C893AF0066DA50 /* ViewController.swift */; };
 		82A567D424C893FC0066DA50 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4A2113394B007343B4 /* main.m */; };
 		82A567D524C894070066DA50 /* TagFinder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4C2113394B007343B4 /* TagFinder.mm */; };
 		82A567D624C894120066DA50 /* ImageDisplay.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4721133939007343B4 /* ImageDisplay.mm */; };
@@ -44,6 +43,7 @@
 		86F39544210FA42500F209EC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39542210FA42500F209EC /* Main.storyboard */; };
 		86F39546210FA42600F209EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86F39545210FA42600F209EC /* Assets.xcassets */; };
 		86F39549210FA42600F209EC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39547210FA42600F209EC /* LaunchScreen.storyboard */; };
+		983FF0D526019543008B13EF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983FF0D426019543008B13EF /* ViewController.swift */; };
 		C083FDE9792A57723D51077F /* Pods_InvisibleMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */; };
 /* End PBXBuildFile section */
 
@@ -57,7 +57,6 @@
 		82468A2D24C88B6800FD31BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreenMapCreator.storyboard; sourceTree = "<group>"; };
 		82468A2F24C88B6800FD31BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		82468A3924C8901800FD31BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainMapCreator.storyboard; sourceTree = "<group>"; };
-		82A567D224C893AF0066DA50 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		82A567D824C894640066DA50 /* ManageLocationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageLocationController.swift; sourceTree = "<group>"; };
 		82A567DA24C894930066DA50 /* SaveLocationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveLocationController.swift; sourceTree = "<group>"; };
 		82A567DC24C895EC0066DA50 /* TagFinder-Swift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TagFinder-Swift.h"; sourceTree = "<group>"; };
@@ -86,6 +85,7 @@
 		86F39553210FA42600F209EC /* InvisibleMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapTests.swift; sourceTree = "<group>"; };
 		86F39555210FA42600F209EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8833ECE2D199509ED373632C /* Pods-InvisibleMapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapTests/Pods-InvisibleMapTests.debug.xcconfig"; sourceTree = "<group>"; };
+		983FF0D426019543008B13EF /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = ../../../Downloads/ViewController.swift; sourceTree = "<group>"; };
 		A6C67955B6E8A782817AA66D /* Pods-InvisibleMapCreator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapCreator/Pods-InvisibleMapCreator.debug.xcconfig"; sourceTree = "<group>"; };
 		C1B323A62949E8BB9B0F9C91 /* Pods-InvisibleMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMap.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMap/Pods-InvisibleMap.release.xcconfig"; sourceTree = "<group>"; };
 		C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -135,7 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				82468A3A24C8901800FD31BC /* MainMapCreator.storyboard */,
-				82A567D224C893AF0066DA50 /* ViewController.swift */,
+				983FF0D426019543008B13EF /* ViewController.swift */,
 				82A567D824C894640066DA50 /* ManageLocationController.swift */,
 				82A567E524C89EAC0066DA50 /* AppDelegate.swift */,
 				82A567DA24C894930066DA50 /* SaveLocationController.swift */,
@@ -274,7 +274,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1160;
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = "Occam Lab";
 				TargetAttributes = {
 					82468A1E24C88B6600FD31BC = {
@@ -420,8 +420,8 @@
 				82A567D424C893FC0066DA50 /* main.m in Sources */,
 				82A567E624C89EAC0066DA50 /* AppDelegate.swift in Sources */,
 				82A567DD24C8976F0066DA50 /* simd+ext.swift in Sources */,
+				983FF0D526019543008B13EF /* ViewController.swift in Sources */,
 				82A567D724C8942D0066DA50 /* ImageConversion.mm in Sources */,
-				82A567D324C893AF0066DA50 /* ViewController.swift in Sources */,
 				822FA78724E2FB3E0001F463 /* AprilTagTracker.swift in Sources */,
 				82A567D924C894640066DA50 /* ManageLocationController.swift in Sources */,
 				82A567D624C894120066DA50 /* ImageDisplay.mm in Sources */,
@@ -565,6 +565,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -590,7 +591,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -626,6 +627,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -645,7 +647,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
