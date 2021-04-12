@@ -61,7 +61,7 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
         }
     }
     std::vector< std::vector< vpImagePoint> > imagePoints = detector->getTagsCorners();
-    std::map< int, double > idSizeMap = {{-1, 0.2032}};
+    std::map< int, double > idSizeMap = {{-1, 0.173}};
     std::vector<std::vector<vpPoint>> tagsPoints = detector->getTagsPoints3D(detector->getTagsId(), idSizeMap);
     
     std::vector<cv::Point3f> list_points3d;
@@ -202,7 +202,7 @@ cv::Matx31d quaternionToRotvec(const cv::Matx41d& q)
     
      // Detect AprilTag
      vpDetectorAprilTag::vpPoseEstimationMethod poseEstimationMethod = vpDetectorAprilTag::HOMOGRAPHY_VIRTUAL_VS;
-     double tagSize = 0.2032; // Size of 8.5x11" printed april tags
+     double tagSize = 0.173; // Size of 8.5x11" printed april tags
      float quad_decimate = 1.0;
      int nThreads = 1;
     
