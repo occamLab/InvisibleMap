@@ -34,12 +34,8 @@ class AppController {
                 mapRecorder.displayWaypointsUI()
             case .SaveMap(let mapName):
                 mapRecorder.saveMap(mapName: mapName)
-            case .RecordPoseData(cameraFrame: let cameraFrame, timestamp: let timestamp, poseId: let poseId):
-                mapRecorder.recordPoseData(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
-            case .RecordTags(cameraFrame: let cameraFrame, timestamp: let timestamp, poseId: let poseId):
-                mapRecorder.recordTags(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
-            case .RecordLocationData(cameraFrame: let cameraFrame, timestamp: let timestamp, poseId: let poseId):
-                mapRecorder.recordLocationData(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
+            case .RecordData(cameraFrame: let cameraFrame):
+                mapRecorder.recordData(cameraFrame: cameraFrame)
             }
         }
     }
@@ -64,6 +60,11 @@ extension AppController {
         processCommands(commands: state.handleEvent(event: .StopRecordingRequested/*(mapName: "placeholder")*/))
         print(state)
     }
+    
+    func processNewARFrame(frame: ARFrame) {
+        processCommands(commands: state.handleEvent(event: .NewARFrame(cameraFrame: frame)))
+        print("New AR Frame processed!")
+    }
 }
 
 protocol ContentViewController {
@@ -77,7 +78,5 @@ protocol MapRecorderController {
     func addWaypoint(pose: simd_float4x4, poseId: Int, waypointName: String)
     func displayWaypointsUI()
     func saveMap(mapName: String)
-    func recordPoseData(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-    func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-    func recordLocationData(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
+    func recordData(cameraFrame: ARFrame)
 }

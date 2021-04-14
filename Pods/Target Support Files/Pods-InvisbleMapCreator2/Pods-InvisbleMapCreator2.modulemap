@@ -1,0 +1,6 @@
+framework module Pods_InvisbleMapCreator2 {
+  umbrella header "Pods-InvisbleMapCreator2-umbrella.h"
+
+  export *
+  module * { export * }
+}

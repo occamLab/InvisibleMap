@@ -1,0 +1,5 @@
+${PODS_ROOT}/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2-frameworks.sh
+${BUILT_PRODUCTS_DIR}/GTMSessionFetcher-iOS14.4/GTMSessionFetcher.framework
+${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac-iOS14.4/GoogleToolboxForMac.framework
+${BUILT_PRODUCTS_DIR}/leveldb-library-iOS14.4/leveldb.framework
+${BUILT_PRODUCTS_DIR}/nanopb-iOS14.4/nanopb.framework

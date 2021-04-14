@@ -1,0 +1,6 @@
+framework module FirebaseDatabase {
+  umbrella header "FirebaseDatabase-iOS13.0-umbrella.h"
+
+  export *
+  module * { export * }
+}

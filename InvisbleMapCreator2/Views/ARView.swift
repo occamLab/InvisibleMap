@@ -34,10 +34,9 @@ class ARView: UIViewController {
     
     // Load, assign a delegate, and create a scene
     override func viewDidLoad() {
-       super.viewDidLoad()
-       arView.delegate = self
-       arView.scene = SCNScene()
-       //arView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
+        super.viewDidLoad()
+        arView.session.delegate = self
+        arView.scene = SCNScene()
     }
     
     // Functions for standard AR view handling
@@ -51,7 +50,6 @@ class ARView: UIViewController {
        super.viewWillAppear(animated)
        let configuration = ARWorldTrackingConfiguration()
        arView.session.run(configuration)
-       arView.delegate = self
     }
     override func viewWillDisappear(_ animated: Bool) {
        super.viewWillDisappear(animated)
@@ -59,18 +57,18 @@ class ARView: UIViewController {
     }
 }
 
-/*
 extension ARView: ARSessionDelegate {
     public func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
-        NavigationController.shared.trackingStatusChanged(session: session, camera: camera)
+        //NavigationController.shared.trackingStatusChanged(session: session, camera: camera)
     }
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        NavigationController.shared.processNewARFrame(frame: frame)
+        AppController.shared.processNewARFrame(frame: frame)
+        print("New Frame")
     }
 }
-*/
 
+/*
 extension ARView: ARSCNViewDelegate { // Protocol that handles content updates- essentially a visual representation of AR ession
     
     // ARSCNViewDelegate
@@ -81,13 +79,5 @@ extension ARView: ARSCNViewDelegate { // Protocol that handles content updates- 
     camera: ARCamera) {}
     
 }
+ */
 
-// Use the ARSessionDelegate protocol to handle new frames
-// Use the ARSessionObserver protocol - session function (cameraDidChangeTrackingState) will keep track of the ARSession lifecycle
-
-
-// create searate class to handle interface of ar sesion
-// defnie relevant function to record when new frame is available
-// then trigger event
-// class will manage creation of ar session then register the delegate then trigger events related to the ar session (e.g. new
-// func sessionDidReceiveNewFrame print(frame.timestamp)

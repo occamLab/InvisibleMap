@@ -25,7 +25,7 @@ enum AppState: StateType {
         case OptionsMenuRequested
         case MainScreenRequested
         // RecordMap events
-        case NewARFrame(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
+        case NewARFrame(cameraFrame: ARFrame)
         case NewTagFound(pose: simd_float4x4, tagId: Int)
         case AddWaypointRequested(pose: simd_float4x4, poseId: Int, waypointName: String)
         case ViewWaypointsRequested
@@ -37,9 +37,7 @@ enum AppState: StateType {
         case DisplayRecordingUI
         case DisplayOptionsMenu
         // RecordMap commands
-        case RecordPoseData(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-        case RecordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-        case RecordLocationData(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
+        case RecordData(cameraFrame: ARFrame)
         case AddTag(pose: simd_float4x4, tagId: Int)
         case AddWaypoint(pose: simd_float4x4, poseId: Int, waypointName: String)
         case DisplayWaypointsUI
@@ -86,7 +84,7 @@ enum RecordMapState: StateType {
     
     // All the effectual inputs from the app which RecordMapState can react to
     enum Event {
-        case NewARFrame(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
+        case NewARFrame(cameraFrame: ARFrame)
         case NewTagFound(pose: simd_float4x4, tagId: Int)
         case AddWaypointRequested(pose: simd_float4x4, poseId: Int, waypointName: String)
         case ViewWaypointsRequested
@@ -98,10 +96,8 @@ enum RecordMapState: StateType {
     // In response to an event, RecordMapState may emit a command
     mutating func handleEvent(event: Event) -> [Command] {
         switch (self, event) {
-        case(.RecordMap, .NewARFrame(let cameraFrame, let timestamp, let poseId)):
-            return [.RecordPoseData(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId),
-                    .RecordTags(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId),
-                    .RecordLocationData(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)]
+        case(.RecordMap, .NewARFrame(let cameraFrame)):
+            return [.RecordData(cameraFrame: cameraFrame)]
         case(.RecordMap, .NewTagFound(let pose, let tagId)):
             return [.AddTag(pose: pose, tagId: tagId)]
         case(.RecordMap, .AddWaypointRequested(let pose, let poseId, let waypointName)):

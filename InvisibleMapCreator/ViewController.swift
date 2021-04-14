@@ -45,7 +45,7 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     var isProcessingFrame = false
     var tagCaptureAllowed = false
     let f = imageToData()
-    let aprilTagQueue = DispatchQueue(label: "edu.occamlab.apriltagfinder", qos: DispatchQoS.userInitiated)
+    let aprilTagQueue = DispatchQueue(label: "edu.occamlab.apriltagfinder", qos: DispatchQoS.userInitiated) //Allows you to asynchronously run a job on a background thread
     var tagData:[[Any]] = []
     var poseData:[[Any]] = []
     var locationData:[[Any]] = []

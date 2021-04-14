@@ -7,8 +7,27 @@
 
 import Foundation
 import ARKit
+import FirebaseDatabase
+import FirebaseStorage
 
 class MapRecorder: MapRecorderController {
+    
+    var lastRecordedTimestamp: Double?
+    
+    var firebaseRef: DatabaseReference!
+    var firebaseStorage: Storage!
+    var firebaseStorageRef: StorageReference!
+    
+    func initFirebase() {
+        firebaseRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference()
+        firebaseStorage = Storage.storage()
+        firebaseStorageRef = firebaseStorage.reference()
+    }
+    
+    init() {
+        initFirebase()
+        print("Firebase initialized")
+    }
 
     var waypoints: [(simd_float4x4, Int)] = []
     
@@ -25,13 +44,13 @@ class MapRecorder: MapRecorderController {
     func saveMap(mapName: String) {
     }
     
-    func recordPoseData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
+    func recordData(cameraFrame: ARFrame) {
+        if lastRecordedTimestamp == nil {
+            lastRecordedTimestamp = cameraFrame.timestamp
+        }
+        else if lastRecordedTimestamp! + 0.1 < cameraFrame.timestamp {
+            lastRecordedTimestamp = lastRecordedTimestamp! + 0.1
+        }
     }
-    
-    func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
-    }
-    
-    func recordLocationData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
-    }
-    
+
 }

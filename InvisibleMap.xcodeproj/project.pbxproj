@@ -30,6 +30,15 @@
 		1447B75C2624230200230A58 /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7562624230200230A58 /* StateType.swift */; };
 		1447B75E2624230200230A58 /* MapRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7592624230200230A58 /* MapRecorder.swift */; };
 		1447B75F2624230200230A58 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B75A2624230200230A58 /* AppState.swift */; };
+		14995FAE2626399A00A7C78B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
+		14995FB2262639DA00A7C78B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4A2113394B007343B4 /* main.m */; };
+		14995FB6262639E400A7C78B /* TagFinder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4C2113394B007343B4 /* TagFinder.mm */; };
+		14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4721133939007343B4 /* ImageDisplay.mm */; };
+		14995FB8262639ED00A7C78B /* ImageConversion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4521133939007343B4 /* ImageConversion.mm */; };
+		14995FBC26263A0900A7C78B /* AprilTagTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */; };
+		14995FC026263B3100A7C78B /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
+		14995FC426263BA800A7C78B /* visp3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86616BC42113369200DD565C /* visp3.framework */; };
+		14995FC826263BB700A7C78B /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8630963B21125E89003D4434 /* opencv2.framework */; };
 		7AFFB8FB1F7230AC88C3A531 /* Pods_InvisibleMapCreator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */; };
 		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
 		822FA78424E2FB000001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
@@ -68,6 +77,7 @@
 		86F39546210FA42600F209EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86F39545210FA42600F209EC /* Assets.xcassets */; };
 		86F39549210FA42600F209EC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39547210FA42600F209EC /* LaunchScreen.storyboard */; };
 		C083FDE9792A57723D51077F /* Pods_InvisibleMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */; };
+		E70E471D7C474EB907B3AC47 /* Pods_InvisbleMapCreator2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB5425F26FBD3AC1712F11A8 /* Pods_InvisbleMapCreator2.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -97,6 +107,8 @@
 		1447B7592624230200230A58 /* MapRecorder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapRecorder.swift; sourceTree = "<group>"; };
 		1447B75A2624230200230A58 /* AppState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7380E641E45D1897DE94C626 /* Pods-InvisbleMapCreator2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisbleMapCreator2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2.debug.xcconfig"; sourceTree = "<group>"; };
+		73E521D0CF00592EDC2AFFD6 /* Pods-InvisbleMapCreator2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisbleMapCreator2.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2.release.xcconfig"; sourceTree = "<group>"; };
 		822FA78224E2F9750001F463 /* DebugHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugHelpers.swift; sourceTree = "<group>"; };
 		822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AprilTagTracker.swift; sourceTree = "<group>"; };
 		82468A1F24C88B6600FD31BC /* InvisibleMapCreator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisibleMapCreator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -135,6 +147,7 @@
 		86F39555210FA42600F209EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8833ECE2D199509ED373632C /* Pods-InvisibleMapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapTests/Pods-InvisibleMapTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A6C67955B6E8A782817AA66D /* Pods-InvisibleMapCreator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapCreator/Pods-InvisibleMapCreator.debug.xcconfig"; sourceTree = "<group>"; };
+		BB5425F26FBD3AC1712F11A8 /* Pods_InvisbleMapCreator2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisbleMapCreator2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B323A62949E8BB9B0F9C91 /* Pods-InvisibleMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMap.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMap/Pods-InvisibleMap.release.xcconfig"; sourceTree = "<group>"; };
 		C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapCreator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,6 +161,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14995FC826263BB700A7C78B /* opencv2.framework in Frameworks */,
+				14995FC426263BA800A7C78B /* visp3.framework in Frameworks */,
+				E70E471D7C474EB907B3AC47 /* Pods_InvisbleMapCreator2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,6 +198,7 @@
 				C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */,
 				5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */,
 				D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */,
+				BB5425F26FBD3AC1712F11A8 /* Pods_InvisbleMapCreator2.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -358,6 +375,8 @@
 				F874C32660D9A94E1C916A75 /* Pods-InvisibleMapTests.release.xcconfig */,
 				A6C67955B6E8A782817AA66D /* Pods-InvisibleMapCreator.debug.xcconfig */,
 				F1A754790DB29E0852547A86 /* Pods-InvisibleMapCreator.release.xcconfig */,
+				7380E641E45D1897DE94C626 /* Pods-InvisbleMapCreator2.debug.xcconfig */,
+				73E521D0CF00592EDC2AFFD6 /* Pods-InvisbleMapCreator2.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -369,9 +388,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1447B711262421CF00230A58 /* Build configuration list for PBXNativeTarget "InvisbleMapCreator2" */;
 			buildPhases = (
+				949B0B21991611CF154D2EFD /* [CP] Check Pods Manifest.lock */,
 				1447B6FF262421CC00230A58 /* Sources */,
 				1447B700262421CC00230A58 /* Frameworks */,
 				1447B701262421CC00230A58 /* Resources */,
+				F5DAABCA2292B37AD0EDFAC0 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -469,6 +490,7 @@
 			files = (
 				1447B70D262421CF00230A58 /* Preview Assets.xcassets in Resources */,
 				1447B70A262421CF00230A58 /* Assets.xcassets in Resources */,
+				14995FAE2626399A00A7C78B /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -538,6 +560,28 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		949B0B21991611CF154D2EFD /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-InvisbleMapCreator2-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		DBFB1FE8B2DA7770844FE8F7 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -573,6 +617,23 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		F5DAABCA2292B37AD0EDFAC0 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -580,15 +641,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14995FBC26263A0900A7C78B /* AprilTagTracker.swift in Sources */,
 				1447B72E2624227600230A58 /* ButtonLayout.swift in Sources */,
 				1447B7302624227600230A58 /* UndoButton.swift in Sources */,
+				14995FB8262639ED00A7C78B /* ImageConversion.mm in Sources */,
 				1447B7312624227600230A58 /* MenuButton.swift in Sources */,
 				1447B7352624227600230A58 /* SideMenuOptionView.swift in Sources */,
 				1447B72F2624227600230A58 /* ARView.swift in Sources */,
 				1447B75B2624230200230A58 /* AppController.swift in Sources */,
+				14995FC026263B3100A7C78B /* simd+ext.swift in Sources */,
 				1447B7322624227600230A58 /* RecordMapButton.swift in Sources */,
 				1447B706262421CC00230A58 /* InvisbleMapCreator2App.swift in Sources */,
+				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
 				1447B73B2624227600230A58 /* VideoWalkthroughView.swift in Sources */,
+				14995FB6262639E400A7C78B /* TagFinder.mm in Sources */,
 				1447B7382624227600230A58 /* ManageMapsView.swift in Sources */,
 				1447B7342624227600230A58 /* AddLocationButton.swift in Sources */,
 				1447B7372624227600230A58 /* GiveFeedbackView.swift in Sources */,
@@ -600,6 +666,7 @@
 				1447B73A2624227600230A58 /* SideMenuView.swift in Sources */,
 				1447B75E2624230200230A58 /* MapRecorder.swift in Sources */,
 				1447B7332624227600230A58 /* ManageLocationsButton.swift in Sources */,
+				14995FB2262639DA00A7C78B /* main.m in Sources */,
 				1447B7362624227600230A58 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -680,6 +747,7 @@
 /* Begin XCBuildConfiguration section */
 		1447B70F262421CF00230A58 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7380E641E45D1897DE94C626 /* Pods-InvisbleMapCreator2.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -688,6 +756,10 @@
 				DEVELOPMENT_ASSET_PATHS = "\"InvisbleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = K78N9SK8FW;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = InvisbleMapCreator2/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -705,6 +777,7 @@
 		};
 		1447B710262421CF00230A58 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 73E521D0CF00592EDC2AFFD6 /* Pods-InvisbleMapCreator2.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -713,6 +786,10 @@
 				DEVELOPMENT_ASSET_PATHS = "\"InvisbleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = K78N9SK8FW;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = InvisbleMapCreator2/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
