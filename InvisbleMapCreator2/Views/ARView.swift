@@ -67,17 +67,3 @@ extension ARView: ARSessionDelegate {
         print("New Frame")
     }
 }
-
-/*
-extension ARView: ARSCNViewDelegate { // Protocol that handles content updates- essentially a visual representation of AR ession
-    
-    // ARSCNViewDelegate
-    func sessionWasInterrupted(_ session: ARSession) {}
-    func sessionInterruptionEnded(_ session: ARSession) {}
-    func session(_ session: ARSession, didFailWithError error: Error) {}
-    func session(_ session: ARSession, cameraDidChangeTrackingState
-    camera: ARCamera) {}
-    
-}
- */
-

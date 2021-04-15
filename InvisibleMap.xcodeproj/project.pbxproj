@@ -39,6 +39,12 @@
 		14995FC026263B3100A7C78B /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
 		14995FC426263BA800A7C78B /* visp3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86616BC42113369200DD565C /* visp3.framework */; };
 		14995FC826263BB700A7C78B /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8630963B21125E89003D4434 /* opencv2.framework */; };
+		14995FCD2626942400A7C78B /* MapRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FCC2626942400A7C78B /* MapRow.swift */; };
+		14995FD226269AB400A7C78B /* ExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD126269AB400A7C78B /* ExitButton.swift */; };
+		14995FD726269B0900A7C78B /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD626269B0900A7C78B /* SaveButton.swift */; };
+		14995FE0262711C800A7C78B /* LocationsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FDF262711C800A7C78B /* LocationsButton.swift */; };
+		14995FE52627123E00A7C78B /* ManageMaps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FE42627123E00A7C78B /* ManageMaps.swift */; };
+		14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FE9262713EC00A7C78B /* RecordMapView.swift */; };
 		7AFFB8FB1F7230AC88C3A531 /* Pods_InvisibleMapCreator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */; };
 		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
 		822FA78424E2FB000001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
@@ -106,6 +112,12 @@
 		1447B7562624230200230A58 /* StateType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
 		1447B7592624230200230A58 /* MapRecorder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapRecorder.swift; sourceTree = "<group>"; };
 		1447B75A2624230200230A58 /* AppState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		14995FCC2626942400A7C78B /* MapRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRow.swift; sourceTree = "<group>"; };
+		14995FD126269AB400A7C78B /* ExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitButton.swift; sourceTree = "<group>"; };
+		14995FD626269B0900A7C78B /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
+		14995FDF262711C800A7C78B /* LocationsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsButton.swift; sourceTree = "<group>"; };
+		14995FE42627123E00A7C78B /* ManageMaps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageMaps.swift; sourceTree = "<group>"; };
+		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7380E641E45D1897DE94C626 /* Pods-InvisbleMapCreator2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisbleMapCreator2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2.debug.xcconfig"; sourceTree = "<group>"; };
 		73E521D0CF00592EDC2AFFD6 /* Pods-InvisbleMapCreator2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisbleMapCreator2.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2.release.xcconfig"; sourceTree = "<group>"; };
@@ -227,11 +239,11 @@
 		1447B71F2624227600230A58 /* Button Views */ = {
 			isa = PBXGroup;
 			children = (
-				1447B7202624227600230A58 /* UndoButton.swift */,
-				1447B7212624227600230A58 /* MenuButton.swift */,
-				1447B7222624227600230A58 /* RecordMapButton.swift */,
-				1447B7232624227600230A58 /* ManageLocationsButton.swift */,
-				1447B7242624227600230A58 /* AddLocationButton.swift */,
+				1447B71D2624227600230A58 /* ButtonLayout.swift */,
+				14995FDF262711C800A7C78B /* LocationsButton.swift */,
+				14995FD126269AB400A7C78B /* ExitButton.swift */,
+				14995FD626269B0900A7C78B /* SaveButton.swift */,
+				14995FDB26269B6D00A7C78B /* Archive */,
 			);
 			path = "Button Views";
 			sourceTree = "<group>";
@@ -256,7 +268,9 @@
 			children = (
 				1447B7412624229600230A58 /* ContentView.swift */,
 				1447B71E2624227600230A58 /* ARView.swift */,
-				1447B71D2624227600230A58 /* ButtonLayout.swift */,
+				14995FCC2626942400A7C78B /* MapRow.swift */,
+				14995FE42627123E00A7C78B /* ManageMaps.swift */,
+				14995FE9262713EC00A7C78B /* RecordMapView.swift */,
 				1447B71F2624227600230A58 /* Button Views */,
 				1447B7252624227600230A58 /* Menu Views */,
 			);
@@ -280,6 +294,18 @@
 				1447B7592624230200230A58 /* MapRecorder.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		14995FDB26269B6D00A7C78B /* Archive */ = {
+			isa = PBXGroup;
+			children = (
+				1447B7202624227600230A58 /* UndoButton.swift */,
+				1447B7212624227600230A58 /* MenuButton.swift */,
+				1447B7222624227600230A58 /* RecordMapButton.swift */,
+				1447B7232624227600230A58 /* ManageLocationsButton.swift */,
+				1447B7242624227600230A58 /* AddLocationButton.swift */,
+			);
+			path = Archive;
 			sourceTree = "<group>";
 		};
 		82468A2024C88B6600FD31BC /* InvisibleMapCreator */ = {
@@ -646,19 +672,25 @@
 				1447B7302624227600230A58 /* UndoButton.swift in Sources */,
 				14995FB8262639ED00A7C78B /* ImageConversion.mm in Sources */,
 				1447B7312624227600230A58 /* MenuButton.swift in Sources */,
+				14995FE52627123E00A7C78B /* ManageMaps.swift in Sources */,
 				1447B7352624227600230A58 /* SideMenuOptionView.swift in Sources */,
 				1447B72F2624227600230A58 /* ARView.swift in Sources */,
 				1447B75B2624230200230A58 /* AppController.swift in Sources */,
 				14995FC026263B3100A7C78B /* simd+ext.swift in Sources */,
+				14995FCD2626942400A7C78B /* MapRow.swift in Sources */,
 				1447B7322624227600230A58 /* RecordMapButton.swift in Sources */,
 				1447B706262421CC00230A58 /* InvisbleMapCreator2App.swift in Sources */,
+				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
+				14995FE0262711C800A7C78B /* LocationsButton.swift in Sources */,
+				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
 				1447B73B2624227600230A58 /* VideoWalkthroughView.swift in Sources */,
 				14995FB6262639E400A7C78B /* TagFinder.mm in Sources */,
 				1447B7382624227600230A58 /* ManageMapsView.swift in Sources */,
 				1447B7342624227600230A58 /* AddLocationButton.swift in Sources */,
 				1447B7372624227600230A58 /* GiveFeedbackView.swift in Sources */,
 				1447B7392624227600230A58 /* SideMenuViewModel.swift in Sources */,
+				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
 				1447B73C2624227600230A58 /* PrintTagsView.swift in Sources */,
 				1447B7422624229600230A58 /* ContentView.swift in Sources */,
 				1447B75C2624230200230A58 /* StateType.swift in Sources */,

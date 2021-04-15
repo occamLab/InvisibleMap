@@ -12,10 +12,10 @@ struct RectangleButtonStyle: ButtonStyle {
         configuration.label
             .frame(width: 80, height: 40)
             .padding(5)
-            .foregroundColor(.white)
             .font(.system(size: 20))
             .background(
                 RoundedRectangle(cornerRadius: 15)
+                    .foregroundColor(Color(UIColor.systemBackground))
                     .opacity(0.7))
     }
 }
@@ -39,10 +39,11 @@ struct ButtonLayout: View {
     var body: some View {
         VStack {
             HStack {
-                MenuButton(recording: $recording)
+                ExitButton()
                 Spacer()
-                UndoButton(recording: $recording)
+                SaveButton()
             }
+            .padding(20)
             Spacer()
             HStack {
                 ManageLocationsButton(recording: $recording)
@@ -52,12 +53,11 @@ struct ButtonLayout: View {
                 AddLocationButton(recording: $recording)
         }
     }
-    .padding(20)
     }
 }
 
 struct ButtonLayout_Previews: PreviewProvider {
     static var previews: some View {
-        ButtonLayout()
+        ButtonLayout().preferredColorScheme(.light)
     }
 }

@@ -7,6 +7,7 @@
 
 import Foundation
 import ARKit
+import Firebase
 import FirebaseDatabase
 import FirebaseStorage
 
@@ -19,6 +20,7 @@ class MapRecorder: MapRecorderController {
     var firebaseStorageRef: StorageReference!
     
     func initFirebase() {
+        FirebaseApp.configure()
         firebaseRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference()
         firebaseStorage = Storage.storage()
         firebaseStorageRef = firebaseStorage.reference()

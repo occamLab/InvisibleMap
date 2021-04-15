@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+/*
 struct MenuButton: View {
     @ObservedObject var popoverViewWrapper = GlobalState.shared.popoverViewWrapper // Track changes to popover UI
     @State var showPopover = false // Track whether popover is showing
@@ -46,3 +46,4 @@ struct MenuButton_Previews: PreviewProvider {
         MenuButton(recording: $recording)
     }
 }
+*/

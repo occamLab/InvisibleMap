@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// All the view types that will exist as a popover over the main screen
+/*// All the view types that will exist as a popover over the main screen
 enum PopoverViewType {
     case optionsMenu
     case recordMap
@@ -20,18 +20,19 @@ class PopoverViewTypeWrapper: ObservableObject {
     public init() {
         popoverUI = .recordMap
     }
-}
+}*/
 
 // Store view wrappers and state variables outside of view struct
 class GlobalState {
     public static var shared = GlobalState()
-    var popoverViewWrapper = PopoverViewTypeWrapper()
+    //var popoverViewWrapper = PopoverViewTypeWrapper()
     
     private init() {
 
     }
 }
 
+/*
 // ARView struct
 struct NavigationIndicator: UIViewControllerRepresentable {
    typealias UIViewControllerType = ARView
@@ -43,20 +44,45 @@ struct NavigationIndicator: UIViewControllerRepresentable {
    UIViewControllerRepresentableContext<NavigationIndicator>) { }
 }
 
-
+*/
 
 struct ContentView: View {
-    @ObservedObject var popoverViewWrapper = GlobalState.shared.popoverViewWrapper // Track changes to popover UI
+    //@ObservedObject var popoverViewWrapper = GlobalState.shared.popoverViewWrapper // Track changes to popover UI
+    @State private var showRecordingUI = false
     
     init() {
         AppController.shared.contentViewer = self
     }
     
-
     var body: some View {
-        ZStack {
-            NavigationIndicator().edgesIgnoringSafeArea(.all)
-            ButtonLayout()
+        NavigationView {
+            VStack {
+                List {
+                    NavigationLink(
+                        destination: PrintTagsView()
+                    ) {
+                        MapRow(mapName: "Map Name")
+                    }
+                    NavigationLink(
+                        destination: PrintTagsView()
+                    ) {
+                        MapRow(mapName: "Map Name")
+                    }
+                }
+                NavigationLink(
+                    destination: RecordMapView(),
+                    isActive: $showRecordingUI
+                ) {
+                    Text("New Map")
+                }
+            }
+            .navigationTitle("All Maps")
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+                showRecordingUI = true
+                AppController.shared.startRecordingRequested() // Request start recording in state machine
+            }
         }
     }
 }
@@ -69,7 +95,7 @@ extension ContentView: ContentViewController {
     }
     
     func displayOptionsMenu() {
-        popoverViewWrapper.popoverUI = .optionsMenu
+        //popoverViewWrapper.popoverUI = .optionsMenu
     }
 }
 
@@ -78,3 +104,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
