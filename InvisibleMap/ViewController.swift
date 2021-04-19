@@ -87,10 +87,13 @@ class ViewController: UIViewController {
             } else {
                 if mapData != nil {
                     do {
+                        print("right before decoding")
                         self.myMap =  try JSONDecoder().decode(Map.self, from: mapData!)
+                        print("after decoding")
                         self.storeTagsInDictionary()
                         self.storeWaypointsInDictionary()
-                        self.renderOdometryVertices()
+//                        self.renderOdometryVertices()
+                        self.renderGraphPath()
 
                     } catch let error {
                         print(error)
@@ -125,20 +128,21 @@ class ViewController: UIViewController {
     }
     
     
-    /// Stores the waypoints from firebase in a dictionary to speed up lookup of nearby waypoints
+    /// Render Odometry vertices and
     func renderOdometryVertices(){
+        print("rendering Odom evrtices")
         var count: Int = 0
         var prev_vertex = myMap.odometryVertices[0]
         var pathObj: SCNNode?
-
+        
         for vertex in myMap.odometryVertices {
+
             count = count + 1
             // Only plot every 10 vertices because otherwise overwhelming
             guard count.isMultiple(of: 10) else {
                 continue
             }
-            // Render odometry Matrix
-//            let odometryMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(0, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
+
             let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
             odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
             odometryNode.simdPosition = simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z)
@@ -156,10 +160,9 @@ class ViewController: UIViewController {
             textNode.scale = SCNVector3(x: 0.002, y: 0.002, z: 0.002)
             odometryNode.addChildNode(textNode)
             odometryNode.name = String("Odometry_\(vertex.poseId)")
-            
-            
+
+
             //render path between poseID
-        
             let x = (prev_vertex.translation.x + vertex.translation.x) / 2
             let y = (prev_vertex.translation.y + vertex.translation.y) / 2
             let z = (prev_vertex.translation.z + vertex.translation.z) / 2
@@ -169,8 +172,7 @@ class ViewController: UIViewController {
             let dist = sqrt(pow(x_dist, 2) + pow(z_dist, 2))
             let hAngle = atan2(-z_dist, x_dist)
             let vAngle = atan2(y_dist, x_dist)
-//            let vAngle = atan2(0, x_dist)
-            
+
             // render SCNNode of given keypoint
             /// SCNNode of the bar path
             pathObj = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: CGFloat(dist), chamferRadius: 1))
@@ -183,7 +185,7 @@ class ViewController: UIViewController {
             pathObj!.rotation = SCNVector4(0, 1, 0, (hAngle - Float.pi/2))
             // vertical rotation
 //            pathObj!.localRotate(by: SCNQuaternion(x: 1, y: 0, z: 0, w: vAngle))
-            
+
             sceneView.scene.rootNode.addChildNode(pathObj!)
 
             // Set current vertex to the previous vertex
@@ -191,38 +193,64 @@ class ViewController: UIViewController {
         }
     }
     
-    /// Create the path SCNNode that corresponds to the long translucent bar element that looks like a route path.
-    /// - Parameters:
-    ///  - location_front: the location of the keypoint user is approaching
-    ///  - location_back: the location of the keypoint user is currently at
-//    func renderPath(_ location_front: LocationInfo, _ location_back: LocationInfo) {
-//
-//        let x = (location_front.x + location_back.x) / 2
-//        let y = (location_front.y + location_back.y) / 2
-//        let z = (location_front.z + location_back.z) / 2
-//        let x_dist = location_front.x - location_back.x
-//        let y_dist = location_front.y - location_back.y
-//        let z_dist = location_front.z - location_back.z
-//        let dist = sqrt(pow(x_dist, 2) + pow(z_dist, 2))
-//        let hAngle = atan2(-z_dist, x_dist)
-//        let vAngle = atan2(y_dist, x_dist)
-//
-//        // render SCNNode of given keypoint
-//        pathObj = SCNNode(geometry: SCNBox(width: 0.25, height: 0.08, length: CGFloat(dist), chamferRadius: 1))
-//
-//        // configure node attributes
-//        pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
-//        pathObj!.opacity = CGFloat(0.5)
-//        pathObj!.position = SCNVector3(x, y - 0.6, z)
-//        // horizontal rotation
-//        pathObj!.rotation = SCNVector4(0, 1, 0, (hAngle - Float.pi/2))
-//        // vertical rotation
-//        pathObj!.localRotate(by: SCNQuaternion(x: 1, y: 0, z: 0, w: -vAngle))
-//
-//        sceneView.scene.rootNode.addChildNode(pathObj!)
-//    }
+    func renderGraphPath(){
+        
+        var pathObj: SCNNode?
 
-    
+        let mydict = Dictionary<Int, ViewController.Map.OdomVertex.vector3>(uniqueKeysWithValues: zip(myMap.odometryVertices.map({$0.poseId}), myMap.odometryVertices.map({$0.translation})))
+
+        for vertex in myMap.odometryVertices {
+            let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
+            odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
+            odometryNode.simdPosition = simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z)
+            mapNode.addChildNode(odometryNode)
+            
+            // Render poseID text
+            let objectText = SCNText(string: String(vertex.poseId), extrusionDepth: 1.0)
+            objectText.font = UIFont (name: "Arial", size: 18)
+            objectText.firstMaterial!.diffuse.contents = UIColor.red
+            let textNode = SCNNode(geometry: objectText)
+            textNode.position = SCNVector3(x: 0.0, y: 0.15, z: 0.0)
+            // change orientation: change the orientation to face the user?
+            // Get vector pointing from the center of the phone to the odometry vertice. -> go to office hours
+            // Get vector pointing out from the camera of the phone
+            textNode.scale = SCNVector3(x: 0.002, y: 0.002, z: 0.002)
+            odometryNode.addChildNode(textNode)
+            odometryNode.name = String("Odometry_\(vertex.poseId)")
+
+
+            for neighbor in vertex.neighbors{
+                // Only render path if it hasn't been rendered yet
+                if (neighbor < vertex.poseId){
+                    let neighbor_vertex = mydict[neighbor]!
+                    
+                    // render path: how can I store poseIds in a dictionary? So get the values of a particular poseID?
+                    let x = (neighbor_vertex.x + vertex.translation.x) / 2
+                    let y = (neighbor_vertex.y + vertex.translation.y) / 2
+                    let z = (neighbor_vertex.z + vertex.translation.z) / 2
+                    let x_dist = neighbor_vertex.x - vertex.translation.x
+                    let y_dist = neighbor_vertex.y - vertex.translation.y
+                    let z_dist = neighbor_vertex.z - vertex.translation.z
+                    let dist = sqrt(pow(x_dist, 2) + pow(z_dist, 2))
+                    let hAngle = atan2(-z_dist, x_dist)
+//                    let vAngle = atan2(y_dist, x_dist)
+        
+                    /// SCNNode of the bar path
+                    pathObj = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: CGFloat(dist), chamferRadius: 1))
+        
+                    //configure node attributes
+                    pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
+                    pathObj!.opacity = CGFloat(0.5)
+                    pathObj!.position = SCNVector3(x, y, z)
+                    // horizontal rotation
+                    pathObj!.rotation = SCNVector4(0, 1, 0, (hAngle - Float.pi/2))
+                    // vertical rotation
+                    
+                    sceneView.scene.rootNode.addChildNode(pathObj!)
+                }
+            }
+        }
+    }
     /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
     func detectNearbyWaypoints(){
         let curr_pose = cameraNode.position
@@ -566,11 +594,14 @@ class ViewController: UIViewController {
                 let poseId: Int
                 let translation: vector3
                 var rotation: quaternion
+                var neighbors: [Int] = []
+
                 
                 enum CodingKeys: String, CodingKey {
                     case poseId
                     case translation = "translation"
                     case rotation = "rotation"
+                    case neighbors = "neighbors"
                 }
                 
                 struct vector3: Decodable {
