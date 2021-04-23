@@ -32,20 +32,6 @@ class GlobalState {
     }
 }
 
-/*
-// ARView struct
-struct NavigationIndicator: UIViewControllerRepresentable {
-   typealias UIViewControllerType = ARView
-   func makeUIViewController(context: Context) -> ARView {
-      return ARView()
-   }
-   func updateUIViewController(_ uiViewController:
-   NavigationIndicator.UIViewControllerType, context:
-   UIViewControllerRepresentableContext<NavigationIndicator>) { }
-}
-
-*/
-
 struct ContentView: View {
     //@ObservedObject var popoverViewWrapper = GlobalState.shared.popoverViewWrapper // Track changes to popover UI
     @State private var showRecordingUI = false
@@ -59,12 +45,12 @@ struct ContentView: View {
             VStack {
                 List {
                     NavigationLink(
-                        destination: PrintTagsView()
+                        destination: EditMapView()
                     ) {
                         MapRow(mapName: "Map Name")
                     }
                     NavigationLink(
-                        destination: PrintTagsView()
+                        destination: EditMapView()
                     ) {
                         MapRow(mapName: "Map Name")
                     }

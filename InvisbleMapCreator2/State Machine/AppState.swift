@@ -21,14 +21,16 @@ enum AppState: StateType {
     enum Event {
         // MainScreen events
         case StartRecordingRequested
-        case StopRecordingRequested/*(mapName: String)*/
         case OptionsMenuRequested
-        case MainScreenRequested
         // RecordMap events
         case NewARFrame(cameraFrame: ARFrame)
-        case NewTagFound(pose: simd_float4x4, tagId: Int)
+        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
         case AddWaypointRequested(pose: simd_float4x4, poseId: Int, waypointName: String)
         case ViewWaypointsRequested
+        case CancelRecordingRequested
+        case StopRecordingRequested
+        // OptionsMenu events
+        case MainScreenRequested
     }
     
     // All the effectful outputs which the state desires to have performed on the app
@@ -38,10 +40,11 @@ enum AppState: StateType {
         case DisplayOptionsMenu
         // RecordMap commands
         case RecordData(cameraFrame: ARFrame)
-        case AddTag(pose: simd_float4x4, tagId: Int)
+        case DetectTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
         case AddWaypoint(pose: simd_float4x4, poseId: Int, waypointName: String)
         case DisplayWaypointsUI
-        case SaveMap(mapName: String)
+        case CancelMap
+        case SaveMap
         // RecordMap and OptionsMenu commands
         case DisplayMainScreen
     }
@@ -55,9 +58,12 @@ enum AppState: StateType {
         case (.MainScreen, .OptionsMenuRequested):
             self = .OptionsMenu
             return [.DisplayOptionsMenu]
-        case (.RecordMap, .StopRecordingRequested/*(let mapName)*/):
+        case (.RecordMap, .CancelRecordingRequested):
             self = .MainScreen
-            return [.DisplayMainScreen/*, .SaveMap(mapName: mapName)*/]
+            return [.CancelMap, .DisplayMainScreen]
+        case (.RecordMap, .StopRecordingRequested):
+            self = .MainScreen
+            return [.SaveMap, .DisplayMainScreen]
         case (.RecordMap(let state), _) where RecordMapState.Event(event) != nil:
             var newState = state
             let commands = newState.handleEvent(event: RecordMapState.Event(event)!)
@@ -85,9 +91,11 @@ enum RecordMapState: StateType {
     // All the effectual inputs from the app which RecordMapState can react to
     enum Event {
         case NewARFrame(cameraFrame: ARFrame)
-        case NewTagFound(pose: simd_float4x4, tagId: Int)
+        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
         case AddWaypointRequested(pose: simd_float4x4, poseId: Int, waypointName: String)
         case ViewWaypointsRequested
+        case CancelRecordingRequested
+        case StopRecordingRequested
     }
     
     // Refers to commands defined in AppState
@@ -98,8 +106,8 @@ enum RecordMapState: StateType {
         switch (self, event) {
         case(.RecordMap, .NewARFrame(let cameraFrame)):
             return [.RecordData(cameraFrame: cameraFrame)]
-        case(.RecordMap, .NewTagFound(let pose, let tagId)):
-            return [.AddTag(pose: pose, tagId: tagId)]
+        case(.RecordMap, .NewTagFound(let tag, let cameraTransform)):
+            return [.DetectTagFound(tag: tag, cameraTransform: cameraTransform)]
         case(.RecordMap, .AddWaypointRequested(let pose, let poseId, let waypointName)):
             return [.AddWaypoint(pose: pose, poseId: poseId, waypointName: waypointName)]
         case(.RecordMap, .ViewWaypointsRequested):
@@ -115,8 +123,10 @@ enum RecordMapState: StateType {
 extension RecordMapState.Event {
     init?(_ event: AppState.Event) {
         switch event {
-        case .NewTagFound(let pose, let tagId):
-            self = .NewTagFound(pose: pose, tagId: tagId)
+        case .NewARFrame(let cameraFrame):
+        self = .NewARFrame(cameraFrame: cameraFrame)
+        case .NewTagFound(let tag, let cameraTransform):
+            self = .NewTagFound(tag: tag, cameraTransform: cameraTransform)
         case .AddWaypointRequested(let pose, let poseId, let waypointName):
             self = .AddWaypointRequested(pose: pose, poseId: poseId, waypointName: waypointName)
         case .ViewWaypointsRequested:

@@ -8,6 +8,7 @@
 import Foundation
 import simd
 import GLKit
+import ARKit
 
 extension float4x4 {
 
@@ -124,5 +125,16 @@ extension simd_quatf {
         } else {
             return self.axis*self.angle
         }
+    }
+}
+
+extension ARFrame {
+    func convertToUIImage() -> (UIImage) {
+        let pixelBuffer = self.capturedImage
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        let context = CIContext(options: nil)
+        let cgImage = context.createCGImage(ciImage, from: ciImage.extent)
+        let uiImage = UIImage(cgImage: cgImage!)
+        return uiImage
     }
 }

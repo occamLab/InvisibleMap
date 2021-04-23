@@ -7,24 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143011F82629D8AF0042FDFC /* AddLocationButton.swift */; };
+		143011FE2629D8CD0042FDFC /* ManageLocationsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */; };
 		1447B706262421CC00230A58 /* InvisbleMapCreator2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B705262421CC00230A58 /* InvisbleMapCreator2App.swift */; };
 		1447B70A262421CF00230A58 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1447B709262421CF00230A58 /* Assets.xcassets */; };
 		1447B70D262421CF00230A58 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1447B70C262421CF00230A58 /* Preview Assets.xcassets */; };
-		1447B72E2624227600230A58 /* ButtonLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B71D2624227600230A58 /* ButtonLayout.swift */; };
 		1447B72F2624227600230A58 /* ARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B71E2624227600230A58 /* ARView.swift */; };
-		1447B7302624227600230A58 /* UndoButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7202624227600230A58 /* UndoButton.swift */; };
-		1447B7312624227600230A58 /* MenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7212624227600230A58 /* MenuButton.swift */; };
-		1447B7322624227600230A58 /* RecordMapButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7222624227600230A58 /* RecordMapButton.swift */; };
-		1447B7332624227600230A58 /* ManageLocationsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7232624227600230A58 /* ManageLocationsButton.swift */; };
-		1447B7342624227600230A58 /* AddLocationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7242624227600230A58 /* AddLocationButton.swift */; };
-		1447B7352624227600230A58 /* SideMenuOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7262624227600230A58 /* SideMenuOptionView.swift */; };
-		1447B7362624227600230A58 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7272624227600230A58 /* SettingsView.swift */; };
-		1447B7372624227600230A58 /* GiveFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7282624227600230A58 /* GiveFeedbackView.swift */; };
-		1447B7382624227600230A58 /* ManageMapsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7292624227600230A58 /* ManageMapsView.swift */; };
-		1447B7392624227600230A58 /* SideMenuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B72A2624227600230A58 /* SideMenuViewModel.swift */; };
-		1447B73A2624227600230A58 /* SideMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B72B2624227600230A58 /* SideMenuView.swift */; };
-		1447B73B2624227600230A58 /* VideoWalkthroughView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B72C2624227600230A58 /* VideoWalkthroughView.swift */; };
-		1447B73C2624227600230A58 /* PrintTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B72D2624227600230A58 /* PrintTagsView.swift */; };
 		1447B7422624229600230A58 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7412624229600230A58 /* ContentView.swift */; };
 		1447B75B2624230200230A58 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7552624230200230A58 /* AppController.swift */; };
 		1447B75C2624230200230A58 /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7562624230200230A58 /* StateType.swift */; };
@@ -43,8 +31,8 @@
 		14995FD226269AB400A7C78B /* ExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD126269AB400A7C78B /* ExitButton.swift */; };
 		14995FD726269B0900A7C78B /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD626269B0900A7C78B /* SaveButton.swift */; };
 		14995FE0262711C800A7C78B /* LocationsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FDF262711C800A7C78B /* LocationsButton.swift */; };
-		14995FE52627123E00A7C78B /* ManageMaps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FE42627123E00A7C78B /* ManageMaps.swift */; };
 		14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FE9262713EC00A7C78B /* RecordMapView.swift */; };
+		14E164732633523B0087A426 /* EditMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E164722633523B0087A426 /* EditMapView.swift */; };
 		7AFFB8FB1F7230AC88C3A531 /* Pods_InvisibleMapCreator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */; };
 		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
 		822FA78424E2FB000001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
@@ -87,26 +75,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		143011F82629D8AF0042FDFC /* AddLocationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLocationButton.swift; sourceTree = "<group>"; };
+		143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageLocationsButton.swift; sourceTree = "<group>"; };
 		1447B703262421CC00230A58 /* InvisbleMapCreator2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisbleMapCreator2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1447B705262421CC00230A58 /* InvisbleMapCreator2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisbleMapCreator2App.swift; sourceTree = "<group>"; };
 		1447B709262421CF00230A58 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1447B70C262421CF00230A58 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1447B70E262421CF00230A58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1447B71D2624227600230A58 /* ButtonLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ButtonLayout.swift; sourceTree = "<group>"; };
 		1447B71E2624227600230A58 /* ARView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARView.swift; sourceTree = "<group>"; };
-		1447B7202624227600230A58 /* UndoButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UndoButton.swift; sourceTree = "<group>"; };
-		1447B7212624227600230A58 /* MenuButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuButton.swift; sourceTree = "<group>"; };
-		1447B7222624227600230A58 /* RecordMapButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordMapButton.swift; sourceTree = "<group>"; };
-		1447B7232624227600230A58 /* ManageLocationsButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageLocationsButton.swift; sourceTree = "<group>"; };
-		1447B7242624227600230A58 /* AddLocationButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddLocationButton.swift; sourceTree = "<group>"; };
-		1447B7262624227600230A58 /* SideMenuOptionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideMenuOptionView.swift; sourceTree = "<group>"; };
-		1447B7272624227600230A58 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		1447B7282624227600230A58 /* GiveFeedbackView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiveFeedbackView.swift; sourceTree = "<group>"; };
-		1447B7292624227600230A58 /* ManageMapsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageMapsView.swift; sourceTree = "<group>"; };
-		1447B72A2624227600230A58 /* SideMenuViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideMenuViewModel.swift; sourceTree = "<group>"; };
-		1447B72B2624227600230A58 /* SideMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideMenuView.swift; sourceTree = "<group>"; };
-		1447B72C2624227600230A58 /* VideoWalkthroughView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoWalkthroughView.swift; sourceTree = "<group>"; };
-		1447B72D2624227600230A58 /* PrintTagsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintTagsView.swift; sourceTree = "<group>"; };
 		1447B7412624229600230A58 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1447B7552624230200230A58 /* AppController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		1447B7562624230200230A58 /* StateType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
@@ -116,8 +92,8 @@
 		14995FD126269AB400A7C78B /* ExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitButton.swift; sourceTree = "<group>"; };
 		14995FD626269B0900A7C78B /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		14995FDF262711C800A7C78B /* LocationsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsButton.swift; sourceTree = "<group>"; };
-		14995FE42627123E00A7C78B /* ManageMaps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageMaps.swift; sourceTree = "<group>"; };
 		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
+		14E164722633523B0087A426 /* EditMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMapView.swift; sourceTree = "<group>"; };
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7380E641E45D1897DE94C626 /* Pods-InvisbleMapCreator2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisbleMapCreator2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2.debug.xcconfig"; sourceTree = "<group>"; };
 		73E521D0CF00592EDC2AFFD6 /* Pods-InvisbleMapCreator2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisbleMapCreator2.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2.release.xcconfig"; sourceTree = "<group>"; };
@@ -239,40 +215,24 @@
 		1447B71F2624227600230A58 /* Button Views */ = {
 			isa = PBXGroup;
 			children = (
-				1447B71D2624227600230A58 /* ButtonLayout.swift */,
-				14995FDF262711C800A7C78B /* LocationsButton.swift */,
 				14995FD126269AB400A7C78B /* ExitButton.swift */,
 				14995FD626269B0900A7C78B /* SaveButton.swift */,
-				14995FDB26269B6D00A7C78B /* Archive */,
+				143011F82629D8AF0042FDFC /* AddLocationButton.swift */,
+				143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */,
+				14995FDF262711C800A7C78B /* LocationsButton.swift */,
 			);
 			path = "Button Views";
-			sourceTree = "<group>";
-		};
-		1447B7252624227600230A58 /* Menu Views */ = {
-			isa = PBXGroup;
-			children = (
-				1447B7262624227600230A58 /* SideMenuOptionView.swift */,
-				1447B7272624227600230A58 /* SettingsView.swift */,
-				1447B7282624227600230A58 /* GiveFeedbackView.swift */,
-				1447B7292624227600230A58 /* ManageMapsView.swift */,
-				1447B72A2624227600230A58 /* SideMenuViewModel.swift */,
-				1447B72B2624227600230A58 /* SideMenuView.swift */,
-				1447B72C2624227600230A58 /* VideoWalkthroughView.swift */,
-				1447B72D2624227600230A58 /* PrintTagsView.swift */,
-			);
-			path = "Menu Views";
 			sourceTree = "<group>";
 		};
 		1447B7402624227E00230A58 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				1447B7412624229600230A58 /* ContentView.swift */,
-				1447B71E2624227600230A58 /* ARView.swift */,
 				14995FCC2626942400A7C78B /* MapRow.swift */,
-				14995FE42627123E00A7C78B /* ManageMaps.swift */,
+				14E164722633523B0087A426 /* EditMapView.swift */,
+				1447B71E2624227600230A58 /* ARView.swift */,
 				14995FE9262713EC00A7C78B /* RecordMapView.swift */,
 				1447B71F2624227600230A58 /* Button Views */,
-				1447B7252624227600230A58 /* Menu Views */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -294,18 +254,6 @@
 				1447B7592624230200230A58 /* MapRecorder.swift */,
 			);
 			path = Controllers;
-			sourceTree = "<group>";
-		};
-		14995FDB26269B6D00A7C78B /* Archive */ = {
-			isa = PBXGroup;
-			children = (
-				1447B7202624227600230A58 /* UndoButton.swift */,
-				1447B7212624227600230A58 /* MenuButton.swift */,
-				1447B7222624227600230A58 /* RecordMapButton.swift */,
-				1447B7232624227600230A58 /* ManageLocationsButton.swift */,
-				1447B7242624227600230A58 /* AddLocationButton.swift */,
-			);
-			path = Archive;
 			sourceTree = "<group>";
 		};
 		82468A2024C88B6600FD31BC /* InvisibleMapCreator */ = {
@@ -668,38 +616,26 @@
 			buildActionMask = 2147483647;
 			files = (
 				14995FBC26263A0900A7C78B /* AprilTagTracker.swift in Sources */,
-				1447B72E2624227600230A58 /* ButtonLayout.swift in Sources */,
-				1447B7302624227600230A58 /* UndoButton.swift in Sources */,
+				143011FE2629D8CD0042FDFC /* ManageLocationsButton.swift in Sources */,
 				14995FB8262639ED00A7C78B /* ImageConversion.mm in Sources */,
-				1447B7312624227600230A58 /* MenuButton.swift in Sources */,
-				14995FE52627123E00A7C78B /* ManageMaps.swift in Sources */,
-				1447B7352624227600230A58 /* SideMenuOptionView.swift in Sources */,
 				1447B72F2624227600230A58 /* ARView.swift in Sources */,
 				1447B75B2624230200230A58 /* AppController.swift in Sources */,
 				14995FC026263B3100A7C78B /* simd+ext.swift in Sources */,
 				14995FCD2626942400A7C78B /* MapRow.swift in Sources */,
-				1447B7322624227600230A58 /* RecordMapButton.swift in Sources */,
 				1447B706262421CC00230A58 /* InvisbleMapCreator2App.swift in Sources */,
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
 				14995FE0262711C800A7C78B /* LocationsButton.swift in Sources */,
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
-				1447B73B2624227600230A58 /* VideoWalkthroughView.swift in Sources */,
 				14995FB6262639E400A7C78B /* TagFinder.mm in Sources */,
-				1447B7382624227600230A58 /* ManageMapsView.swift in Sources */,
-				1447B7342624227600230A58 /* AddLocationButton.swift in Sources */,
-				1447B7372624227600230A58 /* GiveFeedbackView.swift in Sources */,
-				1447B7392624227600230A58 /* SideMenuViewModel.swift in Sources */,
 				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
-				1447B73C2624227600230A58 /* PrintTagsView.swift in Sources */,
+				143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */,
 				1447B7422624229600230A58 /* ContentView.swift in Sources */,
 				1447B75C2624230200230A58 /* StateType.swift in Sources */,
 				1447B75F2624230200230A58 /* AppState.swift in Sources */,
-				1447B73A2624227600230A58 /* SideMenuView.swift in Sources */,
+				14E164732633523B0087A426 /* EditMapView.swift in Sources */,
 				1447B75E2624230200230A58 /* MapRecorder.swift in Sources */,
-				1447B7332624227600230A58 /* ManageLocationsButton.swift in Sources */,
 				14995FB2262639DA00A7C78B /* main.m in Sources */,
-				1447B7362624227600230A58 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

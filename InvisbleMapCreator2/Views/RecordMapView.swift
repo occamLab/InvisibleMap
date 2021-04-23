@@ -20,11 +20,41 @@ struct NavigationIndicator: UIViewControllerRepresentable {
 }
 
 struct RecordMapView: View {
-    var body: some View {
+    var body : some View {
         ZStack {
             NavigationIndicator().edgesIgnoringSafeArea(.all)
-            ButtonLayout()
+                .navigationBarHidden(true)
+                .navigationBarBackButtonHidden(true)
+                .toolbar(content: {
+                    ToolbarItem(placement: .bottomBar) {
+                        HStack {
+                            AddLocationButton()
+                            ManageLocationsButton()
+                        }
+                    }
+                })
+            VStack {
+                HStack {
+                    ExitButton()
+                    Spacer()
+                    SaveButton()
+                }
+                Spacer()
+            }
+            .padding(20)
         }
+    }
+}
+
+extension UINavigationController {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+      
+        //Create translucent toolbar
+        let toolbarAppearance = UIToolbarAppearance()
+        toolbarAppearance.configureWithTransparentBackground()
+        toolbarAppearance.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.5)
+        UIToolbar.appearance().standardAppearance = toolbarAppearance
     }
 }
 

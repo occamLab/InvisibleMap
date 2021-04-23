@@ -67,3 +67,5 @@ extension ARView: ARSessionDelegate {
         print("New Frame")
     }
 }
+
+//Define new protocol ARViewController

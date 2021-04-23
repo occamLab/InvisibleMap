@@ -10,7 +10,9 @@ import SwiftUI
 
 struct SaveButton: View {
     var body: some View {
-        Button(action: {}){
+        Button(action: {
+            AppController.shared.stopRecordingRequested() // Request stop recording in state machine
+        }){
             Text("Save")
         }
         .buttonStyle(RectangleButtonStyle())

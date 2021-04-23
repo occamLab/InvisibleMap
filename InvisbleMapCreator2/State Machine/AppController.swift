@@ -13,36 +13,41 @@ class AppController {
     private var state = AppState.initialState
     var contentViewer: ContentViewController?
     let mapRecorder = MapRecorder()
+    var arViewer: ARViewController?
     
     private init() {
     }
-    
+
     private func processCommands(commands: [AppState.Command]) {
         for command in commands {
             switch command {
+            // MainScreen commands
             case .DisplayRecordingUI:
                 contentViewer?.displayRecordingUI()
             case .DisplayMainScreen:
                 contentViewer?.displayMainScreen()
             case .DisplayOptionsMenu:
                 contentViewer?.displayOptionsMenu()
-            case .AddTag(let pose, let tagId):
-                mapRecorder.addTag(pose: pose, tagId: tagId)
+            // RecordMap commands
+            case .RecordData(cameraFrame: let cameraFrame):
+                mapRecorder.recordData(cameraFrame: cameraFrame)
+            case .DetectTagFound(let tag, let cameraTransform):
+                mapRecorder.detectTagFound(tag: tag, cameraTransform: cameraTransform)
             case .AddWaypoint(let pose, let poseId, let waypointName):
                 mapRecorder.addWaypoint(pose: pose, poseId: poseId, waypointName: waypointName)
             case .DisplayWaypointsUI:
                 mapRecorder.displayWaypointsUI()
-            case .SaveMap(let mapName):
-                mapRecorder.saveMap(mapName: mapName)
-            case .RecordData(cameraFrame: let cameraFrame):
-                mapRecorder.recordData(cameraFrame: cameraFrame)
+            case .CancelMap:
+                mapRecorder.cancelMap()
+            case .SaveMap:
+                mapRecorder.saveMap()
             }
         }
     }
 }
 
 extension AppController {
-    // contentViewer event functions
+    // contentViewer events
     func mainScreenRequested() {
         processCommands(commands: state.handleEvent(event: .MainScreenRequested))
         print(state)
@@ -56,6 +61,12 @@ extension AppController {
         print(state)
     }
     
+    // mapRecorder events
+    func cancelRecordingRequested() {
+        processCommands(commands: state.handleEvent(event: .CancelRecordingRequested))
+        print(state)
+    }
+    
     func stopRecordingRequested() {
         processCommands(commands: state.handleEvent(event: .StopRecordingRequested/*(mapName: "placeholder")*/))
         print(state)
@@ -64,6 +75,10 @@ extension AppController {
     func processNewARFrame(frame: ARFrame) {
         processCommands(commands: state.handleEvent(event: .NewARFrame(cameraFrame: frame)))
         print("New AR Frame processed!")
+    }
+    
+    func processNewTag(tag: AprilTags, cameraTransform: simd_float4x4) {
+        processCommands(commands: state.handleEvent(event: .NewTagFound(tag: tag, cameraTransform: cameraTransform)))
     }
 }
 
@@ -74,9 +89,13 @@ protocol ContentViewController {
 }
 
 protocol MapRecorderController {
-    func addTag(pose: simd_float4x4, tagId: Int)
+    func recordData(cameraFrame: ARFrame)
+    func detectTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
     func addWaypoint(pose: simd_float4x4, poseId: Int, waypointName: String)
     func displayWaypointsUI()
-    func saveMap(mapName: String)
-    func recordData(cameraFrame: ARFrame)
+    func cancelMap()
+    func saveMap()
+}
+
+protocol ARViewController {
 }

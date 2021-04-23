@@ -8,9 +8,25 @@
 
 import SwiftUI
 
+struct RectangleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+            .frame(width: 80, height: 40)
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .foregroundColor(Color(UIColor.systemBackground))
+                    .opacity(0.7))
+    }
+}
+
 struct ExitButton: View {
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
+
     var body: some View {
-        Button(action: {}){
+        Button(action: {
+            self.mode.wrappedValue.dismiss()
+            AppController.shared.cancelRecordingRequested() // Request cancel recording in state machine
+        }){
             Image(systemName: "xmark")
                 .accessibility(label: Text("Cancel Map"))
         }
