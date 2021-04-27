@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1428523C26383B2000146796 /* TagFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1428523B26383B2000146796 /* TagFinder.swift */; };
 		143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143011F82629D8AF0042FDFC /* AddLocationButton.swift */; };
 		143011FE2629D8CD0042FDFC /* ManageLocationsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */; };
 		1447B706262421CC00230A58 /* InvisbleMapCreator2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B705262421CC00230A58 /* InvisbleMapCreator2App.swift */; };
@@ -30,7 +31,6 @@
 		14995FCD2626942400A7C78B /* MapRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FCC2626942400A7C78B /* MapRow.swift */; };
 		14995FD226269AB400A7C78B /* ExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD126269AB400A7C78B /* ExitButton.swift */; };
 		14995FD726269B0900A7C78B /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD626269B0900A7C78B /* SaveButton.swift */; };
-		14995FE0262711C800A7C78B /* LocationsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FDF262711C800A7C78B /* LocationsButton.swift */; };
 		14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FE9262713EC00A7C78B /* RecordMapView.swift */; };
 		14E164732633523B0087A426 /* EditMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E164722633523B0087A426 /* EditMapView.swift */; };
 		7AFFB8FB1F7230AC88C3A531 /* Pods_InvisibleMapCreator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */; };
@@ -75,6 +75,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1428523B26383B2000146796 /* TagFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagFinder.swift; sourceTree = "<group>"; };
 		143011F82629D8AF0042FDFC /* AddLocationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLocationButton.swift; sourceTree = "<group>"; };
 		143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageLocationsButton.swift; sourceTree = "<group>"; };
 		1447B703262421CC00230A58 /* InvisbleMapCreator2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisbleMapCreator2.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,7 +92,6 @@
 		14995FCC2626942400A7C78B /* MapRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRow.swift; sourceTree = "<group>"; };
 		14995FD126269AB400A7C78B /* ExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitButton.swift; sourceTree = "<group>"; };
 		14995FD626269B0900A7C78B /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
-		14995FDF262711C800A7C78B /* LocationsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsButton.swift; sourceTree = "<group>"; };
 		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
 		14E164722633523B0087A426 /* EditMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMapView.swift; sourceTree = "<group>"; };
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -219,7 +219,6 @@
 				14995FD626269B0900A7C78B /* SaveButton.swift */,
 				143011F82629D8AF0042FDFC /* AddLocationButton.swift */,
 				143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */,
-				14995FDF262711C800A7C78B /* LocationsButton.swift */,
 			);
 			path = "Button Views";
 			sourceTree = "<group>";
@@ -252,6 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				1447B7592624230200230A58 /* MapRecorder.swift */,
+				1428523B26383B2000146796 /* TagFinder.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -625,10 +625,10 @@
 				1447B706262421CC00230A58 /* InvisbleMapCreator2App.swift in Sources */,
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
-				14995FE0262711C800A7C78B /* LocationsButton.swift in Sources */,
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
 				14995FB6262639E400A7C78B /* TagFinder.mm in Sources */,
 				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
+				1428523C26383B2000146796 /* TagFinder.swift in Sources */,
 				143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */,
 				1447B7422624229600230A58 /* ContentView.swift in Sources */,
 				1447B75C2624230200230A58 /* StateType.swift in Sources */,

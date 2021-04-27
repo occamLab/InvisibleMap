@@ -24,9 +24,10 @@ enum AppState: StateType {
         case OptionsMenuRequested
         // RecordMap events
         case NewARFrame(cameraFrame: ARFrame)
-        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
-        case AddWaypointRequested(pose: simd_float4x4, poseId: Int, waypointName: String)
-        case ViewWaypointsRequested
+        case FindTagsRequested(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
+        case NewTagFound(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4)
+        case AddLocationRequested(pose: simd_float4x4, poseId: Int, locationName: String)
+        case ViewLocationsRequested
         case CancelRecordingRequested
         case StopRecordingRequested
         // OptionsMenu events
@@ -40,9 +41,10 @@ enum AppState: StateType {
         case DisplayOptionsMenu
         // RecordMap commands
         case RecordData(cameraFrame: ARFrame)
-        case DetectTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
-        case AddWaypoint(pose: simd_float4x4, poseId: Int, waypointName: String)
-        case DisplayWaypointsUI
+        case RecordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
+        case UpdateTagFound(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4)
+        case AddLocation(pose: simd_float4x4, poseId: Int, locationName: String)
+        case DisplayLocationsUI
         case CancelMap
         case SaveMap
         // RecordMap and OptionsMenu commands
@@ -82,8 +84,7 @@ enum AppState: StateType {
 enum RecordMapState: StateType {
     // Lower level app states nested within RecordMapState
     case RecordMap
-    case ViewWaypoints
-    // Add Waypoint state
+    case ViewLocations
         
     // Initial state upon transitioning into the RecordMapState
     static let initialState = RecordMapState.RecordMap
@@ -91,9 +92,10 @@ enum RecordMapState: StateType {
     // All the effectual inputs from the app which RecordMapState can react to
     enum Event {
         case NewARFrame(cameraFrame: ARFrame)
-        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
-        case AddWaypointRequested(pose: simd_float4x4, poseId: Int, waypointName: String)
-        case ViewWaypointsRequested
+        case FindTagsRequested(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
+        case NewTagFound(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4)
+        case AddLocationRequested(pose: simd_float4x4, poseId: Int, locationName: String)
+        case ViewLocationsRequested
         case CancelRecordingRequested
         case StopRecordingRequested
     }
@@ -106,13 +108,15 @@ enum RecordMapState: StateType {
         switch (self, event) {
         case(.RecordMap, .NewARFrame(let cameraFrame)):
             return [.RecordData(cameraFrame: cameraFrame)]
-        case(.RecordMap, .NewTagFound(let tag, let cameraTransform)):
-            return [.DetectTagFound(tag: tag, cameraTransform: cameraTransform)]
-        case(.RecordMap, .AddWaypointRequested(let pose, let poseId, let waypointName)):
-            return [.AddWaypoint(pose: pose, poseId: poseId, waypointName: waypointName)]
-        case(.RecordMap, .ViewWaypointsRequested):
-            self = .ViewWaypoints
-            return [.DisplayWaypointsUI]
+        case(.RecordMap, .FindTagsRequested(let cameraFrame, let timestamp, let poseId)):
+            return [.RecordTags(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)]
+        case(.RecordMap, .NewTagFound(let aprilTagDetectionDictionary, let tag, let cameraTransform)):
+            return [.UpdateTagFound(aprilTagDetectionDictionary: aprilTagDetectionDictionary, tag: tag, cameraTransform: cameraTransform)]
+        case(.RecordMap, .AddLocationRequested(let pose, let poseId, let locationName)):
+            return [.AddLocation(pose: pose, poseId: poseId, locationName: locationName)]
+        case(.RecordMap, .ViewLocationsRequested):
+            self = .ViewLocations
+            return [.DisplayLocationsUI]
             
         default: break
         }
@@ -124,13 +128,15 @@ extension RecordMapState.Event {
     init?(_ event: AppState.Event) {
         switch event {
         case .NewARFrame(let cameraFrame):
-        self = .NewARFrame(cameraFrame: cameraFrame)
-        case .NewTagFound(let tag, let cameraTransform):
-            self = .NewTagFound(tag: tag, cameraTransform: cameraTransform)
-        case .AddWaypointRequested(let pose, let poseId, let waypointName):
-            self = .AddWaypointRequested(pose: pose, poseId: poseId, waypointName: waypointName)
-        case .ViewWaypointsRequested:
-            self = .ViewWaypointsRequested
+            self = .NewARFrame(cameraFrame: cameraFrame)
+        case .FindTagsRequested(let cameraFrame, let timestamp, let poseId):
+            self = .FindTagsRequested(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
+        case .NewTagFound(let aprilTagDetectionDictionary, let tag, let cameraTransform):
+            self = .NewTagFound(aprilTagDetectionDictionary: aprilTagDetectionDictionary, tag: tag, cameraTransform: cameraTransform)
+        case .AddLocationRequested(let pose, let poseId, let locationName):
+            self = .AddLocationRequested(pose: pose, poseId: poseId, locationName: locationName)
+        case .ViewLocationsRequested:
+            self = .ViewLocationsRequested
             
         default: return nil
         }
