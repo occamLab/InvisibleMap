@@ -9,30 +9,8 @@
 import Foundation
 import ARKit
 
-/*class TagDetectionVariables {
-    public static var shared = TagDetectionVariables()
-
-    var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
-    var sceneTransVar: simd_float3x3?
-    var sceneQuatVar: simd_float4x4?
-    var scenePoseQuat: simd_quatf?
-    var scenePoseTranslation: SIMD3<Float>?
-    var tag: AprilTags?
-    
-    private init() {
-
-    }
-}*/
-
 class TagFinder: TagFinderController {
-    
-    var aprilTagDetectionDictionary = TagDetectionVariables.shared.aprilTagDetectionDictionary
-    /*var sceneTransVar = TagDetectionVariables.shared.sceneTransVar
-    var sceneQuatVar = TagDetectionVariables.shared.sceneQuatVar
-    var scenePoseQuat = TagDetectionVariables.shared.scenePoseQuat
-    var scenePoseTranslation = TagDetectionVariables.shared.scenePoseTranslation*/
-    var tag = TagDetectionVariables.shared.tag
-    
+        
     /// Correct the orientation estimate such that the normal vector of the tag is perpendicular to gravity
     let snapTagsToVertical = true
     let f = imageToData()
@@ -64,8 +42,7 @@ class TagFinder: TagFinderController {
             }
 
             for i in 0...tagArray.count-1 {
-                tag = tagArray[i]
-                AppController.shared.processNewTag(aprilTagDetectionDictionary: aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraFrame.camera.transform) // Generates event to detected tag
+                AppController.shared.processNewTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform) // Generates event to transform tag
                 
                 var tagDict:[String:Any] = [:]
                 var pose = tagArray[i].poseData
@@ -110,7 +87,7 @@ class TagFinder: TagFinderController {
         return allTags
     }
     
-    func updateTagFound(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4) {
+    func transformTag(tag: AprilTags, cameraTransform: simd_float4x4) {
                 
         let pose = tag.poseData
         let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
@@ -143,5 +120,8 @@ class TagFinder: TagFinderController {
         let sceneQuatVar = quatMultiplyAsLinearTransform*quatVarMatrix*quatMultiplyAsLinearTransform.transpose
         let scenePoseQuat = simd_quatf(scenePose)
         let scenePoseTranslation = scenePose.getTrans()
+        let sceneVar = (sceneTransVar: sceneTransVar, sceneQuatVar: sceneQuatVar, scenePoseQuat: scenePoseQuat, scenePoseTranslation: scenePoseTranslation)
+        
+        AppController.shared.detectTagRequested(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar) // Generates event to detect tag in AR view
     }
 }

@@ -25,7 +25,8 @@ enum AppState: StateType {
         // RecordMap events
         case NewARFrame(cameraFrame: ARFrame)
         case FindTagsRequested(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-        case NewTagFound(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4)
+        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
+        case DetectTagRequested(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (sceneTransVar: simd_float3x3, sceneQuatVar: simd_float4x4, scenePoseQuat: simd_quatf, scenePoseTranslation: SIMD3<Float>))
         case AddLocationRequested(pose: simd_float4x4, poseId: Int, locationName: String)
         case ViewLocationsRequested
         case CancelRecordingRequested
@@ -42,7 +43,8 @@ enum AppState: StateType {
         // RecordMap commands
         case RecordData(cameraFrame: ARFrame)
         case RecordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-        case UpdateTagFound(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4)
+        case TransformTag(tag: AprilTags, cameraTransform: simd_float4x4)
+        case DetectTag(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (sceneTransVar: simd_float3x3, sceneQuatVar: simd_float4x4, scenePoseQuat: simd_quatf, scenePoseTranslation: SIMD3<Float>))
         case AddLocation(pose: simd_float4x4, poseId: Int, locationName: String)
         case DisplayLocationsUI
         case CancelMap
@@ -93,7 +95,8 @@ enum RecordMapState: StateType {
     enum Event {
         case NewARFrame(cameraFrame: ARFrame)
         case FindTagsRequested(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-        case NewTagFound(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4)
+        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
+        case DetectTagRequested(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (simd_float3x3, simd_float4x4, simd_quatf, SIMD3<Float>))
         case AddLocationRequested(pose: simd_float4x4, poseId: Int, locationName: String)
         case ViewLocationsRequested
         case CancelRecordingRequested
@@ -110,8 +113,10 @@ enum RecordMapState: StateType {
             return [.RecordData(cameraFrame: cameraFrame)]
         case(.RecordMap, .FindTagsRequested(let cameraFrame, let timestamp, let poseId)):
             return [.RecordTags(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)]
-        case(.RecordMap, .NewTagFound(let aprilTagDetectionDictionary, let tag, let cameraTransform)):
-            return [.UpdateTagFound(aprilTagDetectionDictionary: aprilTagDetectionDictionary, tag: tag, cameraTransform: cameraTransform)]
+        case(.RecordMap, .NewTagFound(let tag, let cameraTransform)):
+            return [.TransformTag(tag: tag, cameraTransform: cameraTransform)]
+        case(.RecordMap, .DetectTagRequested(let tag, let cameraTransform, let sceneVar)):
+            return [.DetectTag(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar)]
         case(.RecordMap, .AddLocationRequested(let pose, let poseId, let locationName)):
             return [.AddLocation(pose: pose, poseId: poseId, locationName: locationName)]
         case(.RecordMap, .ViewLocationsRequested):
@@ -131,8 +136,10 @@ extension RecordMapState.Event {
             self = .NewARFrame(cameraFrame: cameraFrame)
         case .FindTagsRequested(let cameraFrame, let timestamp, let poseId):
             self = .FindTagsRequested(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
-        case .NewTagFound(let aprilTagDetectionDictionary, let tag, let cameraTransform):
-            self = .NewTagFound(aprilTagDetectionDictionary: aprilTagDetectionDictionary, tag: tag, cameraTransform: cameraTransform)
+        case .NewTagFound(let tag, let cameraTransform):
+            self = .NewTagFound(tag: tag, cameraTransform: cameraTransform)
+        case .DetectTagRequested(let tag, let cameraTransform, let sceneVar):
+            self = .DetectTagRequested(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar)
         case .AddLocationRequested(let pose, let poseId, let locationName):
             self = .AddLocationRequested(pose: pose, poseId: poseId, locationName: locationName)
         case .ViewLocationsRequested:

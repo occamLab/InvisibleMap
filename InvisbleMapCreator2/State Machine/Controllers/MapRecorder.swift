@@ -45,7 +45,7 @@ class MapRecorder: MapRecorderController {
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             //recordLocationData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            AppController.shared.findTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
+            AppController.shared.findTagsRequested(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
         }
         else if lastRecordedTimestamp! + 0.1 < cameraFrame.timestamp {
             lastRecordedTimestamp = lastRecordedTimestamp! + 0.1
@@ -53,7 +53,7 @@ class MapRecorder: MapRecorderController {
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             //recordLocationData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            AppController.shared.findTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
+            AppController.shared.findTagsRequested(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
         }
         else {
             return

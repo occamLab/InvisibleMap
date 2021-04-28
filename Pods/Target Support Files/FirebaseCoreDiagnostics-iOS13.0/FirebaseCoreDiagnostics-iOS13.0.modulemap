@@ -1,0 +1,6 @@
+framework module FirebaseCoreDiagnostics {
+  umbrella header "FirebaseCoreDiagnostics-iOS13.0-umbrella.h"
+
+  export *
+  module * { export * }
+}

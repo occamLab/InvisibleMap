@@ -1,5 +1,12 @@
 ${PODS_ROOT}/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2-frameworks.sh
+${BUILT_PRODUCTS_DIR}/FirebaseCore-iOS14.4/FirebaseCore.framework
+${BUILT_PRODUCTS_DIR}/FirebaseCoreDiagnostics-iOS14.4/FirebaseCoreDiagnostics.framework
+${BUILT_PRODUCTS_DIR}/FirebaseDatabase-iOS14.4/FirebaseDatabase.framework
+${BUILT_PRODUCTS_DIR}/FirebaseInstallations-iOS14.4/FirebaseInstallations.framework
+${BUILT_PRODUCTS_DIR}/FirebaseStorage-iOS14.4/FirebaseStorage.framework
 ${BUILT_PRODUCTS_DIR}/GTMSessionFetcher-iOS14.4/GTMSessionFetcher.framework
-${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac-iOS14.4/GoogleToolboxForMac.framework
+${BUILT_PRODUCTS_DIR}/GoogleDataTransport-iOS14.4/GoogleDataTransport.framework
+${BUILT_PRODUCTS_DIR}/GoogleUtilities-iOS14.4/GoogleUtilities.framework
+${BUILT_PRODUCTS_DIR}/PromisesObjC-iOS14.4/FBLPromises.framework
 ${BUILT_PRODUCTS_DIR}/leveldb-library-iOS14.4/leveldb.framework
 ${BUILT_PRODUCTS_DIR}/nanopb-iOS14.4/nanopb.framework

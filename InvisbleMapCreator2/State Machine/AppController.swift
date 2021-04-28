@@ -43,8 +43,11 @@ class AppController {
             // TagFinder commands
             case .RecordTags(let cameraFrame, let timestamp, let poseId):
                 tagFinder.recordTags(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
-            case .UpdateTagFound(let aprilTagDetectionDictionary, let tag, let cameraTransform):
-                tagFinder.updateTagFound(aprilTagDetectionDictionary: aprilTagDetectionDictionary, tag: tag, cameraTransform: cameraTransform)
+            case .TransformTag(let tag, let cameraTransform):
+                tagFinder.transformTag(tag: tag, cameraTransform: cameraTransform)
+            // ARViewer commands
+            case .DetectTag(let tag, let cameraTransform, let sceneVar):
+                arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar)
             }
         }
     }
@@ -70,21 +73,28 @@ extension AppController {
     // RecordMap events
     func processNewARFrame(frame: ARFrame) {
         processCommands(commands: state.handleEvent(event: .NewARFrame(cameraFrame: frame)))
-        print("New AR frame processed!")
+        //print("New AR frame processed!")
     }
     
-    func findTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
+    func findTagsRequested(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         processCommands(commands: state.handleEvent(event: .FindTagsRequested(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)))
-        print("Found tags in frame!")
+        //print("Search for tags")
     }
 
-    func processNewTag(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4) {
-        processCommands(commands: state.handleEvent(event: .NewTagFound(aprilTagDetectionDictionary: aprilTagDetectionDictionary, tag: tag, cameraTransform: cameraTransform)))
+    func processNewTag(tag: AprilTags, cameraTransform: simd_float4x4) {
+        processCommands(commands: state.handleEvent(event: .NewTagFound(tag: tag, cameraTransform: cameraTransform)))
+        print("New tag found")
+    }
+    
+    func detectTagRequested(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (sceneTransVar: simd_float3x3, sceneQuatVar: simd_float4x4, scenePoseQuat: simd_quatf, scenePoseTranslation: SIMD3<Float>)) {
+        processCommands(commands: state.handleEvent(event: .DetectTagRequested(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar)))
+        print("Tag detected!")
     }
     
     func addLocationRequested(pose: simd_float4x4, poseId: Int, locationName: String) {
         processCommands(commands: state.handleEvent(event: .AddLocationRequested(pose: pose, poseId: poseId, locationName: locationName)))
     }
+    
     func viewLocationsRequested() {
         processCommands(commands: state.handleEvent(event: .ViewLocationsRequested))
     }
@@ -116,10 +126,10 @@ protocol MapRecorderController {
 
 protocol TagFinderController {
     func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-    func updateTagFound(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4)
+    func transformTag(tag: AprilTags, cameraTransform: simd_float4x4)
 }
 
 protocol ARViewController {
-    func detectTagFound(aprilTagDetectionDictionary: Dictionary<Int, AprilTagTracker>, tag: AprilTags, cameraTransform: simd_float4x4)
+    func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (sceneTransVar: simd_float3x3, sceneQuatVar: simd_float4x4, scenePoseQuat: simd_quatf, scenePoseTranslation: SIMD3<Float>))
 }
 
