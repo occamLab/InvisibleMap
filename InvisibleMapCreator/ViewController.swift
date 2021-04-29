@@ -297,10 +297,11 @@ class ViewController: UIViewController, writeValueBackDelegate, writeNodeBackDel
     // record data
     @objc func recordData() {
         let (cameraFrame, timestamp) = getCameraFrame()
-        if cameraFrame != nil {
-            recordPoseData(cameraFrame: cameraFrame!, timestamp: timestamp!, poseId: poseId)
-            recordTags(cameraFrame: cameraFrame!, timestamp: timestamp!, poseId: poseId)
-            recordLocationData(cameraFrame: cameraFrame!, timestamp: timestamp!, poseId: poseId)
+        if let cameraFrame = cameraFrame {
+            cameraFrame.camera.transform
+            recordPoseData(cameraFrame: cameraFrame, timestamp: timestamp!, poseId: poseId)
+            recordTags(cameraFrame: cameraFrame, timestamp: timestamp!, poseId: poseId)
+            recordLocationData(cameraFrame: cameraFrame, timestamp: timestamp!, poseId: poseId)
             poseNumber.text = "Pose #: \(poseId)"
             poseId += 1
             

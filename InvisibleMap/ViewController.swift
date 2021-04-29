@@ -247,10 +247,10 @@ class ViewController: UIViewController {
             return
         }
         isProcessingFrame = true
-        let (image, time, cameraTransform, cameraIntrinsics) = self.getVideoFrames()
-        if let image = image, let time = time, let cameraTransform = cameraTransform, let cameraIntrinsics = cameraIntrinsics {
+        let (frame, image, time, cameraTransform, cameraIntrinsics) = self.getVideoFrames()
+        if let frame = frame, let image = image, let time = time, let cameraTransform = cameraTransform, let cameraIntrinsics = cameraIntrinsics {
             aprilTagQueue.async {
-                let _ = self.checkTagDetection(image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+                let _ = self.checkTagDetection(frame: frame, image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
                 self.detectNearbyWaypoints()
                 self.isProcessingFrame = false
             }
@@ -262,9 +262,9 @@ class ViewController: UIViewController {
     /// Gets the current frames from the camera
     ///
     /// - Returns: the current camera frame as a UIImage and its timestamp
-    func getVideoFrames() -> (UIImage?, Double?, simd_float4x4?, simd_float3x3?) {
+    func getVideoFrames() -> (ARFrame?, UIImage?, Double?, simd_float4x4?, simd_float3x3?) {
         guard let cameraFrame = sceneView.session.currentFrame, let cameraTransform = sceneView.session.currentFrame?.camera.transform else {
-            return (nil, nil, nil, nil)
+            return (nil, nil, nil, nil, nil)
         }
         let scene = SCNMatrix4(cameraTransform)
         if sceneView.scene.rootNode.childNode(withName: "camera", recursively: false) == nil {
@@ -283,7 +283,7 @@ class ViewController: UIViewController {
         let context = CIContext(options: nil)
         let cgImage = context.createCGImage(ciImage, from: ciImage.extent)
         let uiImage = UIImage(cgImage: cgImage!)
-        return (uiImage, cameraFrame.timestamp, cameraTransform, cameraFrame.camera.intrinsics)
+        return (cameraFrame, uiImage, cameraFrame.timestamp, cameraTransform, cameraFrame.camera.intrinsics)
     }
     
     /// Check if tag is detected and update the tag and map transforms
@@ -291,7 +291,7 @@ class ViewController: UIViewController {
     /// - Parameters:
     ///   - rotatedImage: the camera frame rotated by 90 degrees to enable accurate tag detection
     ///   - timestamp: the timestamp of the current frame
-    func checkTagDetection(image: UIImage, timestamp: Double, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3)->Array<AprilTags> {
+    func checkTagDetection(frame: ARFrame, image: UIImage, timestamp: Double, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3)->Array<AprilTags> {
         let intrinsics = cameraIntrinsics.columns
         f.findTags(image, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y)
         var tagArray: Array<AprilTags> = Array()
@@ -303,7 +303,7 @@ class ViewController: UIViewController {
             }
             /// Add or update the tags that are detected
             for i in 0...tagArray.count-1 {
-                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, doKalman: true, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
+                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, doKalman: true, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform, frame: frame)
                 /// Update the root to map transform if the tag detected is in the map
                 if let tagVertex = tagDictionary[Int(tagArray[i].number)], let originShift = updateRootToMap(vertex: tagVertex) {
                     lastAppliedOriginShift = originShift
