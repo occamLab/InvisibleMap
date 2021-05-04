@@ -124,4 +124,10 @@ class TagFinder: TagFinderController {
         
         AppController.shared.detectTagRequested(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar) // Generates event to detect tag in AR view
     }
+    
+    /// Clear tag data
+    func clearTags() {
+        tagData = []
+        print("Clear tags")
+    }
 }

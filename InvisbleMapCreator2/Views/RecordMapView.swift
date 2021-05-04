@@ -19,7 +19,22 @@ struct NavigationIndicator: UIViewControllerRepresentable {
    UIViewControllerRepresentableContext<NavigationIndicator>) { }
 }
 
+// Store state variables outside of view struct
+class StateVars: ObservableObject {
+    @Published var tagFound: Bool
+    
+    public init() {
+        tagFound = false
+    }
+}
+
 struct RecordMapView: View {
+    @ObservedObject var stateVars = StateVars()
+    
+    init() {
+        AppController.shared.recordViewer = self
+    }
+
     var body : some View {
         ZStack {
             NavigationIndicator().edgesIgnoringSafeArea(.all)
@@ -28,7 +43,7 @@ struct RecordMapView: View {
                 .toolbar(content: {
                     ToolbarItem(placement: .bottomBar) {
                         HStack {
-                            AddLocationButton()
+                            AddLocationButton(tagFound: $stateVars.tagFound)
                             ManageLocationsButton()
                         }
                     }
@@ -43,6 +58,13 @@ struct RecordMapView: View {
             }
             .padding(20)
         }
+    }
+}
+
+extension RecordMapView: RecordViewController {
+    func enableAddLocation() {
+        stateVars.tagFound = true
+        print("Tag Found = \(stateVars.tagFound)")
     }
 }
 

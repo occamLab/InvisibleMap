@@ -14,6 +14,7 @@ struct SaveButton: View {
             AppController.shared.stopRecordingRequested() // Request stop recording in state machine
         }){
             Text("Save")
+                .accessibility(label: Text("Save Map"))
         }
         .buttonStyle(RectangleButtonStyle())
     }

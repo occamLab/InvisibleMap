@@ -15,6 +15,7 @@ class AppController {
     let mapRecorder = MapRecorder()
     let tagFinder = TagFinder()
     var arViewer: ARViewController?
+    var recordViewer: RecordViewController?
     
     private init() {
     }
@@ -36,8 +37,8 @@ class AppController {
                 mapRecorder.addLocation(pose: pose, poseId: poseId, locationName: locationName)
             case .DisplayLocationsUI:
                 mapRecorder.displayLocationsUI()
-            case .CancelMap:
-                mapRecorder.cancelMap()
+            case .ClearData:
+                mapRecorder.clearData()
             case .SaveMap:
                 mapRecorder.saveMap()
             // TagFinder commands
@@ -45,9 +46,16 @@ class AppController {
                 tagFinder.recordTags(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
             case .TransformTag(let tag, let cameraTransform):
                 tagFinder.transformTag(tag: tag, cameraTransform: cameraTransform)
+            case .ClearTags:
+                tagFinder.clearTags()
             // ARViewer commands
             case .DetectTag(let tag, let cameraTransform, let sceneVar):
                 arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar)
+            case .PinLocation(let locationName):
+                arViewer?.pinLocation(locationName: locationName)
+            // RecordViewer commands
+            case .EnableAddLocation:
+                recordViewer?.enableAddLocation()
             }
         }
     }
@@ -73,12 +81,10 @@ extension AppController {
     // RecordMap events
     func processNewARFrame(frame: ARFrame) {
         processCommands(commands: state.handleEvent(event: .NewARFrame(cameraFrame: frame)))
-        //print("New AR frame processed!")
     }
     
     func findTagsRequested(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         processCommands(commands: state.handleEvent(event: .FindTagsRequested(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)))
-        //print("Search for tags")
     }
 
     func processNewTag(tag: AprilTags, cameraTransform: simd_float4x4) {
@@ -93,6 +99,10 @@ extension AppController {
     
     func addLocationRequested(pose: simd_float4x4, poseId: Int, locationName: String) {
         processCommands(commands: state.handleEvent(event: .AddLocationRequested(pose: pose, poseId: poseId, locationName: locationName)))
+    }
+    
+    func saveLocationRequested(locationName: String) {
+        processCommands(commands: state.handleEvent(event: .SaveLocationRequested(locationName: locationName)))
     }
     
     func viewLocationsRequested() {
@@ -120,16 +130,21 @@ protocol MapRecorderController {
     func recordData(cameraFrame: ARFrame)
     func addLocation(pose: simd_float4x4, poseId: Int, locationName: String)
     func displayLocationsUI()
-    func cancelMap()
+    func clearData()
     func saveMap()
 }
 
 protocol TagFinderController {
     func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
     func transformTag(tag: AprilTags, cameraTransform: simd_float4x4)
+    func clearTags()
 }
 
 protocol ARViewController {
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (sceneTransVar: simd_float3x3, sceneQuatVar: simd_float4x4, scenePoseQuat: simd_quatf, scenePoseTranslation: SIMD3<Float>))
+    func pinLocation(locationName: String)
 }
 
+protocol RecordViewController {
+    func enableAddLocation()
+}

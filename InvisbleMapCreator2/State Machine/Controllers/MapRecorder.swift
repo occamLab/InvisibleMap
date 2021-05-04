@@ -12,14 +12,14 @@ import FirebaseDatabase
 import FirebaseStorage
 
 class MapRecorder: MapRecorderController {
-
     
     var lastRecordedTimestamp: Double?
     var poseData: [[Any]] = []
-    var locationData: [[Any]] = []
     var poseId: Int = 0
-    
+    var locationData: [[Any]] = []
     var locations: [(simd_float4x4, Int)] = []
+
+    var processingFrame: Bool = false
     var currentFrameTransform: simd_float4x4 = simd_float4x4.init()
     
     var firebaseRef: DatabaseReference!
@@ -47,13 +47,15 @@ class MapRecorder: MapRecorderController {
             //recordLocationData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             AppController.shared.findTagsRequested(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
         }
-        else if lastRecordedTimestamp! + 0.1 < cameraFrame.timestamp {
-            lastRecordedTimestamp = lastRecordedTimestamp! + 0.1
+        else if lastRecordedTimestamp! + 0.3 < cameraFrame.timestamp && !processingFrame {
+            processingFrame = true
+            lastRecordedTimestamp = lastRecordedTimestamp! + 0.3
             poseId += 1
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             //recordLocationData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             AppController.shared.findTagsRequested(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
+            processingFrame = false
         }
         else {
             return
@@ -70,7 +72,14 @@ class MapRecorder: MapRecorderController {
     func saveMap(mapName: String) {
     }
     
-    func cancelMap() {
+    /// Clear timestamp, pose, and location data
+    func clearData() {
+        lastRecordedTimestamp = nil
+        poseData = []
+        poseId = 0
+        locationData = []
+        locations = []
+        print("Clear data")
     }
     
     func saveMap() {
@@ -95,19 +104,16 @@ extension MapRecorder { // recordData functions
     @objc func recordPoseData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         poseData.append(getCameraCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId))
     }
+    
+    /*@objc func recordLocationData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
+        if recordCurrentLocation == true {
+            let snapshot = self.sceneView.snapshot()
+            let tempLocationData = LocationData(node: currentBoxNode, picture: snapshot, textNode: currentTextNode, poseId: poseId)
+            nodeList.append(tempLocationData)
+            locationData.append(getLocationCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId))
+            recordCurrentLocation = false
+            currentTextNode = SCNNode()
+            currentBoxNode = SCNNode()
+        }
+    }*/
 }
-
-// record data
-/*
-
-@objc func recordLocationData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
-    if recordCurrentLocation == true {
-        let snapshot = self.sceneView.snapshot()
-        let tempLocationData = LocationData(node: currentBoxNode, picture: snapshot, textNode: currentTextNode, poseId: poseId)
-        nodeList.append(tempLocationData)
-        locationData.append(getLocationCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId))
-        recordCurrentLocation = false
-        currentTextNode = SCNNode()
-        currentBoxNode = SCNNode()
-    }
-}*/

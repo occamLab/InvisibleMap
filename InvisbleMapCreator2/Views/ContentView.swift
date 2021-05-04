@@ -20,7 +20,7 @@ class PopoverViewTypeWrapper: ObservableObject {
     public init() {
         popoverUI = .recordMap
     }
-}*/
+}
 
 // Store view wrappers and state variables outside of view struct
 class GlobalState {
@@ -30,7 +30,7 @@ class GlobalState {
     private init() {
 
     }
-}
+}*/
 
 struct ContentView: View {
     //@ObservedObject var popoverViewWrapper = GlobalState.shared.popoverViewWrapper // Track changes to popover UI
