@@ -8,36 +8,35 @@
 
 import SwiftUI
 
-struct LargeRectangleButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .frame(width: 200, height: 40)
-            .foregroundColor(.white)
-            .background(
-                RoundedRectangle(cornerRadius: 15)
-                    .foregroundColor(.green))
-    }
-}
-
 struct AddLocationButton: View {
-    @Binding var tagFound: Bool // Track whether first tag has been found
+    @ObservedObject var recordGlobalState: RecordGlobalState
     
     var body: some View {
         Button(action: {
-            alert()
+            if recordGlobalState.tagFound {
+                recordGlobalState.instructionWrapper = .none // Removes on-screen instructions after the user has successfully added their first location
+                alert()
+            } else {
+                recordGlobalState.instructionWrapper = .findTagReminder // Sends a find tag reminder to the user if they try to add a location before they've found their first tag
+            }
         }){
             HStack {
                 Image(systemName: "plus")
                 Text("Add Location")
             }
         }
-        .buttonStyle(LargeRectangleButtonStyle())
-        .opacity(tagFound ? 1 : 0.5)
-        .disabled(tagFound ? false: true)
+        // Button styling for the AddLocation button
+        .frame(width: 200, height: 40)
+        .foregroundColor(.white)
+        .background(
+            RoundedRectangle(cornerRadius: 15)
+                .foregroundColor(.green))
+        .opacity(recordGlobalState.tagFound ? 1 : 0.5)
+        //.disabled(tagFound ? false: true)
     }
 }
 
-extension AddLocationButton {
+extension AddLocationButton { // Creates an alert with a textfield (functionality currently unavailable in SwiftUI)
     private func alert() {
         let alert = UIAlertController(title: "Name Location", message: nil, preferredStyle: .alert)
         alert.addTextField() { textField in
@@ -46,7 +45,7 @@ extension AddLocationButton {
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: "Save", style: .default) { (action: UIAlertAction) in
             if let text = alert.textFields?.first?.text {
-                AppController.shared.saveLocationRequested(locationName: text) // Request save location in state machine
+                AppController.shared.saveLocationRequested(locationName: text) // Tells the state machine to save the location
             }
         })
         showAlert(alert: alert)
@@ -88,13 +87,12 @@ extension AddLocationButton {
         }
         return controller
     }
-
 }
 
 struct AddLocationButton_Previews: PreviewProvider {
-    @State static var tagFound = false
+    @StateObject static var recordGlobalState = RecordGlobalState()
 
     static var previews: some View {
-        AddLocationButton(tagFound: $tagFound)
+        AddLocationButton(recordGlobalState: recordGlobalState)
     }
 }

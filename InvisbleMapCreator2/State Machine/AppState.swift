@@ -25,10 +25,9 @@ enum AppState: StateType {
         // RecordMap events
         case NewARFrame(cameraFrame: ARFrame)
         case FindTagsRequested(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
-        case DetectTagRequested(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (sceneTransVar: simd_float3x3, sceneQuatVar: simd_float4x4, scenePoseQuat: simd_quatf, scenePoseTranslation: SIMD3<Float>))
-        case AddLocationRequested(pose: simd_float4x4, poseId: Int, locationName: String)
+        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case SaveLocationRequested(locationName: String)
+        case RecordLocationRequested(locationName: String, node: simd_float4x4)
         case ViewLocationsRequested
         case CancelRecordingRequested
         case StopRecordingRequested
@@ -38,23 +37,17 @@ enum AppState: StateType {
     
     // All the effectful outputs which the state desires to have performed on the app
     enum Command {
-        // MainScreen commands
-        case DisplayRecordingUI
-        case DisplayOptionsMenu
         // RecordMap commands
         case RecordData(cameraFrame: ARFrame)
         case RecordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-        case TransformTag(tag: AprilTags, cameraTransform: simd_float4x4)
-        case DetectTag(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (sceneTransVar: simd_float3x3, sceneQuatVar: simd_float4x4, scenePoseQuat: simd_quatf, scenePoseTranslation: SIMD3<Float>))
+        case DetectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case EnableAddLocation
-        case AddLocation(pose: simd_float4x4, poseId: Int, locationName: String)
         case PinLocation(locationName: String)
+        case RecordLocation(locationName: String, node: simd_float4x4)
         case DisplayLocationsUI
         case ClearData
         case ClearTags
         case SaveMap
-        // RecordMap and OptionsMenu commands
-        case DisplayMainScreen
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
@@ -62,16 +55,16 @@ enum AppState: StateType {
         switch (self, event) {
         case (.MainScreen, .StartRecordingRequested):
             self = .RecordMap(.RecordMap)
-            return [.DisplayRecordingUI]
+            return []
         case (.MainScreen, .OptionsMenuRequested):
             self = .OptionsMenu
-            return [.DisplayOptionsMenu]
+            return []
         case (.RecordMap, .CancelRecordingRequested):
             self = .MainScreen
-            return [.ClearData, .ClearTags, .DisplayMainScreen]
+            return [.ClearData, .ClearTags]
         case (.RecordMap, .StopRecordingRequested):
             self = .MainScreen
-            return [.SaveMap, .DisplayMainScreen]
+            return [.SaveMap]
         case (.RecordMap(let state), _) where RecordMapState.Event(event) != nil:
             var newState = state
             let commands = newState.handleEvent(event: RecordMapState.Event(event)!)
@@ -79,7 +72,7 @@ enum AppState: StateType {
             return commands
         case(.OptionsMenu, .MainScreenRequested):
             self = .MainScreen
-            return [.DisplayMainScreen]
+            return []
             
         default: break
         }
@@ -99,10 +92,9 @@ enum RecordMapState: StateType {
     enum Event {
         case NewARFrame(cameraFrame: ARFrame)
         case FindTagsRequested(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4)
-        case DetectTagRequested(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (simd_float3x3, simd_float4x4, simd_quatf, SIMD3<Float>))
-        case AddLocationRequested(pose: simd_float4x4, poseId: Int, locationName: String)
+        case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case SaveLocationRequested(locationName: String)
+        case RecordLocationRequested(locationName: String, node: simd_float4x4)
         case ViewLocationsRequested
         case CancelRecordingRequested
         case StopRecordingRequested
@@ -118,14 +110,12 @@ enum RecordMapState: StateType {
             return [.RecordData(cameraFrame: cameraFrame)]
         case(.RecordMap, .FindTagsRequested(let cameraFrame, let timestamp, let poseId)):
             return [.RecordTags(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)]
-        case(.RecordMap, .NewTagFound(let tag, let cameraTransform)):
-            return [.TransformTag(tag: tag, cameraTransform: cameraTransform)]
-        case(.RecordMap, .DetectTagRequested(let tag, let cameraTransform, let sceneVar)):
-            return [.DetectTag(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar), .EnableAddLocation]
-        case(.RecordMap, .AddLocationRequested(let pose, let poseId, let locationName)):
-            return [.AddLocation(pose: pose, poseId: poseId, locationName: locationName)]
+        case(.RecordMap, .NewTagFound(let tag, let cameraTransform, let snapTagsToVertical)):
+            return [.DetectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical), .EnableAddLocation]
         case(.RecordMap, .SaveLocationRequested(let locationName)):
             return [.PinLocation(locationName: locationName)]
+        case (.RecordMap, .RecordLocationRequested(let locationName, let node)):
+            return [.RecordLocation(locationName: locationName, node: node)]
         case(.RecordMap, .ViewLocationsRequested):
             self = .ViewLocations
             return [.DisplayLocationsUI]
@@ -143,14 +133,12 @@ extension RecordMapState.Event {
             self = .NewARFrame(cameraFrame: cameraFrame)
         case .FindTagsRequested(let cameraFrame, let timestamp, let poseId):
             self = .FindTagsRequested(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
-        case .NewTagFound(let tag, let cameraTransform):
-            self = .NewTagFound(tag: tag, cameraTransform: cameraTransform)
-        case .DetectTagRequested(let tag, let cameraTransform, let sceneVar):
-            self = .DetectTagRequested(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar)
-        case .AddLocationRequested(let pose, let poseId, let locationName):
-            self = .AddLocationRequested(pose: pose, poseId: poseId, locationName: locationName)
+        case .NewTagFound(let tag, let cameraTransform, let snapTagsToVertical):
+            self = .NewTagFound(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
         case .SaveLocationRequested(let locationName):
             self = .SaveLocationRequested(locationName: locationName)
+        case .RecordLocationRequested(let locationName, let node):
+            self = .RecordLocationRequested(locationName: locationName, node: node)
         case .ViewLocationsRequested:
             self = .ViewLocationsRequested
             

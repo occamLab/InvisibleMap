@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+// Defines a button style for all the rectangle buttons on the RecordMap screen (excluding the AddLocation button)
 struct RectangleButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
@@ -20,12 +21,12 @@ struct RectangleButtonStyle: ButtonStyle {
 }
 
 struct ExitButton: View {
-    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode> // Tracks whether the RecordMap screen is being presented
 
     var body: some View {
         Button(action: {
             self.mode.wrappedValue.dismiss()
-            AppController.shared.cancelRecordingRequested() // Request cancel recording in state machine
+            AppController.shared.cancelRecordingRequested() // Tells the state machine to cancel the map recording
         }){
             Image(systemName: "xmark")
                 .accessibility(label: Text("Cancel Map"))

@@ -18,6 +18,7 @@ class MapRecorder: MapRecorderController {
     var poseId: Int = 0
     var locationData: [[Any]] = []
     var locations: [(simd_float4x4, Int)] = []
+    var pendingLocation: (String, simd_float4x4)? // Keep track of whether location has been added
 
     var processingFrame: Bool = false
     var currentFrameTransform: simd_float4x4 = simd_float4x4.init()
@@ -44,7 +45,6 @@ class MapRecorder: MapRecorderController {
             poseId += 1
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            //recordLocationData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             AppController.shared.findTagsRequested(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
         }
         else if lastRecordedTimestamp! + 0.3 < cameraFrame.timestamp && !processingFrame {
@@ -53,7 +53,10 @@ class MapRecorder: MapRecorderController {
             poseId += 1
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            //recordLocationData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
+            if let pendingLocation = pendingLocation {
+                locationData.append(getLocationCoordinates(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId, location: pendingLocation))
+                self.pendingLocation = nil
+            }
             AppController.shared.findTagsRequested(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             processingFrame = false
         }
@@ -61,9 +64,14 @@ class MapRecorder: MapRecorderController {
             return
         }
     }
-
-    func addLocation(pose: simd_float4x4, poseId: Int, locationName: String) {
-        locations.append((pose, poseId))
+    
+    /// Cache the location data so that it is recorded the next time recordData is called
+    func recordLocation(locationName: String, node: simd_float4x4) {
+        //let snapshot = self.sceneView.snapshot()
+        //let tempLocationData = LocationData(node: currentBoxNode, picture: snapshot, textNode: currentTextNode, poseId: poseId)
+        //nodeList.append(tempLocationData)
+        
+        pendingLocation = (locationName, node)
     }
     
     func displayLocationsUI() {
@@ -101,19 +109,17 @@ extension MapRecorder { // recordData functions
         return fullMatrix
     }
     
-    @objc func recordPoseData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
+    /// Append new pose data to list
+    func recordPoseData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         poseData.append(getCameraCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId))
     }
     
-    /*@objc func recordLocationData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
-        if recordCurrentLocation == true {
-            let snapshot = self.sceneView.snapshot()
-            let tempLocationData = LocationData(node: currentBoxNode, picture: snapshot, textNode: currentTextNode, poseId: poseId)
-            nodeList.append(tempLocationData)
-            locationData.append(getLocationCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId))
-            recordCurrentLocation = false
-            currentTextNode = SCNNode()
-            currentBoxNode = SCNNode()
-        }
-    }*/
+    func getLocationCoordinates(cameraFrame: ARFrame, timestamp: Double, poseId: Int, location: (String, simd_float4x4)) -> [Any] {
+        let (locationName, nodeTransform) = location
+        let finalTransform = currentFrameTransform.inverse * nodeTransform
+        let fullMatrix: [Any] = [finalTransform.columns.0.x, finalTransform.columns.1.x, finalTransform.columns.2.x, finalTransform.columns.3.x, finalTransform.columns.0.y, finalTransform.columns.1.y, finalTransform.columns.2.y, finalTransform.columns.3.y, finalTransform.columns.0.z, finalTransform.columns.1.z, finalTransform.columns.2.z, finalTransform.columns.3.z, finalTransform.columns.0.w, finalTransform.columns.1.w, finalTransform.columns.2.w, finalTransform.columns.3.w, timestamp, poseId, locationName]
+        
+        return fullMatrix
+    }
+    
 }

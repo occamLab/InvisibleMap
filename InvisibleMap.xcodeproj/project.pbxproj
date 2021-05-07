@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		141497E62645A41700BF0ABC /* InstructionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141497E52645A41700BF0ABC /* InstructionOverlay.swift */; };
 		1428523C26383B2000146796 /* TagFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1428523B26383B2000146796 /* TagFinder.swift */; };
 		143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143011F82629D8AF0042FDFC /* AddLocationButton.swift */; };
 		143011FE2629D8CD0042FDFC /* ManageLocationsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */; };
@@ -74,6 +75,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		141497E52645A41700BF0ABC /* InstructionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionOverlay.swift; sourceTree = "<group>"; };
 		1428523B26383B2000146796 /* TagFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagFinder.swift; sourceTree = "<group>"; };
 		143011F82629D8AF0042FDFC /* AddLocationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLocationButton.swift; sourceTree = "<group>"; };
 		143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageLocationsButton.swift; sourceTree = "<group>"; };
@@ -226,10 +228,11 @@
 			isa = PBXGroup;
 			children = (
 				1447B7412624229600230A58 /* ContentView.swift */,
+				14995FE9262713EC00A7C78B /* RecordMapView.swift */,
+				1447B71E2624227600230A58 /* ARView.swift */,
 				14995FCC2626942400A7C78B /* MapRow.swift */,
 				14E164722633523B0087A426 /* EditMapView.swift */,
-				1447B71E2624227600230A58 /* ARView.swift */,
-				14995FE9262713EC00A7C78B /* RecordMapView.swift */,
+				141497E52645A41700BF0ABC /* InstructionOverlay.swift */,
 				1447B71F2624227600230A58 /* Button Views */,
 			);
 			path = Views;
@@ -624,6 +627,7 @@
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
+				141497E62645A41700BF0ABC /* InstructionOverlay.swift in Sources */,
 				14995FB6262639E400A7C78B /* TagFinder.mm in Sources */,
 				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
 				1428523C26383B2000146796 /* TagFinder.swift in Sources */,

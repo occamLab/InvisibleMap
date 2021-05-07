@@ -70,18 +70,50 @@ extension ARView: ARSessionDelegate {
 }
 
 extension ARView: ARViewController {
-    func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, sceneVar: (sceneTransVar: simd_float3x3, sceneQuatVar: simd_float4x4, scenePoseQuat: simd_quatf, scenePoseTranslation: SIMD3<Float>)) {
+    
+    /// Adds or updates a tag node when a tag is detected
+    ///
+    /// - Parameter tag: the april tag detected by the visual servoing platform
+    func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         DispatchQueue.main.async {
+            let pose = tag.poseData
+            let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
+            let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
+
+            let originalTagPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+
+            let aprilTagToARKit = simd_float4x4(diagonal:simd_float4(1, -1, -1, 1))
+            // convert from April Tag's convention to ARKit's convention
+            let tagPoseARKit = aprilTagToARKit*originalTagPose
+            // project into world coordinates
+            var scenePose = cameraTransform*tagPoseARKit
+
+            if snapTagsToVertical {
+                scenePose = scenePose.makeZFlat().alignY()
+            }
+            let transVarMatrix = simd_float3x3(diagonal: transVar)
+            let quatVarMatrix = simd_float4x4(diagonal: quatVar)
+
+            // this is the linear transform that takes the original tag pose to the final world pose
+            let linearTransform = scenePose*originalTagPose.inverse
+            let q = simd_quatf(linearTransform)
+
+            let quatMultiplyAsLinearTransform =
+            simd_float4x4(columns: (simd_float4(q.vector.w, q.vector.z, -q.vector.y, -q.vector.x),
+                                    simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
+                                    simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
+                                    simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
+            let sceneTransVar = linearTransform.getUpper3x3()*transVarMatrix*linearTransform.getUpper3x3().transpose
+            let sceneQuatVar = quatMultiplyAsLinearTransform*quatVarMatrix*quatMultiplyAsLinearTransform.transpose
+            let scenePoseQuat = simd_quatf(scenePose)
+            let scenePoseTranslation = scenePose.getTrans()
+            let sceneVar = (sceneTransVar: sceneTransVar, sceneQuatVar: sceneQuatVar, scenePoseQuat: scenePoseQuat, scenePoseTranslation: scenePoseTranslation)
+                        
             let doKalman = false
-            
             let aprilTagTracker = self.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
             self.aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
 
             // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
-            let sceneTransVar = sceneVar.sceneTransVar
-            let sceneQuatVar = sceneVar.sceneQuatVar
-            let scenePoseQuat = sceneVar.scenePoseQuat
-            let scenePoseTranslation = sceneVar.scenePoseTranslation
             aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar, doKalman: doKalman)
 
             let tagNode: SCNNode
@@ -117,10 +149,6 @@ extension ARView: ARViewController {
     
     func pinLocation(locationName: String) {
         DispatchQueue.main.async {
-            // will save current box object in control
-            var currentBoxNode: SCNNode = SCNNode()
-            var currentTextNode: SCNNode = SCNNode()
-            
             let box = SCNBox(width: 0.05, height: 0.2, length: 0.05, chamferRadius: 0)
             
             let text = SCNText(string: locationName, extrusionDepth: 0)
@@ -132,7 +160,7 @@ extension ARView: ARViewController {
             boxNode.name = locationName
             textNode.geometry = text
             textNode.name = locationName + "Text"
-            let boxPosition = SCNVector3(0,0,-0.6)
+            let boxPosition = SCNVector3(0,0,0)
             let textPosition = SCNVector3(0,0.1,0)
             
             self.updatePositionAndOrientationOf(boxNode, withPosition: boxPosition, relativeTo: cameraNode!)
@@ -143,14 +171,12 @@ extension ARView: ARViewController {
             self.arView.scene.rootNode.addChildNode(boxNode)
             self.arView.scene.rootNode.addChildNode(textNode)
             
-            currentBoxNode = boxNode
-            currentTextNode = textNode
-            
-            //isMovingBox = true
+            let nodeTransform = boxNode.simdTransform
+            AppController.shared.recordLocationRequested(locationName: locationName, node: nodeTransform)
         }
     }
     
-    // move node position relative to another node's position.
+    /// Move node position relative to another node's position.
     func updatePositionAndOrientationOf(_ node: SCNNode, withPosition position: SCNVector3, relativeTo referenceNode: SCNNode) {
         let referenceNodeTransform = matrix_float4x4(referenceNode.transform)
         
@@ -163,37 +189,3 @@ extension ARView: ARViewController {
         node.transform = SCNMatrix4(updatedTransform)
     }
 }
-
-
-
-/*
- func addBox(locationName: String) {
-     let box = SCNBox(width: 0.05, height: 0.2, length: 0.05, chamferRadius: 0)
-     
-     let text = SCNText(string: locationName, extrusionDepth: 0)
-     
-     let cameraNode = sceneView.pointOfView
-     let boxNode = SCNNode()
-     let textNode = SCNNode()
-     boxNode.geometry = box
-     boxNode.name = locationName
-     textNode.geometry = text
-     textNode.name = locationName + "Text"
-     let boxPosition = SCNVector3(0,0,-0.6)
-     let textPosition = SCNVector3(0,0.1,0)
-     
-     updatePositionAndOrientationOf(boxNode, withPosition: boxPosition, relativeTo: cameraNode!)
-     updatePositionAndOrientationOf(textNode, withPosition: textPosition, relativeTo: boxNode)
-     
-     textNode.scale = SCNVector3(0.005,0.005,0.005)
-     
-     sceneView.scene.rootNode.addChildNode(boxNode)
-     sceneView.scene.rootNode.addChildNode(textNode)
-     
-     currentBoxNode = boxNode
-     currentTextNode = textNode
-     
-     isMovingBox = true
- }
- 
- */

@@ -42,7 +42,7 @@ class TagFinder: TagFinderController {
             }
 
             for i in 0...tagArray.count-1 {
-                AppController.shared.processNewTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform) // Generates event to transform tag
+                AppController.shared.processNewTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical) // Generates event to transform tag
                 
                 var tagDict:[String:Any] = [:]
                 var pose = tagArray[i].poseData
@@ -85,44 +85,6 @@ class TagFinder: TagFinderController {
             
         }
         return allTags
-    }
-    
-    func transformTag(tag: AprilTags, cameraTransform: simd_float4x4) {
-                
-        let pose = tag.poseData
-        let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
-        let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
-
-        let originalTagPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
-
-        let aprilTagToARKit = simd_float4x4(diagonal:simd_float4(1, -1, -1, 1))
-        // convert from April Tag's convention to ARKit's convention
-        let tagPoseARKit = aprilTagToARKit*originalTagPose
-        // project into world coordinates
-        var scenePose = cameraTransform*tagPoseARKit
-
-        if snapTagsToVertical {
-            scenePose = scenePose.makeZFlat().alignY()
-        }
-        let transVarMatrix = simd_float3x3(diagonal: transVar)
-        let quatVarMatrix = simd_float4x4(diagonal: quatVar)
-
-        // this is the linear transform that takes the original tag pose to the final world pose
-        let linearTransform = scenePose*originalTagPose.inverse
-        let q = simd_quatf(linearTransform)
-
-        let quatMultiplyAsLinearTransform =
-        simd_float4x4(columns: (simd_float4(q.vector.w, q.vector.z, -q.vector.y, -q.vector.x),
-                                simd_float4(-q.vector.z, q.vector.w, q.vector.x, -q.vector.y),
-                                simd_float4(q.vector.y, -q.vector.x, q.vector.w, -q.vector.z),
-                                simd_float4(q.vector.x, q.vector.y, q.vector.z, q.vector.w)))
-        let sceneTransVar = linearTransform.getUpper3x3()*transVarMatrix*linearTransform.getUpper3x3().transpose
-        let sceneQuatVar = quatMultiplyAsLinearTransform*quatVarMatrix*quatMultiplyAsLinearTransform.transpose
-        let scenePoseQuat = simd_quatf(scenePose)
-        let scenePoseTranslation = scenePose.getTrans()
-        let sceneVar = (sceneTransVar: sceneTransVar, sceneQuatVar: sceneQuatVar, scenePoseQuat: scenePoseQuat, scenePoseTranslation: scenePoseTranslation)
-        
-        AppController.shared.detectTagRequested(tag: tag, cameraTransform: cameraTransform, sceneVar: sceneVar) // Generates event to detect tag in AR view
     }
     
     /// Clear tag data
