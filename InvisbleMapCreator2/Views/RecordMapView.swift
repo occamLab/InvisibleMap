@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import ARKit
 
 // Stores the ARView
 struct NavigationIndicator: UIViewControllerRepresentable {
@@ -46,14 +47,24 @@ enum InstructionType {
     }
 }
 
+struct NodeData: Identifiable {
+    let id = UUID()
+    var node: SCNNode
+    var picture: UIImage
+    var textNode: SCNNode
+    var poseId: Int
+}
+
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
 class RecordGlobalState: ObservableObject, RecordViewController {
     @Published var tagFound: Bool
     @Published var instructionWrapper: InstructionType
-    
+    @Published var nodeList: [NodeData]
+
     init() {
         tagFound = false
         instructionWrapper = .findTag
+        nodeList = []
         AppController.shared.recordViewer = self
     }
     
@@ -63,6 +74,10 @@ class RecordGlobalState: ObservableObject, RecordViewController {
             self.tagFound = true
             self.instructionWrapper = .saveLocation
         }
+    }
+    
+    func updateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
+        self.nodeList.append(NodeData(node: node, picture: picture, textNode: textNode, poseId: poseId))
     }
 }
 
@@ -80,7 +95,7 @@ struct RecordMapView: View {
                     ToolbarItem(placement: .bottomBar) {
                         HStack {
                             AddLocationButton(recordGlobalState: recordGlobalState)
-                            ManageLocationsButton()
+                            ManageLocationsButton(recordGlobalState: recordGlobalState)
                         }
                     }
                 })

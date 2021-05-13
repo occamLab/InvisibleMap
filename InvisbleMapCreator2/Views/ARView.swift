@@ -72,8 +72,6 @@ extension ARView: ARSessionDelegate {
 extension ARView: ARViewController {
     
     /// Adds or updates a tag node when a tag is detected
-    ///
-    /// - Parameter tag: the april tag detected by the visual servoing platform
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         DispatchQueue.main.async {
             let pose = tag.poseData
@@ -149,6 +147,7 @@ extension ARView: ARViewController {
     
     func pinLocation(locationName: String) {
         DispatchQueue.main.async {
+            // Generate UUID here and pass it in with the recordLocation data
             let box = SCNBox(width: 0.05, height: 0.2, length: 0.05, chamferRadius: 0)
             
             let text = SCNText(string: locationName, extrusionDepth: 0)
@@ -171,8 +170,9 @@ extension ARView: ARViewController {
             self.arView.scene.rootNode.addChildNode(boxNode)
             self.arView.scene.rootNode.addChildNode(textNode)
             
-            let nodeTransform = boxNode.simdTransform
-            AppController.shared.recordLocationRequested(locationName: locationName, node: nodeTransform)
+            let snapshot = self.arView.snapshot()
+            //AppController.shared.recordLocationRequested(locationName: locationName, node: nodeTransform)
+            AppController.shared.cacheLocationRequested(node: boxNode, picture: snapshot, textNode: textNode)
         }
     }
     

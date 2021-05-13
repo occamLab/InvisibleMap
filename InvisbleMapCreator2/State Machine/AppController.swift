@@ -12,7 +12,6 @@ class AppController {
     public static var shared = AppController()
     private var state = AppState.initialState
     let mapRecorder = MapRecorder()
-    let tagFinder = TagFinder()
     var arViewer: ARViewController?
     var recordViewer: RecordViewController?
     
@@ -25,19 +24,14 @@ class AppController {
             // MapRecorder commands
             case .RecordData(cameraFrame: let cameraFrame):
                 mapRecorder.recordData(cameraFrame: cameraFrame)
-            case .RecordLocation(let locationName, let node):
-                mapRecorder.recordLocation(locationName: locationName, node: node)
+            case .CacheLocation(let node, let picture, let textNode):
+                mapRecorder.cacheLocation(node: node, picture: picture, textNode: textNode)
             case .DisplayLocationsUI:
                 mapRecorder.displayLocationsUI()
             case .ClearData:
                 mapRecorder.clearData()
             case .SaveMap:
                 mapRecorder.saveMap()
-            // TagFinder commands
-            case .RecordTags(let cameraFrame, let timestamp, let poseId):
-                tagFinder.recordTags(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)
-            case .ClearTags:
-                tagFinder.clearTags()
             // ARViewer commands
             case .DetectTag(let tag, let cameraTransform, let snapTagsToVertical):
                 arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
@@ -46,6 +40,8 @@ class AppController {
             // RecordViewer commands
             case .EnableAddLocation:
                 recordViewer?.enableAddLocation()
+            case .UpdateLocationList(node: let node, picture: let picture, textNode: let textNode, poseId: let poseId):
+                recordViewer?.updateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)
             }
         }
     }
@@ -64,6 +60,7 @@ extension AppController {
     }
     
     func startRecordingRequested() {
+        print(state)
         processCommands(commands: state.handleEvent(event: .StartRecordingRequested))
         print(state)
     }
@@ -73,25 +70,28 @@ extension AppController {
         processCommands(commands: state.handleEvent(event: .NewARFrame(cameraFrame: frame)))
     }
     
-    func findTagsRequested(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
-        processCommands(commands: state.handleEvent(event: .FindTagsRequested(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId)))
-    }
-
     func processNewTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         processCommands(commands: state.handleEvent(event: .NewTagFound(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)))
-        print("New tag found")
     }
     
     func saveLocationRequested(locationName: String) {
         processCommands(commands: state.handleEvent(event: .SaveLocationRequested(locationName: locationName)))
     }
     
-    func recordLocationRequested(locationName: String, node: simd_float4x4) {
-        processCommands(commands: state.handleEvent(event: .RecordLocationRequested(locationName: locationName, node: node)))
+    func cacheLocationRequested(node: SCNNode, picture: UIImage, textNode: SCNNode) {
+        processCommands(commands: [AppState.Command.CacheLocation(node: node, picture: picture, textNode: textNode)])
+    }
+    
+    func updateLocationListRequested(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
+        processCommands(commands: [AppState.Command.UpdateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)])
     }
     
     func viewLocationsRequested() {
         processCommands(commands: state.handleEvent(event: .ViewLocationsRequested))
+    }
+    
+    func dismissLocationsRequested() {
+        processCommands(commands: state.handleEvent(event: .DismissLocationsRequested))
     }
     
     func cancelRecordingRequested() {
@@ -107,15 +107,10 @@ extension AppController {
 
 protocol MapRecorderController {
     func recordData(cameraFrame: ARFrame)
-    func recordLocation(locationName: String, node: simd_float4x4)
+    func cacheLocation(node: SCNNode, picture: UIImage, textNode: SCNNode)
     func displayLocationsUI()
     func clearData()
     func saveMap()
-}
-
-protocol TagFinderController {
-    func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int)
-    func clearTags()
 }
 
 protocol ARViewController {
@@ -125,4 +120,5 @@ protocol ARViewController {
 
 protocol RecordViewController {
     func enableAddLocation()
+    func updateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
 }
