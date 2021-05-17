@@ -35,11 +35,13 @@ PODS:
     - nanopb/encode (= 0.3.8)
   - nanopb/decode (0.3.8)
   - nanopb/encode (0.3.8)
+  - SwiftGraph (3.1)
 
 DEPENDENCIES:
   - Firebase/Core
   - Firebase/Database
   - Firebase/Storage
+  - SwiftGraph
 
 SPEC REPOS:
   trunk:
@@ -53,6 +55,7 @@ SPEC REPOS:
     - GTMSessionFetcher
     - leveldb-library
     - nanopb
+    - SwiftGraph
 
 SPEC CHECKSUMS:
   Firebase: 355bd535bfdacaa82a7fe8d9784115edefd6fc03
@@ -65,7 +68,8 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 0c4baf0a73acd0041bf9f71ea018deedab5ea84e
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
+  SwiftGraph: f97852fc9372815b71426cd38baf2609a8a92f76
 
-PODFILE CHECKSUM: fbcc32c5006e5d345721b5208c1e14ea80a6af43
+PODFILE CHECKSUM: 34f317c9420a6c949c9ff0b6b188f4758400865d
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.10.1
