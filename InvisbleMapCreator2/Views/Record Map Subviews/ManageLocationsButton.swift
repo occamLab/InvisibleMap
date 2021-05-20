@@ -20,7 +20,15 @@ struct ManageLocationsButton: View {
             Image(systemName: "line.horizontal.3")
                 .accessibility(label: Text("Manage Locations"))
         }
-        .buttonStyle(RectangleButtonStyle())
+        .frame(width: 80, height: 40)
+        .foregroundColor(.blue)
+        .background(
+            ZStack {
+                RoundedRectangle(cornerRadius: 15)
+                    .foregroundColor(Color(UIColor.systemBackground))
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke(Color.blue, lineWidth: 1)
+            })
         .sheet(isPresented: $showLocations, onDismiss: {
             AppController.shared.dismissLocationsRequested() // Tells the state machine that the manage locations menu has been closed
         }) {

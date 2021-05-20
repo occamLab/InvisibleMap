@@ -4,7 +4,7 @@
 //
 //  Created by Marion Madanguit on 3/5/21.
 //
-//  State Machine Source: https://gist.github.com/andymatuschak/d5f0a8730ad601bcccae97e8398e25b2
+//  For more information about state machine: https://gist.github.com/andymatuschak/d5f0a8730ad601bcccae97e8398e25b2
 
 import Foundation
 

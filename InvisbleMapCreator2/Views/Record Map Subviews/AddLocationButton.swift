@@ -30,9 +30,8 @@ struct AddLocationButton: View {
         .foregroundColor(.white)
         .background(
             RoundedRectangle(cornerRadius: 15)
-                .foregroundColor(.green))
+                .foregroundColor(.blue))
         .opacity(recordGlobalState.tagFound ? 1 : 0.5)
-        //.disabled(tagFound ? false: true)
     }
 }
 

@@ -11,9 +11,11 @@ import ARKit
 class AppController {
     public static var shared = AppController()
     private var state = AppState.initialState
-    let mapRecorder = MapRecorder()
-    var arViewer: ARViewController?
-    var recordViewer: RecordViewController?
+    
+    // Various controllers for handling commands
+    let mapRecorder = MapRecorder() // Initialized in MapRecorder.swift
+    var arViewer: ARViewController? // Initialized in ARView.swift
+    var recordViewer: RecordViewController? // Initialized in RecordMapView.swift
     
     private init() {
     }
@@ -26,12 +28,10 @@ class AppController {
                 mapRecorder.recordData(cameraFrame: cameraFrame)
             case .CacheLocation(let node, let picture, let textNode):
                 mapRecorder.cacheLocation(node: node, picture: picture, textNode: textNode)
-            case .DisplayLocationsUI:
-                mapRecorder.displayLocationsUI()
             case .ClearData:
                 mapRecorder.clearData()
-            case .SaveMap:
-                mapRecorder.saveMap()
+            case .SendToFirebase(let mapName):
+                mapRecorder.sendToFirebase(mapName: mapName)
             // ARViewer commands
             case .DetectTag(let tag, let cameraTransform, let snapTagsToVertical):
                 arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
@@ -49,16 +49,6 @@ class AppController {
 
 extension AppController {
     // MainScreen events
-    func mainScreenRequested() {
-        processCommands(commands: state.handleEvent(event: .MainScreenRequested))
-        print(state)
-    }
-    
-    func optionsMenuRequested() {
-        processCommands(commands: state.handleEvent(event: .OptionsMenuRequested))
-        print(state)
-    }
-    
     func startRecordingRequested() {
         print(state)
         processCommands(commands: state.handleEvent(event: .StartRecordingRequested))
@@ -99,26 +89,28 @@ extension AppController {
         print(state)
     }
     
-    func stopRecordingRequested() {
-        processCommands(commands: state.handleEvent(event: .StopRecordingRequested/*(mapName: "placeholder")*/))
+    func saveMapRequested(mapName: String) {
+        processCommands(commands: state.handleEvent(event: .SaveMapRequested(mapName: mapName)))
         print(state)
     }
 }
 
 protocol MapRecorderController {
+    // Commands that impact the map data being recorded
     func recordData(cameraFrame: ARFrame)
     func cacheLocation(node: SCNNode, picture: UIImage, textNode: SCNNode)
-    func displayLocationsUI()
+    func sendToFirebase(mapName: String)
     func clearData()
-    func saveMap()
 }
 
 protocol ARViewController {
+    // Commands that interact with the ARView
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
     func pinLocation(locationName: String)
 }
 
 protocol RecordViewController {
+    // Commands that impact the record map UI
     func enableAddLocation()
     func updateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
 }

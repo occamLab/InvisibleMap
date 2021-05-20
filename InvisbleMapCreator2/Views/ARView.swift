@@ -70,7 +70,6 @@ extension ARView: ARSessionDelegate {
 }
 
 extension ARView: ARViewController {
-    
     /// Adds or updates a tag node when a tag is detected
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         DispatchQueue.main.async {
@@ -145,6 +144,7 @@ extension ARView: ARViewController {
         }
     }
     
+    /// Creates location node when a location is added
     func pinLocation(locationName: String) {
         DispatchQueue.main.async {
             // Generate UUID here and pass it in with the recordLocation data
@@ -171,7 +171,6 @@ extension ARView: ARViewController {
             self.arView.scene.rootNode.addChildNode(textNode)
             
             let snapshot = self.arView.snapshot()
-            //AppController.shared.recordLocationRequested(locationName: locationName, node: nodeTransform)
             AppController.shared.cacheLocationRequested(node: boxNode, picture: snapshot, textNode: textNode)
         }
     }

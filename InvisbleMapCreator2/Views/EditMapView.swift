@@ -9,6 +9,7 @@ import SwiftUI
 
 struct EditMapView: View {
     var body: some View {
+        // TODO: Determine what the edit map view should look like
         Text("Edit Map View")
     }
 }

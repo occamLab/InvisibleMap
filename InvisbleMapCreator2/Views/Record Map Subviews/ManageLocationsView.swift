@@ -12,21 +12,16 @@ struct ManageLocationsView: View {
     @ObservedObject var recordGlobalState: RecordGlobalState
     @Binding var showLocations: Bool
     
-    /*cell.locationTextLabel?.text = nodeList[indexPath.row].node.name!
-    cell.locationTextLabel?.sizeToFit()
-    cell.locationImageView?.image = nodeList[indexPath.row].picture
-    //cell.textLabel?.text = "test"
-    return cell*/
-    
     var body: some View {
         NavigationView {
             List (recordGlobalState.nodeList) { node in
                 HStack {
                     Image(uiImage: node.picture)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 200, height: 200, alignment: .center)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 50, height: 50)
                         .clipped()
+                        .cornerRadius(8)
                     Text(node.node.name!)
                 }
             }

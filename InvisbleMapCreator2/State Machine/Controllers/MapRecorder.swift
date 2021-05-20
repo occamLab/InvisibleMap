@@ -12,25 +12,37 @@ import FirebaseDatabase
 import FirebaseStorage
 
 class MapRecorder: MapRecorderController {
-    
     var currentFrameTransform: simd_float4x4 = simd_float4x4.init()
+    /// Tracks last recorded frame to set map image to
+    var lastRecordedFrame: ARFrame?
+    /// Timestamp of frame that was last recorded
     var lastRecordedTimestamp: Double?
+    /// Time interval at which pose, tag, location, and node data is recorded
+    let recordInterval = 0.5
+    /// Allows you to asynchronously run a job on a background thread
+    let aprilTagQueue = DispatchQueue(label: "edu.occamlab.apriltagfinder", qos: DispatchQoS.userInitiated)
     var poseId: Int = 0
     var poseData: [[Any]] = []
-    let aprilTagQueue = DispatchQueue(label: "edu.occamlab.apriltagfinder", qos: DispatchQoS.userInitiated) // Allows you to asynchronously run a job on a background thread
     var tagData: [[Any]] = []
-    var pendingLocation: (String, simd_float4x4)? // Keep track of any new locations
     var locationData: [[Any]] = []
-    var pendingNode: (SCNNode, UIImage, SCNNode)? // Keep track of any new location nodes
-
-    var processingFrame: Bool = false // Keep track of whether record data function is processing a frame
+    
+    /// Tracks whether record data function is processing a frame to prevent queue from being overfilled
+    var processingFrame: Bool = false
+    /// Tracks any new locations
+    var pendingLocation: (String, simd_float4x4)?
+    /// Tracks any new location nodes
+    var pendingNode: (SCNNode, UIImage, SCNNode)?
+    
+    /// Correct the orientation estimate such that the normal vector of the tag is perpendicular to gravity
+    let snapTagsToVertical = true
+    
+    let f = imageToData()
     
     var firebaseRef: DatabaseReference!
     var firebaseStorage: Storage!
     var firebaseStorageRef: StorageReference!
     
     func initFirebase() {
-        FirebaseApp.configure()
         firebaseRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference()
         firebaseStorage = Storage.storage()
         firebaseStorageRef = firebaseStorage.reference()
@@ -40,17 +52,22 @@ class MapRecorder: MapRecorderController {
         initFirebase()
     }
     
+    /// Record pose, tag, location, and node data after a specified period of time
     func recordData(cameraFrame: ARFrame) {
         if lastRecordedTimestamp == nil {
             lastRecordedTimestamp = cameraFrame.timestamp
+            lastRecordedFrame = cameraFrame
             poseId += 1
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
+            print("Running \(poseId)")
         }
-        else if lastRecordedTimestamp! + 0.5 < cameraFrame.timestamp && !processingFrame {
+        // Only record data if a specific period of time has passed and if a frame is not already being processed
+        else if lastRecordedTimestamp! + recordInterval < cameraFrame.timestamp && !processingFrame {
             processingFrame = true
-            lastRecordedTimestamp = lastRecordedTimestamp! + 0.5
+            lastRecordedTimestamp = lastRecordedTimestamp! + recordInterval
+            lastRecordedFrame = cameraFrame
             poseId += 1
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
@@ -61,6 +78,7 @@ class MapRecorder: MapRecorderController {
                 self.pendingLocation = nil
                 self.pendingNode = nil
             }
+            print("Running \(poseId)")
             processingFrame = false
         }
         else {
@@ -73,30 +91,47 @@ class MapRecorder: MapRecorderController {
         pendingLocation = (node.name!, node.simdTransform)
         pendingNode = (node, picture, textNode)
     }
-    
-    func displayLocationsUI() {
-    }
-    
-    func saveMap(mapName: String) {
+
+    /// Upload pose data, last image frame to Firebase under "maps" and "unprocessed_maps" nodes
+    func sendToFirebase(mapName: String) {
+        let mapImage = convertToUIImage(cameraFrame: lastRecordedFrame!)
+        let mapId = String(lastRecordedTimestamp!).replacingOccurrences(of: ".", with: "") + mapName
+        let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData]
+        
+        let imagePath = "myTestFolder/" + mapId + ".jpg"
+        let filePath = "myTestFolder/" + mapId + ".json"
+        
+        // TODO: handle errors when failing to upload image and json file
+        // TODO: let the user pick their image
+        // Upload the last image capture to Firebase
+        firebaseStorageRef.child(imagePath).putData(mapImage.jpegData(compressionQuality: 0)!, metadata: StorageMetadata(dictionary: ["contentType": "image/jpeg"]))
+
+        // Upload raw file json
+        if let jsonData = try? JSONSerialization.data(withJSONObject: mapJsonFile, options: []) {
+            firebaseStorageRef.child(filePath).putData(jsonData, metadata: StorageMetadata(dictionary: ["contentType": "application/json"])){ (metadata, error) in
+                // Write to maps node in database
+                self.firebaseRef.child("maps").child(mapId).setValue(["name": mapName, "image": imagePath, "raw_file": filePath])
+                
+                // Write to unprocessed maps node in database
+                self.firebaseRef.child("unprocessed_maps").child(mapId).setValue(filePath)
+            }
+        }
     }
     
     /// Clear timestamp, pose, tag, and location data
     func clearData() {
         lastRecordedTimestamp = nil
+        lastRecordedFrame = nil
         poseId = 0
         poseData = []
         locationData = []
         tagData = []
         print("Clear data")
     }
-    
-    func saveMap() {
-    }
-    
 }
 
-extension MapRecorder { // recordData functions
-    
+// Helper functions that are not explicitly commands
+extension MapRecorder {
     /// Append new pose data to list
     func recordPoseData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         poseData.append(getCameraCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId))
@@ -115,10 +150,6 @@ extension MapRecorder { // recordData functions
     
     /// Finds all april tags in the frame
     func getArTags(cameraFrame: ARFrame, image: UIImage, timeStamp: Double, poseId: Int) -> [[String:Any]] {
-        /// Correct the orientation estimate such that the normal vector of the tag is perpendicular to gravity
-        let snapTagsToVertical = true
-        let f = imageToData()
-        
         let intrinsics = cameraFrame.camera.intrinsics.columns
         f.findTags(image, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y)
         var tagArray: Array<AprilTags> = Array()
@@ -187,4 +218,13 @@ extension MapRecorder { // recordData functions
         return fullMatrix
     }
     
+    /// Convert ARFrame to a UIImage
+    func convertToUIImage(cameraFrame: ARFrame) -> (UIImage) {
+        let pixelBuffer = cameraFrame.capturedImage
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        let context = CIContext(options: nil)
+        let cgImage = context.createCGImage(ciImage, from: ciImage.extent)
+        let uiImage = UIImage(cgImage: cgImage!)
+        return uiImage
+    }
 }

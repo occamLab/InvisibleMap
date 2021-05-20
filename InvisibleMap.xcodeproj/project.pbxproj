@@ -28,7 +28,6 @@
 		14995FC026263B3100A7C78B /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
 		14995FC426263BA800A7C78B /* visp3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86616BC42113369200DD565C /* visp3.framework */; };
 		14995FC826263BB700A7C78B /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8630963B21125E89003D4434 /* opencv2.framework */; };
-		14995FCD2626942400A7C78B /* MapRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FCC2626942400A7C78B /* MapRow.swift */; };
 		14995FD226269AB400A7C78B /* ExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD126269AB400A7C78B /* ExitButton.swift */; };
 		14995FD726269B0900A7C78B /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD626269B0900A7C78B /* SaveButton.swift */; };
 		14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FE9262713EC00A7C78B /* RecordMapView.swift */; };
@@ -90,7 +89,6 @@
 		1447B7562624230200230A58 /* StateType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
 		1447B7592624230200230A58 /* MapRecorder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapRecorder.swift; sourceTree = "<group>"; };
 		1447B75A2624230200230A58 /* AppState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
-		14995FCC2626942400A7C78B /* MapRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRow.swift; sourceTree = "<group>"; };
 		14995FD126269AB400A7C78B /* ExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitButton.swift; sourceTree = "<group>"; };
 		14995FD626269B0900A7C78B /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
@@ -213,16 +211,17 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		1447B71F2624227600230A58 /* Button Views */ = {
+		1447B71F2624227600230A58 /* Record Map Subviews */ = {
 			isa = PBXGroup;
 			children = (
+				141497E52645A41700BF0ABC /* InstructionOverlay.swift */,
 				14995FD126269AB400A7C78B /* ExitButton.swift */,
 				14995FD626269B0900A7C78B /* SaveButton.swift */,
 				143011F82629D8AF0042FDFC /* AddLocationButton.swift */,
 				143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */,
 				141FF9C126499FCE00845059 /* ManageLocationsView.swift */,
 			);
-			path = "Button Views";
+			path = "Record Map Subviews";
 			sourceTree = "<group>";
 		};
 		1447B7402624227E00230A58 /* Views */ = {
@@ -230,11 +229,9 @@
 			children = (
 				1447B7412624229600230A58 /* ContentView.swift */,
 				14E164722633523B0087A426 /* EditMapView.swift */,
-				14995FE9262713EC00A7C78B /* RecordMapView.swift */,
 				1447B71E2624227600230A58 /* ARView.swift */,
-				14995FCC2626942400A7C78B /* MapRow.swift */,
-				141497E52645A41700BF0ABC /* InstructionOverlay.swift */,
-				1447B71F2624227600230A58 /* Button Views */,
+				14995FE9262713EC00A7C78B /* RecordMapView.swift */,
+				1447B71F2624227600230A58 /* Record Map Subviews */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -622,7 +619,6 @@
 				1447B72F2624227600230A58 /* ARView.swift in Sources */,
 				1447B75B2624230200230A58 /* AppController.swift in Sources */,
 				14995FC026263B3100A7C78B /* simd+ext.swift in Sources */,
-				14995FCD2626942400A7C78B /* MapRow.swift in Sources */,
 				1447B706262421CC00230A58 /* InvisbleMapCreator2App.swift in Sources */,
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,

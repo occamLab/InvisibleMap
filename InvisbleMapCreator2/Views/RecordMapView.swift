@@ -127,7 +127,7 @@ extension UINavigationController {
         // Creates a translucent toolbar
         let toolbarAppearance = UIToolbarAppearance()
         toolbarAppearance.configureWithTransparentBackground()
-        toolbarAppearance.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.5)
+        toolbarAppearance.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.7)
         UIToolbar.appearance().standardAppearance = toolbarAppearance
     }
 }

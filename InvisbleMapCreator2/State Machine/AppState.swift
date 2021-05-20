@@ -12,7 +12,6 @@ enum AppState: StateType {
     // Higher level app states
     case MainScreen
     case RecordMap(RecordMapState)
-    case OptionsMenu
     
     // Initial state upon opening the app
     static let initialState = AppState.MainScreen
@@ -21,7 +20,6 @@ enum AppState: StateType {
     enum Event {
         // MainScreen events
         case StartRecordingRequested
-        case OptionsMenuRequested
         // RecordMap events
         case NewARFrame(cameraFrame: ARFrame)
         case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
@@ -29,9 +27,7 @@ enum AppState: StateType {
         case ViewLocationsRequested
         case DismissLocationsRequested
         case CancelRecordingRequested
-        case StopRecordingRequested
-        // OptionsMenu events
-        case MainScreenRequested
+        case SaveMapRequested(mapName: String)
     }
     
     // All the effectful outputs which the state desires to have performed on the app
@@ -43,9 +39,8 @@ enum AppState: StateType {
         case PinLocation(locationName: String)
         case CacheLocation(node: SCNNode, picture: UIImage, textNode: SCNNode)
         case UpdateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
-        case DisplayLocationsUI
+        case SendToFirebase(mapName: String)
         case ClearData
-        case SaveMap
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
@@ -54,23 +49,17 @@ enum AppState: StateType {
         case (.MainScreen, .StartRecordingRequested):
             self = .RecordMap(.RecordMap)
             return []
-        case (.MainScreen, .OptionsMenuRequested):
-            self = .OptionsMenu
-            return []
         case (.RecordMap, .CancelRecordingRequested):
             self = .MainScreen
             return [.ClearData]
-        case (.RecordMap, .StopRecordingRequested):
+        case (.RecordMap, .SaveMapRequested(let mapName)):
             self = .MainScreen
-            return [.SaveMap]
+            return [.SendToFirebase(mapName: mapName), .ClearData]
         case (.RecordMap(let state), _) where RecordMapState.Event(event) != nil:
             var newState = state
             let commands = newState.handleEvent(event: RecordMapState.Event(event)!)
             self = .RecordMap(newState)
             return commands
-        case(.OptionsMenu, .MainScreenRequested):
-            self = .MainScreen
-            return []
             
         default: break
         }
@@ -94,7 +83,7 @@ enum RecordMapState: StateType {
         case ViewLocationsRequested
         case DismissLocationsRequested
         case CancelRecordingRequested
-        case StopRecordingRequested
+        case SaveMapRequested
     }
     
     // Refers to commands defined in AppState
@@ -124,6 +113,7 @@ enum RecordMapState: StateType {
 
 extension RecordMapState.Event {
     init?(_ event: AppState.Event) {
+        // Translate between events in AppState and events in RecordMapState
         switch event {
         case .NewARFrame(let cameraFrame):
             self = .NewARFrame(cameraFrame: cameraFrame)
