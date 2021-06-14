@@ -11,7 +11,7 @@
 		141FF9C226499FCE00845059 /* ManageLocationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141FF9C126499FCE00845059 /* ManageLocationsView.swift */; };
 		143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143011F82629D8AF0042FDFC /* AddLocationButton.swift */; };
 		143011FE2629D8CD0042FDFC /* ManageLocationsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */; };
-		1447B706262421CC00230A58 /* InvisbleMapCreator2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B705262421CC00230A58 /* InvisbleMapCreator2App.swift */; };
+		1447B706262421CC00230A58 /* InvisibleMapCreator2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B705262421CC00230A58 /* InvisibleMapCreator2App.swift */; };
 		1447B70A262421CF00230A58 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1447B709262421CF00230A58 /* Assets.xcassets */; };
 		1447B70D262421CF00230A58 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1447B70C262421CF00230A58 /* Preview Assets.xcassets */; };
 		1447B72F2624227600230A58 /* ARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B71E2624227600230A58 /* ARView.swift */; };
@@ -79,7 +79,7 @@
 		143011F82629D8AF0042FDFC /* AddLocationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLocationButton.swift; sourceTree = "<group>"; };
 		143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageLocationsButton.swift; sourceTree = "<group>"; };
 		1447B703262421CC00230A58 /* InvisbleMapCreator2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisbleMapCreator2.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1447B705262421CC00230A58 /* InvisbleMapCreator2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisbleMapCreator2App.swift; sourceTree = "<group>"; };
+		1447B705262421CC00230A58 /* InvisibleMapCreator2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapCreator2App.swift; sourceTree = "<group>"; };
 		1447B709262421CF00230A58 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1447B70C262421CF00230A58 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1447B70E262421CF00230A58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -190,17 +190,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		1447B704262421CC00230A58 /* InvisbleMapCreator2 */ = {
+		1447B704262421CC00230A58 /* InvisibleMapCreator2 */ = {
 			isa = PBXGroup;
 			children = (
-				1447B705262421CC00230A58 /* InvisbleMapCreator2App.swift */,
+				1447B705262421CC00230A58 /* InvisibleMapCreator2App.swift */,
 				1447B7402624227E00230A58 /* Views */,
 				1447B749262422AB00230A58 /* State Machine */,
 				1447B709262421CF00230A58 /* Assets.xcassets */,
 				1447B70E262421CF00230A58 /* Info.plist */,
 				1447B70B262421CF00230A58 /* Preview Content */,
 			);
-			path = InvisbleMapCreator2;
+			path = InvisibleMapCreator2;
 			sourceTree = "<group>";
 		};
 		1447B70B262421CF00230A58 /* Preview Content */ = {
@@ -286,7 +286,7 @@
 				86F3953D210FA42500F209EC /* InvisibleMap */,
 				86F39552210FA42600F209EC /* InvisibleMapTests */,
 				82468A2024C88B6600FD31BC /* InvisibleMapCreator */,
-				1447B704262421CC00230A58 /* InvisbleMapCreator2 */,
+				1447B704262421CC00230A58 /* InvisibleMapCreator2 */,
 				86F3953C210FA42500F209EC /* Products */,
 				993390B42386AFE1DD02EDC5 /* Pods */,
 				126D761BA492BEFEDB8E7347 /* Frameworks */,
@@ -619,7 +619,7 @@
 				1447B72F2624227600230A58 /* ARView.swift in Sources */,
 				1447B75B2624230200230A58 /* AppController.swift in Sources */,
 				14995FC026263B3100A7C78B /* simd+ext.swift in Sources */,
-				1447B706262421CC00230A58 /* InvisbleMapCreator2App.swift in Sources */,
+				1447B706262421CC00230A58 /* InvisibleMapCreator2App.swift in Sources */,
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
@@ -720,7 +720,7 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisbleMapCreator2/Preview Content\"";
-				DEVELOPMENT_TEAM = K78N9SK8FW;
+				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -750,7 +750,7 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisbleMapCreator2/Preview Content\"";
-				DEVELOPMENT_TEAM = K78N9SK8FW;
+				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

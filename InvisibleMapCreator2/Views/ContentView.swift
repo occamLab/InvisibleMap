@@ -59,7 +59,6 @@ class MapDatabase: ObservableObject {
 
 struct ContentView: View {
     @ObservedObject var mapDatabase = MapDatabase()
-    @State private var showRecordingUI = false
     
     var body: some View {
         NavigationView {
@@ -86,8 +85,7 @@ struct ContentView: View {
                 Divider()
                 // New map button
                 NavigationLink(
-                    destination: RecordMapView(),
-                    isActive: $showRecordingUI
+                    destination: RecordMapView()
                 ) {
                     Text("New Map")
                         .frame(width: 200, height: 40)
@@ -107,12 +105,6 @@ struct ContentView: View {
                         .foregroundColor(.black)
                 }
             )
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
-                showRecordingUI = true
-                AppController.shared.startRecordingRequested() // Tells the state machine to start the map recording
-            }
         }
     }
 }

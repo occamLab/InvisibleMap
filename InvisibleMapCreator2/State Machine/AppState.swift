@@ -45,6 +45,7 @@ enum AppState: StateType {
     
     // In response to an event, a state may transition to a new state, and it may emit a command
     mutating func handleEvent(event: Event) -> [Command] {
+        print(self, event)
         switch (self, event) {
         case (.MainScreen, .StartRecordingRequested):
             self = .RecordMap(.RecordMap)

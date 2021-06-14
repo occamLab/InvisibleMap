@@ -117,6 +117,9 @@ struct RecordMapView: View {
             }
             .padding()
         }
+        .onAppear {
+            AppController.shared.startRecordingRequested()
+        }
     }
 }
 
