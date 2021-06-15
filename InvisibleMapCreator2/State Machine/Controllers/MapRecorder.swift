@@ -60,11 +60,11 @@ class MapRecorder: MapRecorderController {
         if lastRecordedTimestamp == nil {
             lastRecordedTimestamp = cameraFrame.timestamp
             lastRecordedFrame = cameraFrame
-            poseId += 1
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
+            poseId += 1
             
             print("Running \(poseId)")
         }
@@ -73,11 +73,11 @@ class MapRecorder: MapRecorderController {
             processingFrame = true
             lastRecordedTimestamp = lastRecordedTimestamp! + recordInterval
             lastRecordedFrame = cameraFrame
-            poseId += 1
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
+            poseId += 1
             
             if let pendingLocation = pendingLocation {
                 locationData.append(getLocationCoordinates(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId, location: pendingLocation))
