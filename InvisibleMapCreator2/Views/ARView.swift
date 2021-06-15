@@ -49,9 +49,10 @@ class ARView: UIViewController {
        super.viewDidLayoutSubviews()
     }
     override func viewWillAppear(_ animated: Bool) {
-       super.viewWillAppear(animated)
-       let configuration = ARWorldTrackingConfiguration()
-       arView.session.run(configuration)
+        super.viewWillAppear(animated)
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.planeDetection = [.horizontal, .vertical]
+        arView.session.run(configuration)
     }
     override func viewWillDisappear(_ animated: Bool) {
        super.viewWillDisappear(animated)

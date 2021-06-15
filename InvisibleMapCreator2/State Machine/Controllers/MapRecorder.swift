@@ -97,16 +97,7 @@ class MapRecorder: MapRecorderController {
     func updatePlanes(planes: [ARPlaneAnchor]) {
         for plane in planes {
             planesSeen.insert(plane.identifier)
-            let planeId: Int
-            if let id = planeData[plane.identifier]?["id"] as? Int {
-                planeId = id
-            } else {
-                planeId = planeData.count
-            }
-            let planeTransform = plane.transform
-            let boundaryVertices = plane.geometry.boundaryVertices.map({[$0.x, $0.y, $0.z]})
-            let planeDict: [String: Any] = ["pose": [planeTransform.columns.0.x, planeTransform.columns.1.x, planeTransform.columns.2.x, planeTransform.columns.3.x, planeTransform.columns.0.y, planeTransform.columns.1.y, planeTransform.columns.2.y, planeTransform.columns.3.y, planeTransform.columns.0.z, planeTransform.columns.1.z, planeTransform.columns.2.z, planeTransform.columns.3.z, planeTransform.columns.0.w, planeTransform.columns.1.w, planeTransform.columns.2.w, planeTransform.columns.3.w], "boundaries": boundaryVertices, "id": planeId]
-            planeData[plane.identifier] = planeDict
+            planeData[plane.identifier] = getPlaneData(plane: plane)
         }
     }
     
@@ -120,10 +111,11 @@ class MapRecorder: MapRecorderController {
     func sendToFirebase(mapName: String) {
         let mapImage = convertToUIImage(cameraFrame: lastRecordedFrame!)
         let mapId = String(lastRecordedTimestamp!).replacingOccurrences(of: ".", with: "") + mapName
-        var planeDataList: [[String: Any]?] = planeData.keys.map({planeData[$0]})
+        var planeDataList: [[String: Any]] = planeData.keys.map({planeData[$0]}) as! [[String: Any]]
         planeDataList.sort{
-            ($0!["id"] as! Int) < ($1!["id"] as! Int)
+            ($0["id"] as! Int) < ($1["id"] as! Int)
         }
+        
         let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData, "plane_data": planeDataList]
         
         let imagePath = "myTestFolder/" + mapId + ".jpg"
@@ -185,7 +177,7 @@ extension MapRecorder {
             }
             let planePose = simd_float4x4(columns: (simd_float4(planePoseList[0], planePoseList[1], planePoseList[2], planePoseList[3]), simd_float4(planePoseList[4], planePoseList[5], planePoseList[6], planePoseList[7]), simd_float4(planePoseList[8], planePoseList[9], planePoseList[10], planePoseList[11]), simd_float4(planePoseList[12], planePoseList[13], planePoseList[14], planePoseList[15])))
             let transform = matrix_multiply(planePose, currentFrameTransform.inverse)
-            planeInfo.append(["transform": transform, "id": planeId])
+            planeInfo.append(["transform": [transform.columns.0.x, transform.columns.1.x, transform.columns.2.x, transform.columns.3.x, transform.columns.0.y, transform.columns.1.y, transform.columns.2.y, transform.columns.3.y, transform.columns.0.z, transform.columns.1.z, transform.columns.2.z, transform.columns.3.z, transform.columns.0.w, transform.columns.1.w, transform.columns.2.w, transform.columns.3.w], "id": planeId])
         }
         poseData[poseId]["planes"] = planeInfo
         planesSeen.removeAll()
@@ -238,6 +230,20 @@ extension MapRecorder {
             }
         }
         return allTags
+    }
+    
+    /// Get dictionary of plane data
+    func getPlaneData(plane: ARPlaneAnchor) -> [String: Any] {
+        let planeId: Int
+        if let id = planeData[plane.identifier]?["id"] as? Int {
+            planeId = id
+        } else {
+            planeId = planeData.count
+        }
+        let planeTransform = plane.transform
+        let boundaryVertices: [[Float]] = plane.geometry.boundaryVertices.map({[$0.x, $0.y, $0.z]})
+        let planeDict: [String: Any] = ["pose": [planeTransform.columns.0.x, planeTransform.columns.1.x, planeTransform.columns.2.x, planeTransform.columns.3.x, planeTransform.columns.0.y, planeTransform.columns.1.y, planeTransform.columns.2.y, planeTransform.columns.3.y, planeTransform.columns.0.z, planeTransform.columns.1.z, planeTransform.columns.2.z, planeTransform.columns.3.z, planeTransform.columns.0.w, planeTransform.columns.1.w, planeTransform.columns.2.w, planeTransform.columns.3.w], "boundaries": boundaryVertices, "id": planeId]
+        return planeDict
     }
     
     /// Get pose data (transformation matrix, time)
