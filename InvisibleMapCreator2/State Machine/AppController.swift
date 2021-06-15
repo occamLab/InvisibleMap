@@ -24,8 +24,10 @@ class AppController {
         for command in commands {
             switch command {
             // MapRecorder commands
-            case .RecordData(cameraFrame: let cameraFrame):
+            case .RecordData(let cameraFrame):
                 mapRecorder.recordData(cameraFrame: cameraFrame)
+            case .UpdatePlanes(let planes):
+                mapRecorder.updatePlanes(planes: planes)
             case .CacheLocation(let node, let picture, let textNode):
                 mapRecorder.cacheLocation(node: node, picture: picture, textNode: textNode)
             case .ClearData:
@@ -40,7 +42,7 @@ class AppController {
             // RecordViewer commands
             case .EnableAddLocation:
                 recordViewer?.enableAddLocation()
-            case .UpdateLocationList(node: let node, picture: let picture, textNode: let textNode, poseId: let poseId):
+            case .UpdateLocationList(let node, let picture, let textNode, let poseId):
                 recordViewer?.updateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)
             }
         }
@@ -62,6 +64,10 @@ extension AppController {
     
     func processNewTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         processCommands(commands: state.handleEvent(event: .NewTagFound(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)))
+    }
+    
+    func processPlanesUpdated(planes: [ARPlaneAnchor]) {
+        processCommands(commands: state.handleEvent(event: .PlanesUpdated(planes: planes)))
     }
     
     func saveLocationRequested(locationName: String) {

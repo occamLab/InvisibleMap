@@ -23,6 +23,7 @@ enum AppState: StateType {
         // RecordMap events
         case NewARFrame(cameraFrame: ARFrame)
         case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
+        case PlanesUpdated(planes: [ARPlaneAnchor])
         case SaveLocationRequested(locationName: String)
         case ViewLocationsRequested
         case DismissLocationsRequested
@@ -35,6 +36,7 @@ enum AppState: StateType {
         // RecordMap commands
         case RecordData(cameraFrame: ARFrame)
         case DetectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
+        case UpdatePlanes(planes: [ARPlaneAnchor])
         case EnableAddLocation
         case PinLocation(locationName: String)
         case CacheLocation(node: SCNNode, picture: UIImage, textNode: SCNNode)
@@ -80,6 +82,7 @@ enum RecordMapState: StateType {
     enum Event {
         case NewARFrame(cameraFrame: ARFrame)
         case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
+        case PlanesUpdated(planes: [ARPlaneAnchor])
         case SaveLocationRequested(locationName: String)
         case ViewLocationsRequested
         case DismissLocationsRequested
@@ -97,6 +100,8 @@ enum RecordMapState: StateType {
             return [.RecordData(cameraFrame: cameraFrame)]
         case(.RecordMap, .NewTagFound(let tag, let cameraTransform, let snapTagsToVertical)):
             return [.DetectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical), .EnableAddLocation]
+        case(.RecordMap, .PlanesUpdated(let planes)):
+            return [.UpdatePlanes(planes: planes)]
         case(.RecordMap, .SaveLocationRequested(let locationName)):
             return [.PinLocation(locationName: locationName)]
         case(.RecordMap, .ViewLocationsRequested):
@@ -120,6 +125,8 @@ extension RecordMapState.Event {
             self = .NewARFrame(cameraFrame: cameraFrame)
         case .NewTagFound(let tag, let cameraTransform, let snapTagsToVertical):
             self = .NewTagFound(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
+        case .PlanesUpdated(let planes):
+            self = .PlanesUpdated(planes: planes)
         case .SaveLocationRequested(let locationName):
             self = .SaveLocationRequested(locationName: locationName)
         case .ViewLocationsRequested:

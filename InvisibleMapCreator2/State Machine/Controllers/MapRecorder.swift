@@ -25,6 +25,7 @@ class MapRecorder: MapRecorderController {
     var poseData: [[String: Any]] = []
     var tagData: [[[String: Any]]] = []
     var locationData: [[String: Any]] = []
+    var planeData: [UUID: [String: Any]] = [:]
     
     /// Tracks whether record data function is processing a frame to prevent queue from being overfilled
     var processingFrame: Bool = false
@@ -32,6 +33,8 @@ class MapRecorder: MapRecorderController {
     var pendingLocation: (String, simd_float4x4)?
     /// Tracks any new location nodes
     var pendingNode: (SCNNode, UIImage, SCNNode)?
+    /// Tracks current planes seen
+    var planesSeen = Set<UUID>()
     
     /// Correct the orientation estimate such that the normal vector of the tag is perpendicular to gravity
     let snapTagsToVertical = true
@@ -61,6 +64,8 @@ class MapRecorder: MapRecorderController {
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
+            recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
+            
             print("Running \(poseId)")
         }
         // Only record data if a specific period of time has passed and if a frame is not already being processed
@@ -72,6 +77,8 @@ class MapRecorder: MapRecorderController {
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
+            recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
+            
             if let pendingLocation = pendingLocation {
                 locationData.append(getLocationCoordinates(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId, location: pendingLocation))
                 AppController.shared.updateLocationListRequested(node: pendingNode!.0, picture: pendingNode!.1, textNode: pendingNode!.2, poseId: poseId)
@@ -86,6 +93,23 @@ class MapRecorder: MapRecorderController {
         }
     }
     
+    /// Add new planes and update existing planes
+    func updatePlanes(planes: [ARPlaneAnchor]) {
+        for plane in planes {
+            planesSeen.insert(plane.identifier)
+            let planeId: Int
+            if let id = planeData[plane.identifier]?["id"] as? Int {
+                planeId = id
+            } else {
+                planeId = planeData.count
+            }
+            let planeTransform = plane.transform
+            let boundaryVertices = plane.geometry.boundaryVertices.map({[$0.x, $0.y, $0.z]})
+            let planeDict: [String: Any] = ["pose": [planeTransform.columns.0.x, planeTransform.columns.1.x, planeTransform.columns.2.x, planeTransform.columns.3.x, planeTransform.columns.0.y, planeTransform.columns.1.y, planeTransform.columns.2.y, planeTransform.columns.3.y, planeTransform.columns.0.z, planeTransform.columns.1.z, planeTransform.columns.2.z, planeTransform.columns.3.z, planeTransform.columns.0.w, planeTransform.columns.1.w, planeTransform.columns.2.w, planeTransform.columns.3.w], "boundaries": boundaryVertices, "id": planeId]
+            planeData[plane.identifier] = planeDict
+        }
+    }
+    
     /// Cache the location and node data so that it is recorded the next time recordData is called and matches up with the corresponding poseId
     func cacheLocation(node: SCNNode, picture: UIImage, textNode: SCNNode) {
         pendingLocation = (node.name!, node.simdTransform)
@@ -96,7 +120,7 @@ class MapRecorder: MapRecorderController {
     func sendToFirebase(mapName: String) {
         let mapImage = convertToUIImage(cameraFrame: lastRecordedFrame!)
         let mapId = String(lastRecordedTimestamp!).replacingOccurrences(of: ".", with: "") + mapName
-        let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData]
+        let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData, "plane_data": planeData]
         
         let imagePath = "myTestFolder/" + mapId + ".jpg"
         let filePath = "myTestFolder/" + mapId + ".json"
@@ -146,6 +170,21 @@ extension MapRecorder {
                 self.tagData.append(arTags)
             }
         }
+    }
+    
+    /// Append/Modify new plane data to list
+    func recordPlaneData(cameraFrame: ARFrame, poseId: Int) {
+        var planeInfo: [[String: Any]] = []
+        for plane in planesSeen {
+            guard let currentPlane = planeData[plane], let planePoseList = currentPlane["pose"] as? [Float], let planeId = currentPlane["id"] as? Int else {
+                continue
+            }
+            let planePose = simd_float4x4(columns: (simd_float4(planePoseList[0], planePoseList[1], planePoseList[2], planePoseList[3]), simd_float4(planePoseList[4], planePoseList[5], planePoseList[6], planePoseList[7]), simd_float4(planePoseList[8], planePoseList[9], planePoseList[10], planePoseList[11]), simd_float4(planePoseList[12], planePoseList[13], planePoseList[14], planePoseList[15])))
+            let transform = matrix_multiply(planePose, currentFrameTransform.inverse)
+            planeInfo.append(["transform": transform, "id": planeId])
+        }
+        poseData[poseId]["planes"] = planeInfo
+        planesSeen.removeAll()
     }
     
     /// Finds all april tags in the frame
@@ -204,7 +243,7 @@ extension MapRecorder {
         currentFrameTransform = cameraTransform
         let scene = SCNMatrix4(cameraTransform)
         
-        let cameraInfo: [String: Any] = ["matrix": [scene.m11, scene.m12, scene.m13, scene.m14, scene.m21, scene.m22, scene.m23, scene.m24, scene.m31, scene.m32, scene.m33, scene.m34, scene.m41, scene.m42, scene.m43, scene.m44], "timestamp": timestamp, "poseId": poseId]
+        let cameraInfo: [String: Any] = ["pose": [scene.m11, scene.m12, scene.m13, scene.m14, scene.m21, scene.m22, scene.m23, scene.m24, scene.m31, scene.m32, scene.m33, scene.m34, scene.m41, scene.m42, scene.m43, scene.m44], "timestamp": timestamp, "poseId": poseId]
         
         return cameraInfo
     }
@@ -213,7 +252,7 @@ extension MapRecorder {
     func getLocationCoordinates(cameraFrame: ARFrame, timestamp: Double, poseId: Int, location: (String, simd_float4x4)) -> [String: Any] {
         let (locationName, nodeTransform) = location
         let finalTransform = currentFrameTransform.inverse * nodeTransform
-        let locationInfo: [String: Any] = ["matrix": [finalTransform.columns.0.x, finalTransform.columns.1.x, finalTransform.columns.2.x, finalTransform.columns.3.x, finalTransform.columns.0.y, finalTransform.columns.1.y, finalTransform.columns.2.y, finalTransform.columns.3.y, finalTransform.columns.0.z, finalTransform.columns.1.z, finalTransform.columns.2.z, finalTransform.columns.3.z, finalTransform.columns.0.w, finalTransform.columns.1.w, finalTransform.columns.2.w, finalTransform.columns.3.w], "timestamp": timestamp, "poseId": poseId, "name": locationName]
+        let locationInfo: [String: Any] = ["transform": [finalTransform.columns.0.x, finalTransform.columns.1.x, finalTransform.columns.2.x, finalTransform.columns.3.x, finalTransform.columns.0.y, finalTransform.columns.1.y, finalTransform.columns.2.y, finalTransform.columns.3.y, finalTransform.columns.0.z, finalTransform.columns.1.z, finalTransform.columns.2.z, finalTransform.columns.3.z, finalTransform.columns.0.w, finalTransform.columns.1.w, finalTransform.columns.2.w, finalTransform.columns.3.w], "timestamp": timestamp, "poseId": poseId, "name": locationName]
         
         return locationInfo
     }
