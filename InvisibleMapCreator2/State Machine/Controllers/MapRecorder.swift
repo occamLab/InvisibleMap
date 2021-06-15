@@ -22,9 +22,9 @@ class MapRecorder: MapRecorderController {
     /// Allows you to asynchronously run a job on a background thread
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.apriltagfinder", qos: DispatchQoS.userInitiated)
     var poseId: Int = 0
-    var poseData: [[Any]] = []
-    var tagData: [[Any]] = []
-    var locationData: [[Any]] = []
+    var poseData: [[String: Any]] = []
+    var tagData: [[[String: Any]]] = []
+    var locationData: [[String: Any]] = []
     
     /// Tracks whether record data function is processing a frame to prevent queue from being overfilled
     var processingFrame: Bool = false
@@ -198,24 +198,24 @@ extension MapRecorder {
     }
     
     /// Get pose data (transformation matrix, time)
-    func getCameraCoordinates(cameraFrame: ARFrame, timestamp: Double, poseId: Int) -> [Any] {
+    func getCameraCoordinates(cameraFrame: ARFrame, timestamp: Double, poseId: Int) -> [String: Any] {
         let camera = cameraFrame.camera
         let cameraTransform = camera.transform
         currentFrameTransform = cameraTransform
         let scene = SCNMatrix4(cameraTransform)
         
-        let fullMatrix: [Any] = [scene.m11, scene.m12, scene.m13, scene.m14, scene.m21, scene.m22, scene.m23, scene.m24, scene.m31, scene.m32, scene.m33, scene.m34, scene.m41, scene.m42, scene.m43, scene.m44, timestamp, poseId]
+        let cameraInfo: [String: Any] = ["matrix": [scene.m11, scene.m12, scene.m13, scene.m14, scene.m21, scene.m22, scene.m23, scene.m24, scene.m31, scene.m32, scene.m33, scene.m34, scene.m41, scene.m42, scene.m43, scene.m44], "timestamp": timestamp, "poseId": poseId]
         
-        return fullMatrix
+        return cameraInfo
     }
     
     /// Get location data
-    func getLocationCoordinates(cameraFrame: ARFrame, timestamp: Double, poseId: Int, location: (String, simd_float4x4)) -> [Any] {
+    func getLocationCoordinates(cameraFrame: ARFrame, timestamp: Double, poseId: Int, location: (String, simd_float4x4)) -> [String: Any] {
         let (locationName, nodeTransform) = location
         let finalTransform = currentFrameTransform.inverse * nodeTransform
-        let fullMatrix: [Any] = [finalTransform.columns.0.x, finalTransform.columns.1.x, finalTransform.columns.2.x, finalTransform.columns.3.x, finalTransform.columns.0.y, finalTransform.columns.1.y, finalTransform.columns.2.y, finalTransform.columns.3.y, finalTransform.columns.0.z, finalTransform.columns.1.z, finalTransform.columns.2.z, finalTransform.columns.3.z, finalTransform.columns.0.w, finalTransform.columns.1.w, finalTransform.columns.2.w, finalTransform.columns.3.w, timestamp, poseId, locationName]
+        let locationInfo: [String: Any] = ["matrix": [finalTransform.columns.0.x, finalTransform.columns.1.x, finalTransform.columns.2.x, finalTransform.columns.3.x, finalTransform.columns.0.y, finalTransform.columns.1.y, finalTransform.columns.2.y, finalTransform.columns.3.y, finalTransform.columns.0.z, finalTransform.columns.1.z, finalTransform.columns.2.z, finalTransform.columns.3.z, finalTransform.columns.0.w, finalTransform.columns.1.w, finalTransform.columns.2.w, finalTransform.columns.3.w], "timestamp": timestamp, "poseId": poseId, "name": locationName]
         
-        return fullMatrix
+        return locationInfo
     }
     
     /// Convert ARFrame to a UIImage
