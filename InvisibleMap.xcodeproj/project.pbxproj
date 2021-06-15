@@ -70,7 +70,7 @@
 		86F39544210FA42500F209EC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39542210FA42500F209EC /* Main.storyboard */; };
 		86F39549210FA42600F209EC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39547210FA42600F209EC /* LaunchScreen.storyboard */; };
 		C083FDE9792A57723D51077F /* Pods_InvisibleMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */; };
-		E70E471D7C474EB907B3AC47 /* Pods_InvisbleMapCreator2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB5425F26FBD3AC1712F11A8 /* Pods_InvisbleMapCreator2.framework */; };
+		E70E471D7C474EB907B3AC47 /* Pods_InvisibleMapCreator2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB5425F26FBD3AC1712F11A8 /* Pods_InvisibleMapCreator2.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,7 +78,7 @@
 		141FF9C126499FCE00845059 /* ManageLocationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageLocationsView.swift; sourceTree = "<group>"; };
 		143011F82629D8AF0042FDFC /* AddLocationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLocationButton.swift; sourceTree = "<group>"; };
 		143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageLocationsButton.swift; sourceTree = "<group>"; };
-		1447B703262421CC00230A58 /* InvisbleMapCreator2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisbleMapCreator2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1447B703262421CC00230A58 /* InvisibleMapCreator2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisibleMapCreator2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1447B705262421CC00230A58 /* InvisibleMapCreator2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapCreator2App.swift; sourceTree = "<group>"; };
 		1447B709262421CF00230A58 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1447B70C262421CF00230A58 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -94,8 +94,8 @@
 		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
 		14E164722633523B0087A426 /* EditMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMapView.swift; sourceTree = "<group>"; };
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7380E641E45D1897DE94C626 /* Pods-InvisbleMapCreator2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisbleMapCreator2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2.debug.xcconfig"; sourceTree = "<group>"; };
-		73E521D0CF00592EDC2AFFD6 /* Pods-InvisbleMapCreator2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisbleMapCreator2.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2.release.xcconfig"; sourceTree = "<group>"; };
+		7380E641E45D1897DE94C626 /* Pods-InvisibleMapCreator2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapCreator2/Pods-InvisibleMapCreator2.debug.xcconfig"; sourceTree = "<group>"; };
+		73E521D0CF00592EDC2AFFD6 /* Pods-InvisibleMapCreator2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator2.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapCreator2/Pods-InvisibleMapCreator2.release.xcconfig"; sourceTree = "<group>"; };
 		822FA78224E2F9750001F463 /* DebugHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugHelpers.swift; sourceTree = "<group>"; };
 		822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AprilTagTracker.swift; sourceTree = "<group>"; };
 		82468A1F24C88B6600FD31BC /* InvisibleMapCreator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisibleMapCreator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,7 +134,7 @@
 		86F39555210FA42600F209EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8833ECE2D199509ED373632C /* Pods-InvisibleMapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapTests/Pods-InvisibleMapTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A6C67955B6E8A782817AA66D /* Pods-InvisibleMapCreator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapCreator/Pods-InvisibleMapCreator.debug.xcconfig"; sourceTree = "<group>"; };
-		BB5425F26FBD3AC1712F11A8 /* Pods_InvisbleMapCreator2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisbleMapCreator2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB5425F26FBD3AC1712F11A8 /* Pods_InvisibleMapCreator2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapCreator2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B323A62949E8BB9B0F9C91 /* Pods-InvisibleMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMap.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMap/Pods-InvisibleMap.release.xcconfig"; sourceTree = "<group>"; };
 		C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapCreator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,7 +150,7 @@
 			files = (
 				14995FC826263BB700A7C78B /* opencv2.framework in Frameworks */,
 				14995FC426263BA800A7C78B /* visp3.framework in Frameworks */,
-				E70E471D7C474EB907B3AC47 /* Pods_InvisbleMapCreator2.framework in Frameworks */,
+				E70E471D7C474EB907B3AC47 /* Pods_InvisibleMapCreator2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,7 +185,7 @@
 				C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */,
 				5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */,
 				D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */,
-				BB5425F26FBD3AC1712F11A8 /* Pods_InvisbleMapCreator2.framework */,
+				BB5425F26FBD3AC1712F11A8 /* Pods_InvisibleMapCreator2.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -298,7 +298,7 @@
 			children = (
 				86F3953B210FA42500F209EC /* InvisibleMap.app */,
 				82468A1F24C88B6600FD31BC /* InvisibleMapCreator.app */,
-				1447B703262421CC00230A58 /* InvisbleMapCreator2.app */,
+				1447B703262421CC00230A58 /* InvisibleMapCreator2.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -348,8 +348,8 @@
 				F874C32660D9A94E1C916A75 /* Pods-InvisibleMapTests.release.xcconfig */,
 				A6C67955B6E8A782817AA66D /* Pods-InvisibleMapCreator.debug.xcconfig */,
 				F1A754790DB29E0852547A86 /* Pods-InvisibleMapCreator.release.xcconfig */,
-				7380E641E45D1897DE94C626 /* Pods-InvisbleMapCreator2.debug.xcconfig */,
-				73E521D0CF00592EDC2AFFD6 /* Pods-InvisbleMapCreator2.release.xcconfig */,
+				7380E641E45D1897DE94C626 /* Pods-InvisibleMapCreator2.debug.xcconfig */,
+				73E521D0CF00592EDC2AFFD6 /* Pods-InvisibleMapCreator2.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -357,9 +357,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1447B702262421CC00230A58 /* InvisbleMapCreator2 */ = {
+		1447B702262421CC00230A58 /* InvisibleMapCreator2 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1447B711262421CF00230A58 /* Build configuration list for PBXNativeTarget "InvisbleMapCreator2" */;
+			buildConfigurationList = 1447B711262421CF00230A58 /* Build configuration list for PBXNativeTarget "InvisibleMapCreator2" */;
 			buildPhases = (
 				949B0B21991611CF154D2EFD /* [CP] Check Pods Manifest.lock */,
 				1447B6FF262421CC00230A58 /* Sources */,
@@ -371,9 +371,9 @@
 			);
 			dependencies = (
 			);
-			name = InvisbleMapCreator2;
-			productName = InvisbleMapCreator2;
-			productReference = 1447B703262421CC00230A58 /* InvisbleMapCreator2.app */;
+			name = InvisibleMapCreator2;
+			productName = InvisibleMapCreator2;
+			productReference = 1447B703262421CC00230A58 /* InvisibleMapCreator2.app */;
 			productType = "com.apple.product-type.application";
 		};
 		82468A1E24C88B6600FD31BC /* InvisibleMapCreator */ = {
@@ -451,7 +451,7 @@
 			targets = (
 				86F3953A210FA42500F209EC /* InvisibleMap */,
 				82468A1E24C88B6600FD31BC /* InvisibleMapCreator */,
-				1447B702262421CC00230A58 /* InvisbleMapCreator2 */,
+				1447B702262421CC00230A58 /* InvisibleMapCreator2 */,
 			);
 		};
 /* End PBXProject section */
@@ -547,7 +547,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-InvisbleMapCreator2-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-InvisibleMapCreator2-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -595,15 +595,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-InvisibleMapCreator2/Pods-InvisibleMapCreator2-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-InvisibleMapCreator2/Pods-InvisibleMapCreator2-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-InvisbleMapCreator2/Pods-InvisbleMapCreator2-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-InvisibleMapCreator2/Pods-InvisibleMapCreator2-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -713,20 +713,20 @@
 /* Begin XCBuildConfiguration section */
 		1447B70F262421CF00230A58 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7380E641E45D1897DE94C626 /* Pods-InvisbleMapCreator2.debug.xcconfig */;
+			baseConfigurationReference = 7380E641E45D1897DE94C626 /* Pods-InvisibleMapCreator2.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"InvisbleMapCreator2/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				INFOPLIST_FILE = InvisbleMapCreator2/Info.plist;
+				INFOPLIST_FILE = InvisibleMapCreator2/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -734,7 +734,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = Occam.InvisbleMapCreator2;
+				PRODUCT_BUNDLE_IDENTIFIER = Occam.InvisibleMapCreator2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -743,27 +743,27 @@
 		};
 		1447B710262421CF00230A58 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 73E521D0CF00592EDC2AFFD6 /* Pods-InvisbleMapCreator2.release.xcconfig */;
+			baseConfigurationReference = 73E521D0CF00592EDC2AFFD6 /* Pods-InvisibleMapCreator2.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"InvisbleMapCreator2/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				INFOPLIST_FILE = InvisbleMapCreator2/Info.plist;
+				INFOPLIST_FILE = InvisibleMapCreator2/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = Occam.InvisbleMapCreator2;
+				PRODUCT_BUNDLE_IDENTIFIER = Occam.InvisibleMapCreator2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1015,7 +1015,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1447B711262421CF00230A58 /* Build configuration list for PBXNativeTarget "InvisbleMapCreator2" */ = {
+		1447B711262421CF00230A58 /* Build configuration list for PBXNativeTarget "InvisibleMapCreator2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1447B70F262421CF00230A58 /* Debug */,
