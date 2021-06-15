@@ -114,7 +114,7 @@ extension ARView: ARViewController {
             let sceneQuatVar = quatMultiplyAsLinearTransform*quatVarMatrix*quatMultiplyAsLinearTransform.transpose
             let scenePoseQuat = simd_quatf(scenePose)
             let scenePoseTranslation = scenePose.getTrans()
-            let sceneVar = (sceneTransVar: sceneTransVar, sceneQuatVar: sceneQuatVar, scenePoseQuat: scenePoseQuat, scenePoseTranslation: scenePoseTranslation)
+            /* let sceneVar = (sceneTransVar: sceneTransVar, sceneQuatVar: sceneQuatVar, scenePoseQuat: scenePoseQuat, scenePoseTranslation: scenePoseTranslation) */
                         
             let doKalman = false
             let aprilTagTracker = self.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]

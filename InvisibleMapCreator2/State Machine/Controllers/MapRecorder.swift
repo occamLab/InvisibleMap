@@ -120,7 +120,11 @@ class MapRecorder: MapRecorderController {
     func sendToFirebase(mapName: String) {
         let mapImage = convertToUIImage(cameraFrame: lastRecordedFrame!)
         let mapId = String(lastRecordedTimestamp!).replacingOccurrences(of: ".", with: "") + mapName
-        let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData, "plane_data": planeData]
+        var planeDataList: [[String: Any]?] = planeData.keys.map({planeData[$0]})
+        planeDataList.sort{
+            ($0!["id"] as! Int) < ($1!["id"] as! Int)
+        }
+        let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData, "plane_data": planeDataList]
         
         let imagePath = "myTestFolder/" + mapId + ".jpg"
         let filePath = "myTestFolder/" + mapId + ".json"
