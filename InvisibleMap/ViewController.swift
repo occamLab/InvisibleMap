@@ -309,7 +309,9 @@ class ViewController: UIViewController {
                     lastAppliedOriginShift = originShift
                 }
             }
-            
+            for vertexIndex in stride(from: 0, to: myMap.odometryVertices.count, by: 5) {
+                updateRootToMap(vertex: myMap.odometryVertices[vertexIndex])
+            }
         }
         if let lastAppliedOriginShift = lastAppliedOriginShift {
             for detector in aprilTagDetectionDictionary.values {
@@ -349,6 +351,15 @@ class ViewController: UIViewController {
         mapNode.addChildNode(tagNode)
         tagNode.name = String("Tag_\(vertex.id)")
         return computeRootToMap(tagId: vertex.id)
+    }
+    func updateRootToMap(vertex: Map.OdomVertex) {
+        let odomMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
+        let odomNode = SCNNode(geometry: SCNSphere(radius: 0.1))
+        
+        odomNode.geometry?.firstMaterial?.diffuse.contents = UIColor.orange
+        odomNode.transform = odomMatrix
+        mapNode.addChildNode(odomNode)
+        odomNode.name = String("Odom_\(vertex.poseId)")
     }
     
     /// Computes and updates the root to map transform
