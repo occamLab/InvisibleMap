@@ -173,7 +173,7 @@ extension ARView: ARViewController {
     }
     
     /// Raycasts from camera to tag and places tag on the nearest mesh if the device supports LiDAR
-    func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float3? {
+    func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4? {
         let pose = tag.poseData
 
         let originalTagPose = simd_float4x4(rows: [simd_float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), simd_float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), simd_float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), simd_float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
@@ -183,14 +183,16 @@ extension ARView: ARViewController {
         let tagPos = simd_float3(scenePose.columns.3.x, scenePose.columns.3.y, scenePose.columns.3.z)
         let cameraPos = simd_float3(cameraTransform.columns.3.x, cameraTransform.columns.3.y, cameraTransform.columns.3.z)
         
-        let raycastQuery = ARRaycastQuery(origin: cameraPos, direction: tagPos - cameraPos, allowing: .estimatedPlane, alignment: .any)
+        let raycastQuery = ARRaycastQuery(origin: cameraPos, direction: tagPos - cameraPos, allowing: .existingPlaneGeometry, alignment: .any)
         let raycastResult = self.arView.session.raycast(raycastQuery)
         
         if raycastResult.count == 0 {
             return nil
         } else {
-            let raycastTagTransform: simd_float4x4 = simd_float4x4(diagonal:simd_float4(1, -1, -1, 1)) * cameraTransform.inverse * raycastResult[0].worldTransform
-            return simd_float3(raycastTagTransform.columns.3.x, raycastTagTransform.columns.3.y, raycastTagTransform.columns.3.z)
+            let meshTransform = raycastResult[0].worldTransform
+            let raycastTagTransform: simd_float4x4 = simd_float4x4(diagonal:simd_float4(1, -1, -1, 1)) * cameraTransform.inverse * meshTransform
+            
+            return raycastTagTransform
         }
     }
     
