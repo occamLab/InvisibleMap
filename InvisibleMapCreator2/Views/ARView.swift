@@ -74,7 +74,7 @@ extension ARView: ARSessionDelegate {
     
     public func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
         let newAnchors = anchors.compactMap({$0 as? ARPlaneAnchor})
-        AppController.shared.processPlanesUpdated(planes: newAnchors)
+        // AppController.shared.processPlanesUpdated(planes: newAnchors)
     }
     
     public func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {

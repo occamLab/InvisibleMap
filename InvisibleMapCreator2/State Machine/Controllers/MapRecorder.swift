@@ -118,8 +118,8 @@ class MapRecorder: MapRecorderController {
         
         let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData, "plane_data": planeDataList]
         
-        let imagePath = "myTestFolder/" + mapId + ".jpg"
-        let filePath = "myTestFolder/" + mapId + ".json"
+        let imagePath = "rawMapData/" + mapId + ".jpg"
+        let filePath = "rawMapData/" + mapId + ".json"
         
         // TODO: handle errors when failing to upload image and json file
         // TODO: let the user pick their image
@@ -197,7 +197,7 @@ extension MapRecorder {
 
             for i in 0...tagArray.count-1 {
                 var tagDict:[String:Any] = [:]
-                var pose = tagArray[i].poseData
+                
                 
                 if ((AppController.shared.arViewer?.supportsLidar) != nil ? AppController.shared.arViewer?.supportsLidar as! Bool : false) {
                     let raycastPose: simd_float4x4? = AppController.shared.arViewer?.raycastTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical)
@@ -205,11 +205,13 @@ extension MapRecorder {
                     if raycastPose == nil {
                         continue
                     } else {
-                        pose = raycastPose!.toRowMajorOrder()
+                        tagArray[i].poseData = raycastPose!.toRowMajorOrder()
                     }
                 }
                 
                 AppController.shared.processNewTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical) // Generates event to detect new tag
+                
+                var pose = tagArray[i].poseData
                 
                 if snapTagsToVertical {
                     var simdPose = simd_float4x4(rows: [simd_float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), simd_float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), simd_float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), simd_float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])

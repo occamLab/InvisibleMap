@@ -37,6 +37,7 @@ enum AppState: StateType {
         case RecordData(cameraFrame: ARFrame)
         case DetectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case UpdatePlanes(planes: [ARPlaneAnchor])
+        // case PauseRecording
         case EnableAddLocation
         case PinLocation(locationName: String)
         case CacheLocation(node: SCNNode, picture: UIImage, textNode: SCNNode)
@@ -73,6 +74,7 @@ enum AppState: StateType {
 enum RecordMapState: StateType {
     // Lower level app states nested within RecordMapState
     case RecordMap
+    case RecordingPaused
     case ViewLocations
         
     // Initial state upon transitioning into the RecordMapState
@@ -83,6 +85,7 @@ enum RecordMapState: StateType {
         case NewARFrame(cameraFrame: ARFrame)
         case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case PlanesUpdated(planes: [ARPlaneAnchor])
+        // case PauseRecordingPressed
         case SaveLocationRequested(locationName: String)
         case ViewLocationsRequested
         case DismissLocationsRequested
@@ -102,6 +105,12 @@ enum RecordMapState: StateType {
             return [.DetectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical), .EnableAddLocation]
         case(.RecordMap, .PlanesUpdated(let planes)):
             return [.UpdatePlanes(planes: planes)]
+        // case(.RecordMap, .PauseRecordingPressed):
+        //     self = .RecordingPaused
+        //     return []
+        // case(.RecordingPaused, .PauseRecordingPressed):
+        //     self = .RecordMap
+        //     return []
         case(.RecordMap, .SaveLocationRequested(let locationName)):
             return [.PinLocation(locationName: locationName)]
         case(.RecordMap, .ViewLocationsRequested):
