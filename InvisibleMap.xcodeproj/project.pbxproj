@@ -35,6 +35,7 @@
 		14F15C94263954F2008DB04C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
 		14F15C98263954F3008DB04C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
 		14F15C99263954F4008DB04C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
+		1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F64364E269DDD08007BD526 /* MemoryChecker.m */; };
 		7AFFB8FB1F7230AC88C3A531 /* Pods_InvisibleMapCreator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */; };
 		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
 		822FA78424E2FB000001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
@@ -93,6 +94,8 @@
 		14995FD626269B0900A7C78B /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
 		14E164722633523B0087A426 /* EditMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMapView.swift; sourceTree = "<group>"; };
+		1F64364E269DDD08007BD526 /* MemoryChecker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MemoryChecker.m; sourceTree = "<group>"; };
+		1F643651269DDD92007BD526 /* MemoryChecker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemoryChecker.h; sourceTree = "<group>"; };
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7380E641E45D1897DE94C626 /* Pods-InvisibleMapCreator2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapCreator2/Pods-InvisibleMapCreator2.debug.xcconfig"; sourceTree = "<group>"; };
 		73E521D0CF00592EDC2AFFD6 /* Pods-InvisibleMapCreator2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator2.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapCreator2/Pods-InvisibleMapCreator2.release.xcconfig"; sourceTree = "<group>"; };
@@ -196,6 +199,7 @@
 				1447B705262421CC00230A58 /* InvisibleMapCreator2App.swift */,
 				1447B7402624227E00230A58 /* Views */,
 				1447B749262422AB00230A58 /* State Machine */,
+				1F64364A269DD75B007BD526 /* Utils */,
 				1447B709262421CF00230A58 /* Assets.xcassets */,
 				1447B70E262421CF00230A58 /* Info.plist */,
 				1447B70B262421CF00230A58 /* Preview Content */,
@@ -253,6 +257,15 @@
 				1447B7592624230200230A58 /* MapRecorder.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		1F64364A269DD75B007BD526 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				1F64364E269DDD08007BD526 /* MemoryChecker.m */,
+				1F643651269DDD92007BD526 /* MemoryChecker.h */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		82468A2024C88B6600FD31BC /* InvisibleMapCreator */ = {
@@ -625,6 +638,7 @@
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
 				141497E62645A41700BF0ABC /* InstructionOverlay.swift in Sources */,
 				14995FB6262639E400A7C78B /* TagFinder.mm in Sources */,
+				1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */,
 				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
 				143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */,
 				141FF9C226499FCE00845059 /* ManageLocationsView.swift in Sources */,

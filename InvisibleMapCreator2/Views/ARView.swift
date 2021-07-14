@@ -23,7 +23,8 @@ struct ARViewIndicator: UIViewControllerRepresentable {
 
 class ARView: UIViewController {
     var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
-
+    let memoryChecker : MemoryChecker = MemoryChecker()
+    
     // Create an AR view
     var arView: ARSCNView {
        return self.view as! ARSCNView
@@ -70,16 +71,26 @@ extension ARView: ARSessionDelegate {
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         AppController.shared.processNewARFrame(frame: frame)
+        self.memoryChecker.printRemainingMemory()
+        if(self.memoryChecker.getRemainingMemory() < 500) {
+            arView.session.pause()
+            let configuration = ARWorldTrackingConfiguration()
+            configuration.planeDetection = [.horizontal, .vertical]
+            if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
+                configuration.sceneReconstruction = .mesh
+            }
+            arView.session.run(configuration, options: [.resetSceneReconstruction])
+        }
     }
     
     public func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
-        let newAnchors = anchors.compactMap({$0 as? ARPlaneAnchor})
+        // let newAnchors = anchors.compactMap({$0 as? ARPlaneAnchor})
         // AppController.shared.processPlanesUpdated(planes: newAnchors)
     }
     
     public func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
-        let updatedAnchors = anchors.compactMap({$0 as? ARPlaneAnchor})
-        AppController.shared.processPlanesUpdated(planes: updatedAnchors)
+        // let updatedAnchors = anchors.compactMap({$0 as? ARPlaneAnchor})
+        // AppController.shared.processPlanesUpdated(planes: updatedAnchors)
     }
 }
 
