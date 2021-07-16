@@ -14,13 +14,13 @@ struct RecordTagButton: View {
             AppController.shared.mapRecorder.recordTag = true
         }){
             Text("Record Tag")
+                .frame(width: 200, height: 60)
+                .foregroundColor(.white)
+                .background(
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(.blue))
         }
         // Button styling for the AddLocation button
-        .frame(width: 200, height: 60)
-        .foregroundColor(.white)
-        .background(
-            RoundedRectangle(cornerRadius: 15)
-                .foregroundColor(.blue))
     }
 }
 

@@ -92,39 +92,35 @@ struct RecordMapView: View {
         ZStack {
             NavigationIndicator().edgesIgnoringSafeArea(.all)
                 // Hides the default navigation bar so that we can replace it with custom exit and save buttons
-                .navigationBarHidden(true)
+                // .navigationBarHidden(true)
                 .navigationBarBackButtonHidden(true)
                 // Toolbar buttons
                 .toolbar(content: {
-                    ToolbarItem(placement: .bottomBar) {
-                        VStack {
-                            RecordTagButton()
-                            HStack {
-                                AddLocationButton(recordGlobalState: recordGlobalState)
-                                ManageLocationsButton(recordGlobalState: recordGlobalState)
-                            }
-                            Spacer()
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        ExitButton()
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        SaveButton()
+                    }
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        HStack {
+                            AddLocationButton(recordGlobalState: recordGlobalState)
+                            ManageLocationsButton(recordGlobalState: recordGlobalState)
                         }
                     }
                 })
             VStack {
-                // Navigation bar buttons
-                HStack {
-                    ExitButton()
-                    Spacer()
-                    SaveButton()
-                }
-                Spacer()
-                    .frame(height: 30)
                 // Shows instructions if there are any
                 if recordGlobalState.instructionWrapper.text != nil {
                     InstructionOverlay(instruction: $recordGlobalState.instructionWrapper.text)
                         .animation(.easeInOut)
                 }
-                Spacer()
+                RecordTagButton()
+                    .frame(maxHeight: .infinity, alignment: .bottom)
             }
             .padding()
         }
+        .ignoresSafeArea(.keyboard)
         .onAppear {
             AppController.shared.startRecordingRequested()
         }

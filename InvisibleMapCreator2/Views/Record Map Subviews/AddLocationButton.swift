@@ -24,13 +24,13 @@ struct AddLocationButton: View {
                 Image(systemName: "plus")
                 Text("Add Location")
             }
+            .frame(width: 200, height: 40)
+            .foregroundColor(.white)
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .foregroundColor(.blue))
         }
         // Button styling for the AddLocation button
-        .frame(width: 200, height: 40)
-        .foregroundColor(.white)
-        .background(
-            RoundedRectangle(cornerRadius: 15)
-                .foregroundColor(.blue))
         .opacity(recordGlobalState.tagFound ? 1 : 0.5)
     }
 }

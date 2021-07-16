@@ -92,7 +92,6 @@ class MapRecorder: MapRecorderController {
             processingFrame = false
         }
         else {
-            print("Record data did nothing")
             return
         }
     }
