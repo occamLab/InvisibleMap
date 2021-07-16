@@ -35,6 +35,7 @@
 		14F15C94263954F2008DB04C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
 		14F15C98263954F3008DB04C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
 		14F15C99263954F4008DB04C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
+		1F4C30C626A1D70C008CBE3C /* RecordTagButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4C30C526A1D70C008CBE3C /* RecordTagButton.swift */; };
 		1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F64364E269DDD08007BD526 /* MemoryChecker.m */; };
 		7AFFB8FB1F7230AC88C3A531 /* Pods_InvisibleMapCreator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D037B2F221F9D7994F54F384 /* Pods_InvisibleMapCreator.framework */; };
 		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
@@ -94,6 +95,7 @@
 		14995FD626269B0900A7C78B /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
 		14E164722633523B0087A426 /* EditMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMapView.swift; sourceTree = "<group>"; };
+		1F4C30C526A1D70C008CBE3C /* RecordTagButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordTagButton.swift; sourceTree = "<group>"; };
 		1F64364E269DDD08007BD526 /* MemoryChecker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MemoryChecker.m; sourceTree = "<group>"; };
 		1F643651269DDD92007BD526 /* MemoryChecker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemoryChecker.h; sourceTree = "<group>"; };
 		5E46BAEE83EF648F569F5997 /* Pods_InvisibleMapTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -224,6 +226,7 @@
 				143011F82629D8AF0042FDFC /* AddLocationButton.swift */,
 				143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */,
 				141FF9C126499FCE00845059 /* ManageLocationsView.swift */,
+				1F4C30C526A1D70C008CBE3C /* RecordTagButton.swift */,
 			);
 			path = "Record Map Subviews";
 			sourceTree = "<group>";
@@ -642,6 +645,7 @@
 				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
 				143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */,
 				141FF9C226499FCE00845059 /* ManageLocationsView.swift in Sources */,
+				1F4C30C626A1D70C008CBE3C /* RecordTagButton.swift in Sources */,
 				1447B7422624229600230A58 /* ContentView.swift in Sources */,
 				1447B75C2624230200230A58 /* StateType.swift in Sources */,
 				1447B75F2624230200230A58 /* AppState.swift in Sources */,

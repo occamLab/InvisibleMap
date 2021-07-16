@@ -56,13 +56,13 @@ class MapRecorder: MapRecorderController {
     }
     
     /// Record pose, tag, location, and node data after a specified period of time
-    func recordData(cameraFrame: ARFrame) {
+    func recordData(cameraFrame: ARFrame, recordTag: Bool) {
         if lastRecordedTimestamp == nil {
             lastRecordedTimestamp = cameraFrame.timestamp
             lastRecordedFrame = cameraFrame
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
+            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId, saveTagInfo: recordTag)
             recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
             poseId += 1
             
@@ -75,7 +75,7 @@ class MapRecorder: MapRecorderController {
             lastRecordedFrame = cameraFrame
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
+            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId, saveTagInfo: recordTag)
             recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
             poseId += 1
             
@@ -158,11 +158,11 @@ extension MapRecorder {
     }
     
     /// Append new april tag data to list
-    @objc func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
+    @objc func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int, saveTagInfo: Bool) {
         let uiimage = cameraFrame.convertToUIImage()
         aprilTagQueue.async {
             let arTags = self.getArTags(cameraFrame: cameraFrame, image: uiimage, timeStamp: timestamp, poseId: poseId)
-            if !arTags.isEmpty {
+            if saveTagInfo && !arTags.isEmpty {
                 self.tagData.append(arTags)
             }
         }

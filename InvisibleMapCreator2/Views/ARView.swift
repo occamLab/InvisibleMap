@@ -42,9 +42,9 @@ class ARView: UIViewController {
         arView.scene = SCNScene()
         AppController.shared.arViewer = self
         configuration.planeDetection = [.horizontal, .vertical]
-        if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
-            configuration.sceneReconstruction = .mesh
-        }
+        //if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
+        //    configuration.sceneReconstruction = .mesh
+        //}
     }
     
     // Functions for standard AR view handling
@@ -72,7 +72,7 @@ extension ARView: ARSessionDelegate {
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         AppController.shared.processNewARFrame(frame: frame)
         self.memoryChecker.printRemainingMemory()
-        if(self.memoryChecker.getRemainingMemory() < 2000) {
+        if(self.memoryChecker.getRemainingMemory() < 500) {
             arView.session.pause()
             arView.session.run(configuration, options: [.resetSceneReconstruction])
         }

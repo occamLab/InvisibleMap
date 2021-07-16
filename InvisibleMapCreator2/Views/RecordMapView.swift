@@ -71,8 +71,12 @@ class RecordGlobalState: ObservableObject, RecordViewController {
     // Record view controller commands
     func enableAddLocation() {
         DispatchQueue.main.async {
-            self.tagFound = true
-            self.instructionWrapper = .saveLocation
+            if self.tagFound {
+                self.instructionWrapper = .none
+            } else {
+                self.tagFound = true
+                self.instructionWrapper = .saveLocation
+            }
         }
     }
     
@@ -93,9 +97,13 @@ struct RecordMapView: View {
                 // Toolbar buttons
                 .toolbar(content: {
                     ToolbarItem(placement: .bottomBar) {
-                        HStack {
-                            AddLocationButton(recordGlobalState: recordGlobalState)
-                            ManageLocationsButton(recordGlobalState: recordGlobalState)
+                        VStack {
+                            RecordTagButton()
+                            HStack {
+                                AddLocationButton(recordGlobalState: recordGlobalState)
+                                ManageLocationsButton(recordGlobalState: recordGlobalState)
+                            }
+                            Spacer()
                         }
                     }
                 })
