@@ -32,6 +32,7 @@ class AppController {
                 mapRecorder.cacheLocation(node: node, picture: picture, textNode: textNode)
             case .ClearData:
                 mapRecorder.clearData()
+                arViewer?.resetArSession()
             case .SendToFirebase(let mapName):
                 mapRecorder.sendToFirebase(mapName: mapName)
             // ARViewer commands
@@ -115,6 +116,7 @@ protocol ARViewController {
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
     func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4?
     func pinLocation(locationName: String)
+    func resetArSession()
 }
 
 protocol RecordViewController {

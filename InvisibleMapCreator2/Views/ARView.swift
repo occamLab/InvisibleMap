@@ -24,6 +24,7 @@ struct ARViewIndicator: UIViewControllerRepresentable {
 class ARView: UIViewController {
     var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
     let memoryChecker : MemoryChecker = MemoryChecker()
+    let configuration = ARWorldTrackingConfiguration()
     
     // Create an AR view
     var arView: ARSCNView {
@@ -40,6 +41,10 @@ class ARView: UIViewController {
         arView.session.delegate = self
         arView.scene = SCNScene()
         AppController.shared.arViewer = self
+        configuration.planeDetection = [.horizontal, .vertical]
+        if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
+            configuration.sceneReconstruction = .mesh
+        }
     }
     
     // Functions for standard AR view handling
@@ -51,11 +56,6 @@ class ARView: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal, .vertical]
-        if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
-            configuration.sceneReconstruction = .mesh
-        }
         arView.session.run(configuration)
     }
     override func viewWillDisappear(_ animated: Bool) {
@@ -72,13 +72,8 @@ extension ARView: ARSessionDelegate {
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         AppController.shared.processNewARFrame(frame: frame)
         self.memoryChecker.printRemainingMemory()
-        if(self.memoryChecker.getRemainingMemory() < 500) {
+        if(self.memoryChecker.getRemainingMemory() < 2000) {
             arView.session.pause()
-            let configuration = ARWorldTrackingConfiguration()
-            configuration.planeDetection = [.horizontal, .vertical]
-            if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
-                configuration.sceneReconstruction = .mesh
-            }
             arView.session.run(configuration, options: [.resetSceneReconstruction])
         }
     }
@@ -249,5 +244,11 @@ extension ARView: ARViewController {
         
         let updatedTransform = matrix_multiply(referenceNodeTransform, translationMatrix)
         node.transform = SCNMatrix4(updatedTransform)
+    }
+    
+    /// Reset ARSession after a map recording has been exited
+    func resetArSession() {
+        arView.session.pause()
+        arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction])
     }
 }
