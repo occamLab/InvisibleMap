@@ -29,13 +29,12 @@ enum AppState: StateType {
         case DismissLocationsRequested
         case CancelRecordingRequested
         case SaveMapRequested(mapName: String)
-        case EnableTagRecording
     }
     
     // All the effectful outputs which the state desires to have performed on the app
     enum Command {
         // RecordMap commands
-        case RecordData(cameraFrame: ARFrame, recordTag: Bool)
+        case RecordData(cameraFrame: ARFrame)
         case DetectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case UpdatePlanes(planes: [ARPlaneAnchor])
         // case PauseRecording
@@ -49,10 +48,10 @@ enum AppState: StateType {
     
     // In response to an event, a state may transition to a new state, and it may emit a command
     mutating func handleEvent(event: Event) -> [Command] {
-        print(self, event)
+        print("AppState Handle Event: \(self),\n event is \(event)")
         switch (self, event) {
         case (.MainScreen, .StartRecordingRequested):
-            self = .RecordMap(.RecordMap(recordTag: false))
+            self = .RecordMap(.RecordMap)
             return []
         case (.RecordMap, .CancelRecordingRequested):
             self = .MainScreen
@@ -63,6 +62,7 @@ enum AppState: StateType {
         case (.RecordMap(let state), _) where RecordMapState.Event(event) != nil:
             var newState = state
             let commands = newState.handleEvent(event: RecordMapState.Event(event)!)
+            self = .RecordMap(newState)
             return commands
             
         default: break
@@ -73,12 +73,12 @@ enum AppState: StateType {
 
 enum RecordMapState: StateType {
     // Lower level app states nested within RecordMapState
-    case RecordMap(recordTag: Bool)
+    case RecordMap
     case RecordingPaused
     case ViewLocations
         
     // Initial state upon transitioning into the RecordMapState
-    static let initialState = RecordMapState.RecordMap(recordTag: false)
+    static let initialState = RecordMapState.RecordMap
     
     // All the effectual inputs from the app which RecordMapState can react to
     enum Event {
@@ -91,7 +91,6 @@ enum RecordMapState: StateType {
         case DismissLocationsRequested
         case CancelRecordingRequested
         case SaveMapRequested
-        case EnableTagRecording
     }
     
     // Refers to commands defined in AppState
@@ -100,11 +99,8 @@ enum RecordMapState: StateType {
     // In response to an event, RecordMapState may emit a command
     mutating func handleEvent(event: Event) -> [Command] {
         switch (self, event) {
-            case(.RecordMap(let recordTag), .NewARFrame(let cameraFrame)):
-                print("Record Tag: \(recordTag)")
-                let command: [Command] = [.RecordData(cameraFrame: cameraFrame, recordTag: recordTag)]
-                self = .RecordMap(recordTag: false)
-                return command
+            case(.RecordMap, .NewARFrame(let cameraFrame)):
+                return [.RecordData(cameraFrame: cameraFrame)]
             case(.RecordMap, .NewTagFound(let tag, let cameraTransform, let snapTagsToVertical)):
                 return [.DetectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical), .EnableAddLocation]
             case(.RecordMap, .PlanesUpdated(let planes)):
@@ -120,11 +116,8 @@ enum RecordMapState: StateType {
             case(.RecordMap, .ViewLocationsRequested):
                 self = .ViewLocations
                 return []
-            case(.RecordMap(let recordTag), .DismissLocationsRequested):
-                self = .RecordMap(recordTag: recordTag)
-                return []
-            case(.RecordMap, .EnableTagRecording):
-                self = .RecordMap(recordTag: true)
+            case(.RecordMap, .DismissLocationsRequested):
+                self = .RecordMap
                 return []
                 
             default: break
@@ -149,8 +142,6 @@ extension RecordMapState.Event {
             self = .ViewLocationsRequested
         case .DismissLocationsRequested:
             self = .DismissLocationsRequested
-        case .EnableTagRecording:
-            self = .EnableTagRecording
             
         default: return nil
         }

@@ -36,6 +36,9 @@ class MapRecorder: MapRecorderController {
     /// Tracks current planes seen
     var planesSeen = Set<UUID>()
     
+    /// Tracks whether the user has asked for a tag to be recorded
+    var recordTag = false
+    
     /// Correct the orientation estimate such that the normal vector of the tag is perpendicular to gravity
     let snapTagsToVertical = true
     
@@ -56,13 +59,13 @@ class MapRecorder: MapRecorderController {
     }
     
     /// Record pose, tag, location, and node data after a specified period of time
-    func recordData(cameraFrame: ARFrame, recordTag: Bool) {
+    func recordData(cameraFrame: ARFrame) {
         if lastRecordedTimestamp == nil {
             lastRecordedTimestamp = cameraFrame.timestamp
             lastRecordedFrame = cameraFrame
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId, saveTagInfo: recordTag)
+            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
             poseId += 1
             
@@ -75,7 +78,7 @@ class MapRecorder: MapRecorderController {
             lastRecordedFrame = cameraFrame
             
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId, saveTagInfo: recordTag)
+            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
             poseId += 1
             
@@ -89,6 +92,7 @@ class MapRecorder: MapRecorderController {
             processingFrame = false
         }
         else {
+            print("Record data did nothing")
             return
         }
     }
@@ -158,13 +162,14 @@ extension MapRecorder {
     }
     
     /// Append new april tag data to list
-    @objc func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int, saveTagInfo: Bool) {
+    @objc func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         let uiimage = cameraFrame.convertToUIImage()
         aprilTagQueue.async {
             let arTags = self.getArTags(cameraFrame: cameraFrame, image: uiimage, timeStamp: timestamp, poseId: poseId)
-            if saveTagInfo && !arTags.isEmpty {
+            if self.recordTag && !arTags.isEmpty {
                 self.tagData.append(arTags)
             }
+            self.recordTag = false
         }
     }
     

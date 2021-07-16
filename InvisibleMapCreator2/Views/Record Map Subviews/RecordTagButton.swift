@@ -11,7 +11,7 @@ import SwiftUI
 struct RecordTagButton: View {
     var body: some View {
         Button(action: {
-            AppController.shared.recordTagRequested()
+            AppController.shared.mapRecorder.recordTag = true
         }){
             Text("Record Tag")
         }

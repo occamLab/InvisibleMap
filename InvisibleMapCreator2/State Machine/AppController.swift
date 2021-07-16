@@ -24,8 +24,8 @@ class AppController {
         for command in commands {
             switch command {
             // MapRecorder commands
-            case .RecordData(let cameraFrame, let recordTag):
-                mapRecorder.recordData(cameraFrame: cameraFrame, recordTag: recordTag)
+            case .RecordData(let cameraFrame):
+                mapRecorder.recordData(cameraFrame: cameraFrame)
             case .UpdatePlanes(let planes):
                 mapRecorder.updatePlanes(planes: planes)
             case .CacheLocation(let node, let picture, let textNode):
@@ -100,15 +100,11 @@ extension AppController {
         processCommands(commands: state.handleEvent(event: .SaveMapRequested(mapName: mapName)))
         print(state)
     }
-    
-    func recordTagRequested() {
-        processCommands(commands: state.handleEvent(event: .EnableTagRecording))
-    }
 }
 
 protocol MapRecorderController {
     // Commands that impact the map data being recorded
-    func recordData(cameraFrame: ARFrame, recordTag: Bool)
+    func recordData(cameraFrame: ARFrame)
     func cacheLocation(node: SCNNode, picture: UIImage, textNode: SCNNode)
     func sendToFirebase(mapName: String)
     func clearData()
