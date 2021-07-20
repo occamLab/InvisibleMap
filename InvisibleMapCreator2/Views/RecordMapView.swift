@@ -116,6 +116,7 @@ struct RecordMapView: View {
                         .animation(.easeInOut)
                 }
                 RecordTagButton()
+                    .environmentObject(AppController.shared.mapRecorder)
                     .frame(maxHeight: .infinity, alignment: .bottom)
             }
             .padding()

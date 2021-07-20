@@ -13,7 +13,7 @@ class AppController {
     private var state = AppState.initialState
     
     // Various controllers for handling commands
-    let mapRecorder = MapRecorder() // Initialized in MapRecorder.swift
+    var mapRecorder = MapRecorder() // Initialized in MapRecorder.swift
     var arViewer: ARViewController? // Initialized in ARView.swift
     var recordViewer: RecordViewController? // Initialized in RecordMapView.swift
     

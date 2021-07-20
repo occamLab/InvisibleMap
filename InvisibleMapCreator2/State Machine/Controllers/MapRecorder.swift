@@ -11,7 +11,7 @@ import Firebase
 import FirebaseDatabase
 import FirebaseStorage
 
-class MapRecorder: MapRecorderController {
+class MapRecorder: MapRecorderController, ObservableObject {
     var currentFrameTransform: simd_float4x4 = simd_float4x4.init()
     /// Tracks last recorded frame to set map image to
     var lastRecordedFrame: ARFrame?
@@ -37,7 +37,8 @@ class MapRecorder: MapRecorderController {
     var planesSeen = Set<UUID>()
     
     /// Tracks whether the user has asked for a tag to be recorded
-    var recordTag = false
+    @Published var recordTag = false
+    @Published var seesTag = false
     
     /// Correct the orientation estimate such that the normal vector of the tag is perpendicular to gravity
     let snapTagsToVertical = true
@@ -165,10 +166,13 @@ extension MapRecorder {
         let uiimage = cameraFrame.convertToUIImage()
         aprilTagQueue.async {
             let arTags = self.getArTags(cameraFrame: cameraFrame, image: uiimage, timeStamp: timestamp, poseId: poseId)
+            self.seesTag = !arTags.isEmpty
             if self.recordTag && !arTags.isEmpty {
                 self.tagData.append(arTags)
             }
-            self.recordTag = false
+            if arTags.isEmpty {
+                self.recordTag = false
+            }
         }
     }
     
