@@ -4,6 +4,6 @@
 /Frameworks
 /InvisibleMap/GoogleService-Info.plist
 /**/.DS_Store
-/Pods
-Podfile
-Podfile.lock
+Pods/
+/Podfile
+/Podfile.lock
