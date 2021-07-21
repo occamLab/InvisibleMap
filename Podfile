@@ -6,6 +6,7 @@ target 'InvisibleMap' do
   use_frameworks!
 
   # Pods for InvisibleMap
+  pod 'SwiftGraph'
   pod 'Firebase/Core'
   pod 'Firebase/Database'
   pod 'Firebase/Storage'

@@ -12,6 +12,7 @@ import GLKit
 import Firebase
 import FirebaseDatabase
 import FirebaseStorage
+import SwiftGraph
 
 // TODO: can probably just do 1d Kalman filtering for angle
 // TODO: if we use ARPlaneAnchor instead of the raw depth data, will that lead to better plane detection accuracy?  This doesn't seem to be the case when we tried to use the depth data directly (also note that we were not using the smoothed depth data)
@@ -46,6 +47,13 @@ class ViewController: UIViewController {
     let f = imageToData()
     var isProcessingFrame = false
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.invisiblemap", qos: DispatchQoS.userInitiated)
+    
+    var pathPlanningGraph: WeightedGraph<String, Float>?
+    // odometryDict stores a list of nodes by poseID to their xyz data
+    var odometryDict: Dictionary<Int, ViewController.Map.OdomVertex.vector3>?
+    var pathObjs: [SCNNode] = []
+    // runs path planning and visualizations on a timer
+    var pathPlanningTimer = Timer()
     
     override func viewWillAppear(_ animated: Bool) {
         startSession()
@@ -87,9 +95,16 @@ class ViewController: UIViewController {
             } else {
                 if mapData != nil {
                     do {
+                        print("right before decoding")
                         self.myMap =  try JSONDecoder().decode(Map.self, from: mapData!)
+                        print("after decoding")
                         self.storeTagsInDictionary()
                         self.storeWaypointsInDictionary()
+//                        self.renderOdometryVertices()
+                        self.renderGraphPath()
+                        // runs path planning on a timer
+                        self.scheduledPathPlanningTimer()
+//                        self.pathPlanning()
 
                     } catch let error {
                         print(error)
@@ -123,6 +138,197 @@ class ViewController: UIViewController {
         }
     }
     
+    
+    /// Render  odometry vertices along with their pose ID and paths connecting vertices in the x-z plane.
+    func renderOdometryVertices(){
+        print("rendering Odom evrtices")
+        var prev_vertex = myMap.odometryVertices[0]
+        var pathObj: SCNNode?
+        
+        for vertex in myMap.odometryVertices {
+
+            let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
+            odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
+            odometryNode.simdPosition = simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z)
+            mapNode.addChildNode(odometryNode)
+            
+            // Render poseID text
+            let objectText = SCNText(string: String(vertex.poseId), extrusionDepth: 1.0)
+            objectText.font = UIFont (name: "Arial", size: 18)
+            objectText.firstMaterial!.diffuse.contents = UIColor.red
+            let textNode = SCNNode(geometry: objectText)
+            textNode.position = SCNVector3(x: 0.0, y: 0.15, z: 0.0)
+            textNode.scale = SCNVector3(x: 0.002, y: 0.002, z: 0.002)
+            odometryNode.addChildNode(textNode)
+            odometryNode.name = String("Odometry_\(vertex.poseId)")
+
+
+            //render path between poseID
+            let x = (prev_vertex.translation.x + vertex.translation.x) / 2
+            let y = (prev_vertex.translation.y + vertex.translation.y) / 2
+            let z = (prev_vertex.translation.z + vertex.translation.z) / 2
+            let x_dist = prev_vertex.translation.x - vertex.translation.x
+            let y_dist = prev_vertex.translation.y - vertex.translation.y
+            let z_dist = prev_vertex.translation.z - vertex.translation.z
+            let dist = sqrt(pow(x_dist, 2) + pow(z_dist, 2))
+            let hAngle = atan2(-z_dist, x_dist)
+//            let vAngle = atan2(y_dist, x_dist)
+
+            // render SCNNode of given keypoint
+            /// SCNNode of the bar path
+            pathObj = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: CGFloat(dist), chamferRadius: 1))
+
+            //configure node attributes
+            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
+            pathObj!.opacity = CGFloat(0.5)
+            pathObj!.position = SCNVector3(x, y, z)
+            // horizontal rotation
+            pathObj!.rotation = SCNVector4(0, 1, 0, (hAngle - Float.pi/2))
+            // vertical rotation
+//            pathObj!.localRotate(by: SCNQuaternion(x: 1, y: 0, z: 0, w: vAngle))
+
+            sceneView.scene.rootNode.addChildNode(pathObj!)
+
+            // Set current vertex to the previous vertex
+            prev_vertex = vertex
+        }
+    }
+    
+    
+    //Renders graph used for path planning and initializes dictionary and graph used
+    func renderGraphPath(){
+        
+        var pathObj: SCNNode?
+        
+        // Initializes dictionary and graph
+        odometryDict = Dictionary<Int, ViewController.Map.OdomVertex.vector3>(uniqueKeysWithValues: zip(myMap.odometryVertices.map({$0.poseId}), myMap.odometryVertices.map({$0.translation})))
+        pathPlanningGraph = WeightedGraph<String, Float>(vertices: Array(odometryDict!.keys).sorted().map({String($0)}))
+
+        for vertex in myMap.odometryVertices {
+            let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
+            odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
+            odometryNode.simdPosition = simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z)
+            mapNode.addChildNode(odometryNode)
+            
+            // Render poseID text
+            let objectText = SCNText(string: String(vertex.poseId), extrusionDepth: 1.0)
+            objectText.font = UIFont (name: "Arial", size: 18)
+            objectText.firstMaterial!.diffuse.contents = UIColor.red
+            let textNode = SCNNode(geometry: objectText)
+            textNode.position = SCNVector3(x: 0.0, y: 0.15, z: 0.0)
+            textNode.scale = SCNVector3(x: 0.002, y: 0.002, z: 0.002)
+            odometryNode.addChildNode(textNode)
+            odometryNode.name = String("Odometry_\(vertex.poseId)")
+            
+            for neighbor in vertex.neighbors{
+                // Only render path if it hasn't been rendered yet
+                if (neighbor < vertex.poseId){
+
+                    let neighbor_vertex = odometryDict![neighbor]!
+
+                    let x = (neighbor_vertex.x + vertex.translation.x) / 2
+                    let y = (neighbor_vertex.y + vertex.translation.y) / 2
+                    let z = (neighbor_vertex.z + vertex.translation.z) / 2
+                    let x_dist = neighbor_vertex.x - vertex.translation.x
+                    let y_dist = neighbor_vertex.y - vertex.translation.y
+                    let z_dist = neighbor_vertex.z - vertex.translation.z
+                    let dist = sqrt(pow(x_dist, 2) + pow(z_dist, 2))
+                    let total_dist = sqrt(pow(x_dist, 2) + pow(y_dist, 2) + pow(z_dist, 2))
+                    let hAngle = atan2(-z_dist, x_dist)
+//                    let vAngle = atan2(y_dist, x_dist)
+        
+                    // Adding edge from vertex to neighbor
+                    pathPlanningGraph!.addEdge(from: String(vertex.poseId), to:String(neighbor), weight:total_dist)
+
+                    /// SCNNode of the bar path
+                    pathObj = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: CGFloat(dist), chamferRadius: 1))
+        
+                    //configure node attributes
+                    pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
+                    pathObj!.opacity = CGFloat(0.5)
+                    pathObj!.position = SCNVector3(x, y, z)
+                    // horizontal rotation
+                    pathObj!.rotation = SCNVector4(0, 1, 0, (hAngle - Float.pi/2))
+                    // vertical rotation
+                    
+                    sceneView.scene.rootNode.addChildNode(pathObj!)
+                }
+            }
+        }
+    }
+    
+    
+    
+    // Gets the poseID of the node closest to the current camera position that is not the desired endpoint
+    func getClosestGraphNode(endpoint: Int) -> Int?{
+        // get user's phone location
+        let (_, _, cameraTransform, _) = self.getVideoFrames()
+        
+        // get node closest to the current camera position
+        var closest_node: Int = 0
+        var min_dist = 100000.0
+        for node in odometryDict!{
+            let x_dist = node.value.x - cameraTransform!.columns.3.x
+            let y_dist = node.value.y - cameraTransform!.columns.3.y
+            let z_dist = node.value.z - cameraTransform!.columns.3.z
+            let dist = sqrt(pow(x_dist, 2) + pow(y_dist, 2) + pow(z_dist, 2))
+            if (Double)(dist) < min_dist && node.key != endpoint{
+                min_dist = (Double)(dist)
+                closest_node = node.key
+            }
+        }
+        return closest_node
+    }
+    
+    
+    // Plans and from path from current location to end and visualizes it in red
+    @objc func pathPlanning(){
+        let endpoint = odometryDict!.count-1
+        let startpoint = getClosestGraphNode(endpoint: endpoint)
+        
+        var pathObj: SCNNode?
+
+        let (_, pathDict) = pathPlanningGraph!.dijkstra(root: String(0), startDistance: Float(0.0))
+        print("startpoint:", startpoint!)
+        print("endpoint:", endpoint)
+        // find path from startpoint to endpointß
+        let path: [WeightedEdge<Float>] = pathDictToPath(from: pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
+        let stops: [String] = pathPlanningGraph!.edgesToVertices(edges: path)
+        
+        //remove all previous paths and clear scene from past paths
+        pathObjs.map({$0.removeFromParentNode()})
+        pathObjs = []
+        
+        //Render current path
+        for i in 0...stops.count-2{
+            let path_curr_vertex = odometryDict![Int(stops[i])!]!
+            let path_next_vertex = odometryDict![Int(stops[i+1])!]!
+            
+                let x = (path_next_vertex.x + path_curr_vertex.x) / 2
+                let y = (path_next_vertex.y + path_curr_vertex.y) / 2
+                let z = (path_next_vertex.z + path_curr_vertex.z) / 2
+                let x_dist = path_next_vertex.x - path_curr_vertex.x
+                let y_dist = path_next_vertex.y - path_curr_vertex.y
+                let z_dist = path_next_vertex.z - path_curr_vertex.z
+                let dist = sqrt(pow(x_dist, 2) + pow(z_dist, 2))
+                let hAngle = atan2(-z_dist, x_dist)
+    
+                /// SCNNode of the bar path
+                pathObj = SCNNode(geometry: SCNBox(width: 0.06, height: 0.06, length: CGFloat(dist), chamferRadius: 1))
+                pathObjs.append(pathObj!)
+
+                //configure node attributes
+                pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.red
+                pathObj!.opacity = CGFloat(1)
+                pathObj!.position = SCNVector3(x, y, z)
+                // horizontal rotation
+                pathObj!.rotation = SCNVector4(0, 1, 0, (hAngle - Float.pi/2))
+                
+                sceneView.scene.rootNode.addChildNode(pathObj!)
+        }
+    }
+    
+
     
     /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
     func detectNearbyWaypoints(){
@@ -180,7 +386,13 @@ class ViewController: UIViewController {
         }
     }
     
-    
+    // Finds and visualizes path to the endpoint on a timer
+    func scheduledPathPlanningTimer() {
+        pathPlanningTimer.invalidate()
+        pathPlanningTimer = Timer()
+        pathPlanningTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.pathPlanning), userInfo: nil, repeats: true)
+    }
+
     
     /// Processes the pose, april tags, and nearby waypoints on a timer.
     func scheduledLocalizationTimer() {
@@ -249,6 +461,8 @@ class ViewController: UIViewController {
         isProcessingFrame = true
         let (image, time, cameraTransform, cameraIntrinsics) = self.getVideoFrames()
         if let image = image, let time = time, let cameraTransform = cameraTransform, let cameraIntrinsics = cameraIntrinsics {
+            print(cameraTransform.columns.3.x ,cameraTransform.columns.3.y, cameraTransform.columns.3.z)
+
             aprilTagQueue.async {
                 let _ = self.checkTagDetection(image: image, timestamp: time, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
                 self.detectNearbyWaypoints()
@@ -303,15 +517,13 @@ class ViewController: UIViewController {
             }
             /// Add or update the tags that are detected
             for i in 0...tagArray.count-1 {
-                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, doKalman: false, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
+                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, doKalman: true, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
                 /// Update the root to map transform if the tag detected is in the map
                 if let tagVertex = tagDictionary[Int(tagArray[i].number)], let originShift = updateRootToMap(vertex: tagVertex) {
                     lastAppliedOriginShift = originShift
                 }
             }
-            for vertexIndex in stride(from: 0, to: myMap.odometryVertices.count, by: 5) {
-                updateRootToMap(vertex: myMap.odometryVertices[vertexIndex])
-            }
+            
         }
         if let lastAppliedOriginShift = lastAppliedOriginShift {
             for detector in aprilTagDetectionDictionary.values {
@@ -351,15 +563,6 @@ class ViewController: UIViewController {
         mapNode.addChildNode(tagNode)
         tagNode.name = String("Tag_\(vertex.id)")
         return computeRootToMap(tagId: vertex.id)
-    }
-    func updateRootToMap(vertex: Map.OdomVertex) {
-        let odomMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
-        let odomNode = SCNNode(geometry: SCNSphere(radius: 0.1))
-        
-        odomNode.geometry?.firstMaterial?.diffuse.contents = UIColor.orange
-        odomNode.transform = odomMatrix
-        mapNode.addChildNode(odomNode)
-        odomNode.name = String("Odom_\(vertex.poseId)")
     }
     
     /// Computes and updates the root to map transform
@@ -478,11 +681,14 @@ class ViewController: UIViewController {
                 let poseId: Int
                 let translation: vector3
                 var rotation: quaternion
+                var neighbors: [Int] = []
+
                 
                 enum CodingKeys: String, CodingKey {
                     case poseId
                     case translation = "translation"
                     case rotation = "rotation"
+                    case neighbors = "neighbors"
                 }
                 
                 struct vector3: Decodable {

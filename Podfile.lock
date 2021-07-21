@@ -94,11 +94,13 @@ PODS:
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
   - PromisesObjC (1.2.12)
+  - SwiftGraph (3.1)
 
 DEPENDENCIES:
   - Firebase/Core
   - Firebase/Database
   - Firebase/Storage
+  - SwiftGraph
 
 SPEC REPOS:
   trunk:
@@ -116,6 +118,7 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
+    - SwiftGraph
 
 SPEC CHECKSUMS:
   Firebase: c121feb35e4126c0b355e3313fa9b487d47319fd
@@ -132,7 +135,8 @@ SPEC CHECKSUMS:
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
+  SwiftGraph: f97852fc9372815b71426cd38baf2609a8a92f76
 
-PODFILE CHECKSUM: c44cd5a62fb63ef550cd7e851de567c420b5511e
+PODFILE CHECKSUM: 32c674bed332dab514960235343e81d835eb327d
 
 COCOAPODS: 1.10.1
