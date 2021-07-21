@@ -7,3 +7,6 @@
 Pods/
 /Podfile
 /Podfile.lock
+/InvisibleMap.xcodeproj/xcuserdata/
+/InvisibleMap.xcworkspace/xcuserdata/
+/InvisibleMap.xcodeproj/xcshareddata/xcschemes/
