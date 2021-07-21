@@ -5,6 +5,7 @@
 //  Created by djconnolly27 on 8/8/18.
 //  Copyright © 2018 Occam Lab. All rights reserved.
 //
+
 import Foundation
 import Firebase
 
@@ -54,7 +55,7 @@ class ChooseMapViewController: UITableViewController {
     
     func processMap(key: String, values: [String: Any]) {
         // only include in the list if it is processed
-        if let processedMapFile = values["map_with_graph"] as? String {
+        if let processedMapFile = values["map_file"] as? String {
             // TODO: pick a sensible default image
             let imageRef = storageRef.child((values["image"] as? String) ?? "olin_library.jpg")
             imageRef.getData(maxSize: 10*1024*1024) { imageData, error in
