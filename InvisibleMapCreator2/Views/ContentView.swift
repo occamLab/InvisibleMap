@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import FirebaseAuth
 
 class MapDatabase: ObservableObject {
     @Published var maps: [String] = []
@@ -17,7 +18,23 @@ class MapDatabase: ObservableObject {
     
     init() {
         FirebaseApp.configure()
-        mapsRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference(withPath: "maps")
+        
+        if Auth.auth().currentUser == nil {
+            Auth.auth().signInAnonymously() { (authResult, error) in guard let authResult = authResult
+                else {
+                    return
+                }
+                print("Successful login \(String(describing: Auth.auth().currentUser!.uid))")
+            }
+        } else {
+            print("User: \(String(describing: Auth.auth().currentUser!.uid))")
+        }
+        
+        var userMapsPath = "maps/"
+        if Auth.auth().currentUser != nil {
+            userMapsPath = userMapsPath + String(Auth.auth().currentUser!.uid)
+        }
+        mapsRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference(withPath: userMapsPath)
         storageRef = Storage.storage().reference()
         
         // Tracks any addition, change, or removal to the map database

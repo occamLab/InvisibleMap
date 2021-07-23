@@ -9,10 +9,14 @@
 import UIKit
 import ARKit
 import GLKit
+import AVFoundation
+import AudioToolbox
+import MediaPlayer
 import Firebase
 import FirebaseDatabase
 import FirebaseStorage
 import SwiftGraph
+import SwiftUI
 
 // TODO: can probably just do 1d Kalman filtering for angle
 // TODO: if we use ARPlaneAnchor instead of the raw depth data, will that lead to better plane detection accuracy?  This doesn't seem to be the case when we tried to use the depth data directly (also note that we were not using the smoothed depth data)
@@ -33,17 +37,23 @@ class ViewController: UIViewController {
     let tagTiltMin: Float = 0.09
     let tagTiltMax: Float = 0.91
     var mapFileName: String = ""
-    var endpointTagId: Int = 3
+    var endpointTagId: Int = 0
     /// We use the knowledge that the z-axis of the tag should be perpendicular to gravity to adjust the tag detection
     var snapTagsToVertical = true
     
     @IBOutlet var sceneView: ARSCNView!
     var tagFinderTimer = Timer()
+    var firstTagFound = false
     
     /// Speech synthesis objects (reuse these or memory will leak)
     let synth = AVSpeechSynthesizer()
     let voice = AVSpeechSynthesisVoice(language: "en-US")
     var lastSpeechTime : [Int:Date] = [:]
+    
+    // audio and haptic feedback
+    var audioPlayers: [String: AVAudioPlayer?] = [:]
+    var pingTimer = Timer()
+    var hapticGenerator : UIImpactFeedbackGenerator?
 
     let f = imageToData()
     var isProcessingFrame = false
@@ -58,15 +68,23 @@ class ViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         startSession()
+        setupPing()
         createMap()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        sceneView.scene.rootNode.enumerateChildNodes { (node, stop) in
+        self.sceneView.scene.rootNode.enumerateChildNodes { (node, stop) in
             node.removeFromParentNode()
         }
-        sceneView.session.pause()
-        tagFinderTimer.invalidate()
+        self.sceneView.session.pause()
+        self.tagFinderTimer.invalidate()
+        self.stopPathPlanning()
+        self.firstTagFound = false
+    }
+    
+    func stopPathPlanning() {
+        self.pathPlanningTimer.invalidate()
+        self.pingTimer.invalidate()
     }
     
     /// Initializes the map node, of which all of the tags and waypoints downloaded from firebase are children
@@ -83,6 +101,25 @@ class ViewController: UIViewController {
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
+    // Setup audio elements
+      func setupPing() {
+        do {
+            try self.audioPlayers["startNav"] = AVAudioPlayer(contentsOf: URL(fileURLWithPath: "/System/Library/Audio/UISounds/tweet_sent.caf"))
+            try self.audioPlayers["arrived"] = AVAudioPlayer(contentsOf: URL(fileURLWithPath: "/System/Library/Audio/UISounds/New/Fanfare.caf"))
+            try self.audioPlayers["ping"] = AVAudioPlayer(contentsOf: URL(fileURLWithPath: "/System/Library/Audio/UISounds/Tock.caf"))
+            self.hapticGenerator = UIImpactFeedbackGenerator(style: .light)
+            self.hapticGenerator!.prepare()
+            for p in self.audioPlayers.values {
+                p!.prepareToPlay()
+            }
+            self.scheduledPingTimer()
+        }
+        catch let audioError {
+          print("Could not setup audio: \(audioError)")
+        }
+      }
+
+    
     /// Downloads the selected map from firebase
     func createMap() {
         createMapNode()
@@ -96,15 +133,10 @@ class ViewController: UIViewController {
             } else {
                 if mapData != nil {
                     do {
-                        print("right before decoding")
                         self.myMap =  try JSONDecoder().decode(Map.self, from: mapData!)
-                        print("after decoding")
                         self.storeTagsInDictionary()
                         self.storeWaypointsInDictionary()
-                        self.renderGraphPath()
-                        // runs path planning on a timer
                         self.scheduledPathPlanningTimer()
-
                     } catch let error {
                         print(error)
                     }
@@ -139,7 +171,6 @@ class ViewController: UIViewController {
     
     //Renders graph used for path planning and initializes dictionary and graph used
     func renderGraphPath(){
-        
         var pathObj: SCNNode?
         
         // Initializes dictionary and graph
@@ -166,18 +197,19 @@ class ViewController: UIViewController {
                 // Only render path if it hasn't been rendered yet
                 if (neighbor < vertex.poseId){
 
-                    let neighbor_vertex = odometryDict![neighbor]!
+                    let neighborVertex = odometryDict![neighbor]!
 
-                    let x = (neighbor_vertex.x + vertex.translation.x) / 2
-                    let y = (neighbor_vertex.y + vertex.translation.y) / 2
-                    let z = (neighbor_vertex.z + vertex.translation.z) / 2
-                    let x_dist = neighbor_vertex.x - vertex.translation.x
-                    let y_dist = neighbor_vertex.y - vertex.translation.y
-                    let z_dist = neighbor_vertex.z - vertex.translation.z
-                    let dist = sqrt(pow(x_dist, 2) + pow(z_dist, 2))
-                    let total_dist = sqrt(pow(x_dist, 2) + pow(y_dist, 2) + pow(z_dist, 2))
-                    let hAngle = atan2(-z_dist, x_dist)
-//                    let vAngle = atan2(y_dist, x_dist)
+                    let x = (neighborVertex.x + vertex.translation.x) / 2
+                    let y = (neighborVertex.y + vertex.translation.y) / 2
+                    let z = (neighborVertex.z + vertex.translation.z) / 2
+                    let xDist = neighborVertex.x - vertex.translation.x
+                    let yDist = neighborVertex.y - vertex.translation.y
+                    let zDist = neighborVertex.z - vertex.translation.z
+                    let planarDist = sqrt(pow(xDist, 2) + pow(zDist, 2))
+                    let dist = sqrt(pow(xDist, 2) + pow(zDist, 2))
+                    let total_dist = sqrt(pow(xDist, 2) + pow(yDist, 2) + pow(zDist, 2))
+                    let hAngle = atan2(xDist, zDist)
+                    let vAngle = atan2(yDist, planarDist)
         
                     // Adding edge from vertex to neighbor
                     pathPlanningGraph!.addEdge(from: String(vertex.poseId), to:String(neighbor), weight:total_dist)
@@ -190,8 +222,9 @@ class ViewController: UIViewController {
                     pathObj!.opacity = CGFloat(0.5)
                     pathObj!.position = SCNVector3(x, y, z)
                     // horizontal rotation
-                    pathObj!.rotation = SCNVector4(0, 1, 0, (hAngle - Float.pi/2))
+                    pathObj!.rotation = SCNVector4(0, 1, 0, hAngle)
                     // vertical rotation
+                    // pathObj!.localRotate(by: SCNQuaternion(x: 1, y: 0, z: 0, w: -vAngle))
                     
                     sceneView.scene.rootNode.addChildNode(pathObj!)
                 }
@@ -229,6 +262,12 @@ class ViewController: UIViewController {
     
     // Plans a path from the current location to the end and visualizes it in red
     @objc func pathPlanning(){
+        if !self.firstTagFound {
+            return
+        }
+        
+        print("path planning!")
+
         let tagLocation = myMap.tagVertices.first(where: {$0.id == self.endpointTagId})!.translation
         
         let endpoint = getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
@@ -237,8 +276,6 @@ class ViewController: UIViewController {
         var pathObj: SCNNode?
 
         let (_, pathDict) = pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
-        print("Path planning graph: ", pathPlanningGraph!.description)
-        print("Path dict: ", pathDict)
         print("startpoint:", startpoint!)
         print("endpoint:", endpoint)
         // find path from startpoint to endpointß
@@ -251,31 +288,49 @@ class ViewController: UIViewController {
         
         //Render current path
         for i in 0...stops.count-2{
-            let path_curr_vertex = odometryDict![Int(stops[i])!]!
-            let path_next_vertex = odometryDict![Int(stops[i+1])!]!
+            let pathCurrentVertex = odometryDict![Int(stops[i])!]!
+            let pathNextVertex = odometryDict![Int(stops[i+1])!]!
             
-                let x = (path_next_vertex.x + path_curr_vertex.x) / 2
-                let y = (path_next_vertex.y + path_curr_vertex.y) / 2
-                let z = (path_next_vertex.z + path_curr_vertex.z) / 2
-                let x_dist = path_next_vertex.x - path_curr_vertex.x
-                let y_dist = path_next_vertex.y - path_curr_vertex.y
-                let z_dist = path_next_vertex.z - path_curr_vertex.z
-                let dist = sqrt(pow(x_dist, 2) + pow(z_dist, 2))
-                let hAngle = atan2(x_dist, z_dist)
-                // let vAngle = atan2(y_dist, x_dist)
-    
-                /// SCNNode of the bar path
-                pathObj = SCNNode(geometry: SCNBox(width: 0.06, height: 0.06, length: CGFloat(dist), chamferRadius: 1))
-                pathObjs.append(pathObj!)
+            let x = (pathNextVertex.x + pathCurrentVertex.x) / 2
+            let y = (pathNextVertex.y + pathCurrentVertex.y) / 2
+            let z = (pathNextVertex.z + pathCurrentVertex.z) / 2
+            let xDist = pathNextVertex.x - pathCurrentVertex.x
+            let yDist = pathNextVertex.y - pathCurrentVertex.y
+            let zDist = pathNextVertex.z - pathCurrentVertex.z
+            let planarDist = sqrt(pow(xDist, 2) + pow(zDist, 2))
+            let dist = sqrt(pow(xDist, 2) + pow(zDist, 2))
+            let hAngle = atan2(xDist, zDist)
+            let vAngle = atan2(yDist, planarDist)
 
-                //configure node attributes
-                pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.red
-                pathObj!.opacity = CGFloat(1)
-                pathObj!.position = SCNVector3(x, y, z)
-                // horizontal rotation
-                pathObj!.rotation = SCNVector4(0, 1, 0, hAngle)
-                
-                sceneView.scene.rootNode.addChildNode(pathObj!)
+            /// SCNNode of the bar path
+            pathObj = SCNNode(geometry: SCNBox(width: 0.06, height: 0.06, length: CGFloat(dist), chamferRadius: 1))
+            pathObjs.append(pathObj!)
+
+            //configure node attributes
+            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.red
+            pathObj!.opacity = CGFloat(1)
+            pathObj!.position = SCNVector3(x, y, z)
+            // horizontal rotation
+            pathObj!.rotation = SCNVector4(0, 1, 0, hAngle)
+            // vertical rotation
+            // pathObj!.localRotate(by: SCNQuaternion(x: 1, y: 0, z: 0, w: -vAngle))
+        
+            sceneView.scene.rootNode.addChildNode(pathObj!)
+        }
+        
+        /// Ping audio from a few nodes down to ensure direction
+        if stops.count < 3 {
+            self.playSound(type: "arrived")
+            self.stopPathPlanning()
+        } else {
+            let audioSource = odometryDict![Int(stops[2])!]!
+            let directionToSource = vector2(self.cameraNode.position.x, self.cameraNode.position.z) - vector2(audioSource.x, audioSource.z)
+            var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(self.cameraNode.transform.m31, self.cameraNode.transform.m33))
+            volumeScale = acos(volumeScale) / Float.pi
+            volumeScale = 1 - volumeScale
+            volumeScale = pow(volumeScale, 3)
+            self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
+            print("Volume scale: \(volumeScale)")
         }
     }
     
@@ -343,13 +398,47 @@ class ViewController: UIViewController {
         pathPlanningTimer = Timer()
         pathPlanningTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.pathPlanning), userInfo: nil, repeats: true)
     }
-
     
     /// Processes the pose, april tags, and nearby waypoints on a timer.
     func scheduledLocalizationTimer() {
         tagFinderTimer.invalidate()
         tagFinderTimer = Timer()
         tagFinderTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.updateLandmarks), userInfo: nil, repeats: true)
+    }
+    
+    func scheduledPingTimer() {
+        self.pingTimer.invalidate()
+        self.pingTimer = Timer()
+        self.pingTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.ping), userInfo: nil, repeats: true)
+    }
+    
+    @objc func ping() {
+        if !self.firstTagFound {
+            return
+        }
+        self.playSound(type: "ping")
+        let volume = self.audioPlayers["ping"]!!.volume
+        let hapticScale = pow(volume, 1.0 / 3.0)
+        if hapticScale > 0.75 {
+            self.hapticGenerator = UIImpactFeedbackGenerator(style: .heavy)
+        } else if hapticScale > 0.5 {
+            self.hapticGenerator = UIImpactFeedbackGenerator(style: .medium)
+        } else if hapticScale > 0.25 {
+            self.hapticGenerator = UIImpactFeedbackGenerator(style: .light)
+        } else {
+            self.hapticGenerator = nil
+        }
+        self.hapticGenerator?.impactOccurred()
+    }
+    @objc func playSound(type: String) {
+        do {
+            try AVAudioSession.sharedInstance().setCategory("AVAudioSessionCategoryPlayback")
+            try AVAudioSession.sharedInstance().setActive(true)
+            guard let player = self.audioPlayers[type]! else { return }
+            player.play()
+        } catch let error {
+            print(error.localizedDescription)
+        }
     }
     
     
@@ -463,12 +552,19 @@ class ViewController: UIViewController {
         let numTags = f.getNumberOfTags()
         var lastAppliedOriginShift: simd_float4x4?
         if numTags > 0 {
+            if !self.firstTagFound {
+                print("Starting path planning")
+                self.renderGraphPath()
+                self.playSound(type: "startNav")
+                self.firstTagFound = true
+            }
+            
             for i in 0...f.getNumberOfTags()-1 {
                 tagArray.append(f.getTagAt(i))
             }
             /// Add or update the tags that are detected
             for i in 0...tagArray.count-1 {
-                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, doKalman: true, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
+                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, doKalman: false, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
                 /// Update the root to map transform if the tag detected is in the map
                 if let tagVertex = tagDictionary[Int(tagArray[i].number)], let originShift = updateRootToMap(vertex: tagVertex) {
                     lastAppliedOriginShift = originShift

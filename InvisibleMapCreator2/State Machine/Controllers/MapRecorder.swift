@@ -114,7 +114,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
     /// Upload pose data, last image frame to Firebase under "maps" and "unprocessed_maps" nodes
     func sendToFirebase(mapName: String) {
         let mapImage = convertToUIImage(cameraFrame: lastRecordedFrame!)
-        let mapId = String(lastRecordedTimestamp!).replacingOccurrences(of: ".", with: "") + mapName
+        let mapId =  mapName + " " + String(lastRecordedTimestamp!).replacingOccurrences(of: ".", with: "")
         var planeDataList: [[String: Any]] = planeData.keys.map({planeData[$0]}) as! [[String: Any]]
         planeDataList.sort{
             ($0["id"] as! Int) < ($1["id"] as! Int)
@@ -122,8 +122,8 @@ class MapRecorder: MapRecorderController, ObservableObject {
         
         let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData, "plane_data": planeDataList]
         
-        let imagePath = "rawMapData/" + mapId + ".jpg"
-        let filePath = "rawMapData/" + mapId + ".json"
+        let imagePath = "rawMapData/" + String(describing: Auth.auth().currentUser!.uid) + "/" + mapId + ".jpg"
+        let filePath = "rawMapData/" + String(describing: Auth.auth().currentUser!.uid) + "/" + mapId + ".json"
         
         // TODO: handle errors when failing to upload image and json file
         // TODO: let the user pick their image
@@ -134,10 +134,10 @@ class MapRecorder: MapRecorderController, ObservableObject {
         if let jsonData = try? JSONSerialization.data(withJSONObject: mapJsonFile, options: []) {
             firebaseStorageRef.child(filePath).putData(jsonData, metadata: StorageMetadata(dictionary: ["contentType": "application/json"])){ (metadata, error) in
                 // Write to maps node in database
-                self.firebaseRef.child("maps").child(mapId).setValue(["name": mapName, "image": imagePath, "raw_file": filePath])
+                self.firebaseRef.child("maps").child(String(describing: Auth.auth().currentUser!.uid)).child(mapId).setValue(["name": mapName, "image": imagePath, "raw_file": filePath])
                 
                 // Write to unprocessed maps node in database
-                self.firebaseRef.child("unprocessed_maps").child(mapId).setValue(filePath)
+                self.firebaseRef.child("unprocessed_maps").child(String(describing: Auth.auth().currentUser!.uid)).child(mapId).setValue(filePath)
             }
         }
     }

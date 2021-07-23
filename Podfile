@@ -21,6 +21,7 @@ target 'InvisibleMapCreator' do
   pod 'Firebase/Core'
   pod 'Firebase/Database'
   pod 'Firebase/Storage'
+  pod 'Firebase/Auth'
 
 end
 
@@ -32,5 +33,7 @@ target 'InvisibleMapCreator2' do
   pod 'Firebase/Core'
   pod 'Firebase/Database'
   pod 'Firebase/Storage'
+  pod 'Firebase/Analytics'
+  pod 'Firebase/Auth'
 
 end
