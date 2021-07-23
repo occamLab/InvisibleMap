@@ -169,64 +169,84 @@ class ViewController: UIViewController {
         }
     }
     
-    //Renders graph used for path planning and initializes dictionary and graph used
-    func renderGraphPath(){
+    /// Creates a node for a path edge between two vertices
+    func renderEdge(from firstVertex: Map.OdomVertex.vector3, to secondVertex: Map.OdomVertex.vector3, isPath: Bool) {
         var pathObj: SCNNode?
         
+        let x = (secondVertex.x + firstVertex.x) / 2
+        let y = (secondVertex.y + firstVertex.y) / 2
+        let z = (secondVertex.z + firstVertex.z) / 2
+        let xDist = secondVertex.x - firstVertex.x
+        let yDist = secondVertex.y - firstVertex.y
+        let zDist = secondVertex.z - firstVertex.z
+        let dist = sqrt(pow(xDist, 2) + pow(yDist, 2) + pow(zDist, 2))
+
+        /// SCNNode of the bar path
+        pathObj = SCNNode(geometry: SCNBox(width: CGFloat(dist), height: 0.06, length: 0.06, chamferRadius: 1))
+        pathObjs.append(pathObj!)
+
+        //configure node attributes
+        if !isPath {
+            let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
+            odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
+            odometryNode.simdPosition = simd_float3(firstVertex.x, firstVertex.y, firstVertex.z)
+            mapNode.addChildNode(odometryNode)
+            
+            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
+            pathObj!.opacity = CGFloat(1)
+        } else {
+            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.red
+            pathObj!.opacity = CGFloat(1)
+        }
+        
+        let xAxis = simd_normalize(simd_float3(xDist, yDist, zDist))
+        let yAxis: simd_float3
+        if xDist == 0 && zDist == 0 {
+            // this is the case where the path goes straight up and we can set yAxis more or less arbitrarily
+            yAxis = simd_float3(1, 0, 0)
+        } else if xDist == 0 {
+            // zDist must be non-zero, which means that for yAxis to be perpendicular to the xAxis and have a zero y-component, we must make yAxis equal to simd_float3(1, 0, 0)
+            yAxis = simd_float3(1, 0, 0)
+        } else if zDist == 0 {
+            // xDist must be non-zero, which means that for yAxis to be perpendicular to the xAxis and have a zero y-component, we must make yAxis equal to simd_float3(0, 0, 1)
+            yAxis = simd_float3(0, 0, 1)
+        } else {
+            // TODO: real math
+            let yAxisZComponent = sqrt(1 / (zDist*zDist/(xDist*xDist) + 1))
+            let yAxisXComponent = -zDist*yAxisZComponent/xDist
+            yAxis = simd_float3(yAxisXComponent, 0, yAxisZComponent)
+        }
+        let zAxis = simd_cross(xAxis, yAxis)
+        let pathTransform = simd_float4x4(columns: (simd_float4(xAxis, 0), simd_float4(yAxis, 0), simd_float4(zAxis, 0), simd_float4(x, y - 0.6, z, 1)))
+
+        pathObj!.simdTransform = pathTransform
+        
+        if isPath {
+            mapNode.addChildNode(pathObj!)
+        }
+    }
+    
+    /// Renders graph used for path planning and initializes dictionary and graph used
+    func renderGraphPath(){
         // Initializes dictionary and graph
         odometryDict = Dictionary<Int, ViewController.Map.OdomVertex.vector3>(uniqueKeysWithValues: zip(myMap.odometryVertices.map({$0.poseId}), myMap.odometryVertices.map({$0.translation})))
         pathPlanningGraph = WeightedGraph<String, Float>(vertices: Array(odometryDict!.keys).sorted().map({String($0)}))
 
         for vertex in myMap.odometryVertices {
-            let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
-            odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
-            odometryNode.simdPosition = simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z)
-            mapNode.addChildNode(odometryNode)
-            
-            // Render poseID text
-            let objectText = SCNText(string: String(vertex.poseId), extrusionDepth: 1.0)
-            objectText.font = UIFont (name: "Arial", size: 18)
-            objectText.firstMaterial!.diffuse.contents = UIColor.red
-            let textNode = SCNNode(geometry: objectText)
-            textNode.position = SCNVector3(x: 0.0, y: 0.15, z: 0.0)
-            textNode.scale = SCNVector3(x: 0.002, y: 0.002, z: 0.002)
-            odometryNode.addChildNode(textNode)
-            odometryNode.name = String("Odometry_\(vertex.poseId)")
-            
             for neighbor in vertex.neighbors{
                 // Only render path if it hasn't been rendered yet
                 if (neighbor < vertex.poseId){
-
                     let neighborVertex = odometryDict![neighbor]!
 
-                    let x = (neighborVertex.x + vertex.translation.x) / 2
-                    let y = (neighborVertex.y + vertex.translation.y) / 2
-                    let z = (neighborVertex.z + vertex.translation.z) / 2
                     let xDist = neighborVertex.x - vertex.translation.x
                     let yDist = neighborVertex.y - vertex.translation.y
                     let zDist = neighborVertex.z - vertex.translation.z
-                    let planarDist = sqrt(pow(xDist, 2) + pow(zDist, 2))
-                    let dist = sqrt(pow(xDist, 2) + pow(zDist, 2))
                     let total_dist = sqrt(pow(xDist, 2) + pow(yDist, 2) + pow(zDist, 2))
-                    let hAngle = atan2(xDist, zDist)
-                    let vAngle = atan2(yDist, planarDist)
         
                     // Adding edge from vertex to neighbor
                     pathPlanningGraph!.addEdge(from: String(vertex.poseId), to:String(neighbor), weight:total_dist)
-
-                    /// SCNNode of the bar path
-                    pathObj = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: CGFloat(dist), chamferRadius: 1))
-        
-                    //configure node attributes
-                    pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
-                    pathObj!.opacity = CGFloat(0.5)
-                    pathObj!.position = SCNVector3(x, y, z)
-                    // horizontal rotation
-                    pathObj!.rotation = SCNVector4(0, 1, 0, hAngle)
-                    // vertical rotation
-                    // pathObj!.localRotate(by: SCNQuaternion(x: 1, y: 0, z: 0, w: -vAngle))
-                    
-                    sceneView.scene.rootNode.addChildNode(pathObj!)
+                    // Render edge
+                    self.renderEdge(from: vertex.translation, to: neighborVertex, isPath: false)
                 }
             }
         }
@@ -272,8 +292,6 @@ class ViewController: UIViewController {
         
         let endpoint = getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
         let startpoint = getClosestGraphNode(ignoring: endpoint)
-        
-        var pathObj: SCNNode?
 
         let (_, pathDict) = pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
         print("startpoint:", startpoint!)
@@ -291,31 +309,7 @@ class ViewController: UIViewController {
             let pathCurrentVertex = odometryDict![Int(stops[i])!]!
             let pathNextVertex = odometryDict![Int(stops[i+1])!]!
             
-            let x = (pathNextVertex.x + pathCurrentVertex.x) / 2
-            let y = (pathNextVertex.y + pathCurrentVertex.y) / 2
-            let z = (pathNextVertex.z + pathCurrentVertex.z) / 2
-            let xDist = pathNextVertex.x - pathCurrentVertex.x
-            let yDist = pathNextVertex.y - pathCurrentVertex.y
-            let zDist = pathNextVertex.z - pathCurrentVertex.z
-            let planarDist = sqrt(pow(xDist, 2) + pow(zDist, 2))
-            let dist = sqrt(pow(xDist, 2) + pow(zDist, 2))
-            let hAngle = atan2(xDist, zDist)
-            let vAngle = atan2(yDist, planarDist)
-
-            /// SCNNode of the bar path
-            pathObj = SCNNode(geometry: SCNBox(width: 0.06, height: 0.06, length: CGFloat(dist), chamferRadius: 1))
-            pathObjs.append(pathObj!)
-
-            //configure node attributes
-            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.red
-            pathObj!.opacity = CGFloat(1)
-            pathObj!.position = SCNVector3(x, y, z)
-            // horizontal rotation
-            pathObj!.rotation = SCNVector4(0, 1, 0, hAngle)
-            // vertical rotation
-            // pathObj!.localRotate(by: SCNQuaternion(x: 1, y: 0, z: 0, w: -vAngle))
-        
-            sceneView.scene.rootNode.addChildNode(pathObj!)
+            self.renderEdge(from: pathCurrentVertex, to: pathNextVertex, isPath: true)
         }
         
         /// Ping audio from a few nodes down to ensure direction

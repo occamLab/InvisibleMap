@@ -121,6 +121,7 @@ struct ContentView: View {
                     Image(systemName: "gearshape").imageScale(.large)
                         .foregroundColor(.black)
                 }
+                .accessibilityLabel(Text("Settings"))
             )
         }
     }
