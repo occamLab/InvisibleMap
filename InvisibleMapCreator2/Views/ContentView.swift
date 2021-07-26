@@ -20,7 +20,7 @@ class MapDatabase: ObservableObject {
         FirebaseApp.configure()
         
         if Auth.auth().currentUser == nil {
-            Auth.auth().signInAnonymously() { (authResult, error) in guard let authResult = authResult
+            Auth.auth().signInAnonymously() { (authResult, error) in guard let _ = authResult
                 else {
                     return
                 }
@@ -114,15 +114,15 @@ struct ContentView: View {
             }
             .listStyle(PlainListStyle())
             .navigationTitle("All Maps")
-            .navigationBarItems(trailing:
-                Button(action: {
-                    // TODO: Build settings menu 
-                }) {
-                    Image(systemName: "gearshape").imageScale(.large)
-                        .foregroundColor(.black)
-                }
-                .accessibilityLabel(Text("Settings"))
-            )
+//            .navigationBarItems(trailing:
+//                Button(action: {
+//                    // TODO: Build settings menu
+//                }) {
+//                    Image(systemName: "gearshape").imageScale(.large)
+//                        .foregroundColor(.black)
+//                }
+//                .accessibilityLabel(Text("Settings"))
+//            )
         }
     }
 }

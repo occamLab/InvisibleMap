@@ -10,13 +10,15 @@ import SwiftUI
 
 struct RecordTagButton: View {
     @EnvironmentObject var mapRecorder: MapRecorder
+    @ObservedObject var recordGlobalState: RecordGlobalState
     
     var body: some View {
         Button(action: {
-            var logging = "Button pressed: switching recordTag from \(self.mapRecorder.recordTag) "
-            self.mapRecorder.recordTag.toggle()
-            logging = logging + "to \(self.mapRecorder.recordTag)"
-            print(logging)
+            if self.mapRecorder.seesTag {
+                self.mapRecorder.recordTag.toggle()
+            } else {
+                recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, recordTagRequested: true)
+            }
         }){
             Text(self.mapRecorder.recordTag ? "Stop Recording Tags" : "Start Recording Tags")
                 .frame(width: 300, height: 60)
@@ -26,13 +28,14 @@ struct RecordTagButton: View {
                         .foregroundColor(self.mapRecorder.recordTag ? .red : .blue)
                         .opacity(self.mapRecorder.seesTag ? 1 : 0.5))
         }
-        .disabled(!self.mapRecorder.seesTag)
-        // Button styling for the AddLocation button
+        //.disabled(!self.mapRecorder.seesTag)
     }
 }
 
 struct RecordTagButton_Previews: PreviewProvider {
+    @StateObject static var recordGlobalState = RecordGlobalState()
+    
     static var previews: some View {
-        RecordTagButton().environmentObject(AppController.shared.mapRecorder)
+        RecordTagButton(recordGlobalState: recordGlobalState).environmentObject(AppController.shared.mapRecorder)
     }
 }

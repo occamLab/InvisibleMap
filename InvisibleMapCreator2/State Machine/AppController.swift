@@ -41,8 +41,8 @@ class AppController {
             case .PinLocation(let locationName):
                 arViewer?.pinLocation(locationName: locationName)
             // RecordViewer commands
-            case .EnableAddLocation:
-                recordViewer?.enableAddLocation()
+            case .UpdateInstructionText:
+                recordViewer?.updateInstructionText()
             case .UpdateLocationList(let node, let picture, let textNode, let poseId):
                 recordViewer?.updateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)
             }
@@ -121,6 +121,6 @@ protocol ARViewController {
 
 protocol RecordViewController {
     // Commands that impact the record map UI
-    func enableAddLocation()
+    func updateInstructionText()
     func updateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
 }
