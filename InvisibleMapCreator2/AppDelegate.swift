@@ -1,21 +1,22 @@
 //
 //  AppDelegate.swift
-//  InvisibleMap
+//  InvisibleMapCreator2
 //
-//  Created by djconnolly27 on 7/30/18.
-//  Copyright © 2018 Occam Lab. All rights reserved.
+//  Created by occamlab on 7/26/21.
+//  Copyright © 2021 Occam Lab. All rights reserved.
 //
 
 import UIKit
 import Firebase
 import FirebaseAuth
+import SwiftUI
 
-@UIApplicationMain
+//@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         FirebaseApp.configure()
         
@@ -26,9 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UIApplication.shared.isIdleTimerDisabled = true
             return true
         }
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let vc = storyboard.instantiateViewController(withIdentifier: "chooseMapController")
-       //let vc = ViewController()
+        let vc = UIHostingController(rootView: ContentView())
         window = UIWindow(frame:UIScreen.main.bounds)
         window?.rootViewController = vc
         window?.makeKeyAndVisible()
@@ -60,4 +59,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 }
+
 

@@ -17,8 +17,6 @@ class MapDatabase: ObservableObject {
     var storageRef: StorageReference!
     
     init() {
-        FirebaseApp.configure()
-        
         if Auth.auth().currentUser == nil {
             Auth.auth().signInAnonymously() { (authResult, error) in guard let authResult = authResult
                 else {
@@ -78,51 +76,56 @@ struct ContentView: View {
     @ObservedObject var mapDatabase = MapDatabase()
     
     var body: some View {
-        NavigationView {
-            VStack {
-                // All maps list
-                List {
-                    // Populate list view with data from firebase as the app is loaded
-                    ForEach(Array(zip(self.mapDatabase.images, self.mapDatabase.maps)), id: \.0) { map in
-                        NavigationLink(
-                            destination: EditMapView() // TODO: Determine what each map should navigate to
-                        ) {
-                            HStack {
-                                Image(uiImage: map.0)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 100, height: 100)
-                                    .clipped()
-                                    .cornerRadius(8)
-                                Text(map.1)
+        if Auth.auth().currentUser == nil {
+            AppleSignInControllerRepresentable()
+        }
+        else {
+            NavigationView {
+                VStack {
+                    // All maps list
+                    List {
+                        // Populate list view with data from firebase as the app is loaded
+                        ForEach(Array(zip(self.mapDatabase.images, self.mapDatabase.maps)), id: \.0) { map in
+                            NavigationLink(
+                                destination: EditMapView() // TODO: Determine what each map should navigate to
+                            ) {
+                                HStack {
+                                    Image(uiImage: map.0)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 100, height: 100)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                    Text(map.1)
+                                }
                             }
                         }
                     }
+                    Divider()
+                    // New map button
+                    NavigationLink(
+                        destination: RecordMapView()
+                    ) {
+                        Text("New Map")
+                            .frame(width: 200, height: 40)
+                            .foregroundColor(.blue)
+                            .background(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.blue, lineWidth: 1))
+                    }
                 }
-                Divider()
-                // New map button
-                NavigationLink(
-                    destination: RecordMapView()
-                ) {
-                    Text("New Map")
-                        .frame(width: 200, height: 40)
-                        .foregroundColor(.blue)
-                        .background(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.blue, lineWidth: 1))
-                }
+                .listStyle(PlainListStyle())
+                .navigationTitle("All Maps")
+                .navigationBarItems(trailing:
+                    Button(action: {
+                        // TODO: Build settings menu
+                    }) {
+                        Image(systemName: "gearshape").imageScale(.large)
+                            .foregroundColor(.black)
+                    }
+                    .accessibilityLabel(Text("Settings"))
+                )
             }
-            .listStyle(PlainListStyle())
-            .navigationTitle("All Maps")
-            .navigationBarItems(trailing:
-                Button(action: {
-                    // TODO: Build settings menu 
-                }) {
-                    Image(systemName: "gearshape").imageScale(.large)
-                        .foregroundColor(.black)
-                }
-                .accessibilityLabel(Text("Settings"))
-            )
         }
     }
 }
@@ -130,6 +133,17 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+    }
+}
+
+struct AppleSignInControllerRepresentable: UIViewControllerRepresentable {
+    typealias UIViewControllerType = AppleSignInController
+    
+    func makeUIViewController(context: Context) -> AppleSignInController {
+        return AppleSignInController()
+    }
+    func updateUIViewController(_ uiViewController: AppleSignInController, context: Context) {
+        return
     }
 }
 

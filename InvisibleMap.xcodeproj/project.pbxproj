@@ -71,6 +71,11 @@
 		86F39541210FA42500F209EC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F39540210FA42500F209EC /* ViewController.swift */; };
 		86F39544210FA42500F209EC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39542210FA42500F209EC /* Main.storyboard */; };
 		86F39549210FA42600F209EC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39547210FA42600F209EC /* LaunchScreen.storyboard */; };
+		98BF269C26AF2FF90076427E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269B26AF2FF90076427E /* AppDelegate.swift */; };
+		98BF26A026AF4F9E0076427E /* AppleSignInController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269526AF01F60076427E /* AppleSignInController.swift */; };
+		98BF26A126AF4F9E0076427E /* AuthenticationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */; };
+		98BF26A526B03EAA0076427E /* AppleSignInController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269526AF01F60076427E /* AppleSignInController.swift */; };
+		98BF26A626B03EB90076427E /* AuthenticationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */; };
 		C083FDE9792A57723D51077F /* Pods_InvisibleMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */; };
 		E70E471D7C474EB907B3AC47 /* Pods_InvisibleMapCreator2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB5425F26FBD3AC1712F11A8 /* Pods_InvisibleMapCreator2.framework */; };
 /* End PBXBuildFile section */
@@ -138,6 +143,10 @@
 		86F39553210FA42600F209EC /* InvisibleMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapTests.swift; sourceTree = "<group>"; };
 		86F39555210FA42600F209EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8833ECE2D199509ED373632C /* Pods-InvisibleMapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapTests/Pods-InvisibleMapTests.debug.xcconfig"; sourceTree = "<group>"; };
+		98BF269526AF01F60076427E /* AppleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInController.swift; sourceTree = "<group>"; };
+		98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
+		98BF269926AF14D50076427E /* InvisibleMap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap.entitlements; sourceTree = "<group>"; };
+		98BF269B26AF2FF90076427E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A6C67955B6E8A782817AA66D /* Pods-InvisibleMapCreator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapCreator/Pods-InvisibleMapCreator.debug.xcconfig"; sourceTree = "<group>"; };
 		BB5425F26FBD3AC1712F11A8 /* Pods_InvisibleMapCreator2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapCreator2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B323A62949E8BB9B0F9C91 /* Pods-InvisibleMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMap.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMap/Pods-InvisibleMap.release.xcconfig"; sourceTree = "<group>"; };
@@ -199,6 +208,7 @@
 			isa = PBXGroup;
 			children = (
 				1447B705262421CC00230A58 /* InvisibleMapCreator2App.swift */,
+				98BF269B26AF2FF90076427E /* AppDelegate.swift */,
 				1447B7402624227E00230A58 /* Views */,
 				1447B749262422AB00230A58 /* State Machine */,
 				1F64364A269DD75B007BD526 /* Utils */,
@@ -299,6 +309,7 @@
 		86F39532210FA42500F209EC = {
 			isa = PBXGroup;
 			children = (
+				98BF269A26AF2E4F0076427E /* Authentication */,
 				86F3953D210FA42500F209EC /* InvisibleMap */,
 				86F39552210FA42600F209EC /* InvisibleMapTests */,
 				82468A2024C88B6600FD31BC /* InvisibleMapCreator */,
@@ -322,6 +333,7 @@
 		86F3953D210FA42500F209EC /* InvisibleMap */ = {
 			isa = PBXGroup;
 			children = (
+				98BF269926AF14D50076427E /* InvisibleMap.entitlements */,
 				868CBA4A2113394B007343B4 /* main.m */,
 				868CBA4D2113394B007343B4 /* TagFinder-Swift.h */,
 				868CBA4B2113394B007343B4 /* TagFinder.h */,
@@ -353,6 +365,15 @@
 				86F39555210FA42600F209EC /* Info.plist */,
 			);
 			path = InvisibleMapTests;
+			sourceTree = "<group>";
+		};
+		98BF269A26AF2E4F0076427E /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				98BF269526AF01F60076427E /* AppleSignInController.swift */,
+				98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */,
+			);
+			path = Authentication;
 			sourceTree = "<group>";
 		};
 		993390B42386AFE1DD02EDC5 /* Pods */ = {
@@ -629,17 +650,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98BF269C26AF2FF90076427E /* AppDelegate.swift in Sources */,
 				14995FBC26263A0900A7C78B /* AprilTagTracker.swift in Sources */,
 				143011FE2629D8CD0042FDFC /* ManageLocationsButton.swift in Sources */,
 				14995FB8262639ED00A7C78B /* ImageConversion.mm in Sources */,
 				1447B72F2624227600230A58 /* ARView.swift in Sources */,
 				1447B75B2624230200230A58 /* AppController.swift in Sources */,
 				14995FC026263B3100A7C78B /* simd+ext.swift in Sources */,
+				98BF26A026AF4F9E0076427E /* AppleSignInController.swift in Sources */,
 				1447B706262421CC00230A58 /* InvisibleMapCreator2App.swift in Sources */,
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
 				141497E62645A41700BF0ABC /* InstructionOverlay.swift in Sources */,
+				98BF26A126AF4F9E0076427E /* AuthenticationHelper.swift in Sources */,
 				14995FB6262639E400A7C78B /* TagFinder.mm in Sources */,
 				1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */,
 				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
@@ -677,6 +701,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98BF26A626B03EB90076427E /* AuthenticationHelper.swift in Sources */,
+				98BF26A526B03EAA0076427E /* AppleSignInController.swift in Sources */,
 				868CBA4F2113394B007343B4 /* TagFinder.mm in Sources */,
 				822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */,
 				86112CD3211B837200736960 /* ChooseMapTableViewCell.swift in Sources */,
@@ -752,7 +778,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = Occam.InvisibleMapCreator2;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMapCreator2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -781,7 +807,7 @@
 					"@executable_path/Frameworks",
 				);
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = Occam.InvisibleMapCreator2;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMapCreator2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -967,6 +993,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = InvisibleMap/InvisibleMap.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_BITCODE = NO;
@@ -987,7 +1014,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMap;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "InvisibleMap/TagFinder-Swift.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1002,6 +1029,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = InvisibleMap/InvisibleMap.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_BITCODE = NO;
@@ -1022,7 +1050,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.InvisibleMap;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "InvisibleMap/TagFinder-Swift.h";
 				SWIFT_VERSION = 4.0;
