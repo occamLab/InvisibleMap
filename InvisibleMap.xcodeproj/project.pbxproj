@@ -100,6 +100,7 @@
 		14995FD626269B0900A7C78B /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
 		14E164722633523B0087A426 /* EditMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMapView.swift; sourceTree = "<group>"; };
+		1F32376526AEF09D008B9A11 /* InvisibleMapCreator2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMapCreator2.entitlements; sourceTree = "<group>"; };
 		1F4C30C526A1D70C008CBE3C /* RecordTagButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordTagButton.swift; sourceTree = "<group>"; };
 		1F64364E269DDD08007BD526 /* MemoryChecker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MemoryChecker.m; sourceTree = "<group>"; };
 		1F643651269DDD92007BD526 /* MemoryChecker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemoryChecker.h; sourceTree = "<group>"; };
@@ -207,6 +208,7 @@
 		1447B704262421CC00230A58 /* InvisibleMapCreator2 */ = {
 			isa = PBXGroup;
 			children = (
+				1F32376526AEF09D008B9A11 /* InvisibleMapCreator2.entitlements */,
 				1447B705262421CC00230A58 /* InvisibleMapCreator2App.swift */,
 				98BF269B26AF2FF90076427E /* AppDelegate.swift */,
 				1447B7402624227E00230A58 /* Views */,
@@ -762,6 +764,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
+				CODE_SIGN_ENTITLEMENTS = InvisibleMapCreator2/InvisibleMapCreator2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
@@ -792,6 +795,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
+				CODE_SIGN_ENTITLEMENTS = InvisibleMapCreator2/InvisibleMapCreator2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;

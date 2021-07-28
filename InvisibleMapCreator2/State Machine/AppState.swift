@@ -38,7 +38,7 @@ enum AppState: StateType {
         case DetectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case UpdatePlanes(planes: [ARPlaneAnchor])
         // case PauseRecording
-        case EnableAddLocation
+        case UpdateInstructionText
         case PinLocation(locationName: String)
         case CacheLocation(node: SCNNode, picture: UIImage, textNode: SCNNode)
         case UpdateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
@@ -100,9 +100,9 @@ enum RecordMapState: StateType {
     mutating func handleEvent(event: Event) -> [Command] {
         switch (self, event) {
             case(.RecordMap, .NewARFrame(let cameraFrame)):
-                return [.RecordData(cameraFrame: cameraFrame)]
+                return [.RecordData(cameraFrame: cameraFrame), .UpdateInstructionText]
             case(.RecordMap, .NewTagFound(let tag, let cameraTransform, let snapTagsToVertical)):
-                return [.DetectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical), .EnableAddLocation]
+                return [.DetectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)]
             case(.RecordMap, .PlanesUpdated(let planes)):
                 return [.UpdatePlanes(planes: planes)]
             // case(.RecordMap, .PauseRecordingPressed):

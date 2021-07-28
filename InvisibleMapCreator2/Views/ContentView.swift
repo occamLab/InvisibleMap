@@ -18,7 +18,7 @@ class MapDatabase: ObservableObject {
     
     init() {
         if Auth.auth().currentUser == nil {
-            Auth.auth().signInAnonymously() { (authResult, error) in guard let authResult = authResult
+            Auth.auth().signInAnonymously() { (authResult, error) in guard let _ = authResult
                 else {
                     return
                 }
@@ -126,6 +126,20 @@ struct ContentView: View {
                     .accessibilityLabel(Text("Settings"))
                 )
             }
+<<<<<<< HEAD
+=======
+            .listStyle(PlainListStyle())
+            .navigationTitle("All Maps")
+//            .navigationBarItems(trailing:
+//                Button(action: {
+//                    // TODO: Build settings menu
+//                }) {
+//                    Image(systemName: "gearshape").imageScale(.large)
+//                        .foregroundColor(.black)
+//                }
+//                .accessibilityLabel(Text("Settings"))
+//            )
+>>>>>>> 88044c58f3d779172ccf155628a4b195caf2a447
         }
     }
 }

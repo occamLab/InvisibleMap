@@ -36,6 +36,8 @@ class MapRecorder: MapRecorderController, ObservableObject {
     /// Tracks current planes seen
     var planesSeen = Set<UUID>()
     
+    /// Tracks whether the first tag has been found
+    @Published var firstTagFound = false
     /// Tracks whether the user has asked for a tag to be recorded
     @Published var recordTag = false
     @Published var seesTag = false
@@ -146,6 +148,8 @@ class MapRecorder: MapRecorderController, ObservableObject {
     func clearData() {
         lastRecordedTimestamp = nil
         lastRecordedFrame = nil
+        firstTagFound = false
+        seesTag = false
         poseId = 0
         poseData = []
         locationData = []
@@ -167,10 +171,13 @@ extension MapRecorder {
         aprilTagQueue.async {
             let arTags = self.getArTags(cameraFrame: cameraFrame, image: uiimage, timeStamp: timestamp, poseId: poseId)
             self.seesTag = !arTags.isEmpty
-            if self.recordTag && !arTags.isEmpty {
+            if !self.firstTagFound && self.seesTag {
+                self.firstTagFound = true
+            }
+            if self.recordTag && self.seesTag {
                 self.tagData.append(arTags)
             }
-            if arTags.isEmpty {
+            if !self.seesTag {
                 self.recordTag = false
             }
         }
