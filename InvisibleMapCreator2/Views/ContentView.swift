@@ -126,8 +126,6 @@ struct ContentView: View {
                     .accessibilityLabel(Text("Settings"))
                 )
             }
-<<<<<<< HEAD
-=======
             .listStyle(PlainListStyle())
             .navigationTitle("All Maps")
 //            .navigationBarItems(trailing:
@@ -139,7 +137,6 @@ struct ContentView: View {
 //                }
 //                .accessibilityLabel(Text("Settings"))
 //            )
->>>>>>> 88044c58f3d779172ccf155628a4b195caf2a447
         }
     }
 }
