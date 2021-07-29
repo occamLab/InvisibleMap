@@ -9,9 +9,7 @@
 import SwiftUI
 
 @main
-struct InvisbleMapCreator2App: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
+struct InvisbleMapCreator2App: App {    
     var body: some Scene {
         WindowGroup {
             ContentView()

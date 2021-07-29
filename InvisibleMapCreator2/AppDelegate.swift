@@ -1,9 +1,9 @@
 //
 //  AppDelegate.swift
-//  InvisibleMapCreator2
+//  InvisibleMap
 //
-//  Created by occamlab on 7/26/21.
-//  Copyright © 2021 Occam Lab. All rights reserved.
+//  Created by djconnolly27 on 7/30/18.
+//  Copyright © 2018 Occam Lab. All rights reserved.
 //
 
 import UIKit
@@ -11,14 +11,12 @@ import Firebase
 import FirebaseAuth
 import SwiftUI
 
-//@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        FirebaseApp.configure()
         
         if Auth.auth().currentUser == nil {
             window = UIWindow(frame:UIScreen.main.bounds)
@@ -59,5 +57,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 }
-
 

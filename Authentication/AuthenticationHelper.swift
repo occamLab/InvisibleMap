@@ -101,17 +101,17 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
           // Sign in with Firebase.
           Auth.auth().signIn(with: credential) { (authResult, error) in
             if (error != nil) {
-              // Error. If error.code == .MissingOrInvalidNonce, make sure
-              // you're sending the SHA256-hashed nonce as a hex string with
-              // your request to Apple.
-              print(error!.localizedDescription)
-                
+                // Error. If error.code == .MissingOrInvalidNonce, make sure
+                // you're sending the SHA256-hashed nonce as a hex string with
+                // your request to Apple.
+                print("Received error during sign in: \(error!.localizedDescription)")
+                print("Transitioning to main app with error")
                 self.transitionToMainApp()
-
-              return
+                return
             }
             // User is signed in to Firebase with Apple.
             // ...
+            print("Transitioning to main app")
             self.transitionToMainApp()
 
           }
@@ -128,14 +128,16 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
       }
     
     func transitionToMainApp() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.window?.rootViewController?.dismiss(animated: false)
-        appDelegate.window = UIWindow(frame:UIScreen.main.bounds)
-        appDelegate.window?.makeKeyAndVisible()
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let vc = storyboard.instantiateViewController(withIdentifier: "chooseMapController")
-        appDelegate.window?.rootViewController = vc
-        //appDelegate.vc = appDelegate.window?.rootViewController
+        #if !IS_MAP_CREATOR
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.window?.rootViewController?.dismiss(animated: false)
+            appDelegate.window = UIWindow(frame:UIScreen.main.bounds)
+            appDelegate.window?.makeKeyAndVisible()
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "chooseMapController")
+            appDelegate.window?.rootViewController = vc
+            //appDelegate.vc = appDelegate.window?.rootViewController
+        #endif
     }
 
 }

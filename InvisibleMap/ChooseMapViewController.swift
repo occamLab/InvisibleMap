@@ -8,7 +8,7 @@
 
 import Foundation
 import Firebase
-
+import FirebaseAuth
 
 /// A View Controller for handling map selection
 class ChooseMapViewController: UITableViewController {
@@ -56,13 +56,12 @@ class ChooseMapViewController: UITableViewController {
     func processMapFromFirebase(key: String, values: [String: Any]) {
         // only include in the list if it is processed
         if let _ = values["map_file"] as? String {
-            processMap(mapName: key, mapInfo: values)
-        } else {
-            // TODO: Only see public folder and your own sub-folder
+            processMap(mapName: values["name"] as! String, mapInfo: values)
+        } else if Auth.auth().currentUser?.uid == key {
             for subkey in values.keys {
                 let subval = values[subkey] as? [String: Any]
                 if let _ = subval?["map_file"] as? String {
-                    processMap(mapName: subkey, mapInfo: subval!)
+                    processMap(mapName: subval!["name"] as! String, mapInfo: subval!)
                 }
             }
         }

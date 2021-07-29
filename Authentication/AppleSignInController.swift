@@ -40,12 +40,15 @@ class AppleSignInController: UIViewController {
     }
         
     @objc private func signInWithApple() {
-        print("Shared is AppDelegate: \(UIApplication.shared.delegate is AppDelegate)")
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        
-        /// handle sign in flow using FirbaseAuthentication Apple ID
-        authHelper = AuthenticationHelper(window: appDelegate?.window!)
-        authHelper?.startSignInWithAppleFlow()
-        
+        #if IS_MAP_CREATOR
+            authHelper = AuthenticationHelper(window: nil)
+            authHelper?.startSignInWithAppleFlow()
+        #else
+            let appDelegate = UIApplication.shared.delegate as? AppDelegate
+            
+            /// handle sign in flow using FirbaseAuthentication Apple ID
+            authHelper = AuthenticationHelper(window: appDelegate?.window!)
+            authHelper?.startSignInWithAppleFlow()
+        #endif
     }
 }

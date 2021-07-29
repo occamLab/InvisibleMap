@@ -168,7 +168,7 @@ extension MapRecorder {
     /// Append new april tag data to list
     @objc func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         let uiimage = cameraFrame.convertToUIImage()
-        aprilTagQueue.async {
+        DispatchQueue.main.async {
             let arTags = self.getArTags(cameraFrame: cameraFrame, image: uiimage, timeStamp: timestamp, poseId: poseId)
             self.seesTag = !arTags.isEmpty
             if !self.firstTagFound && self.seesTag {

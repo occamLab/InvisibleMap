@@ -172,6 +172,7 @@ class ViewController: UIViewController {
     /// Creates a node for a path edge between two vertices
     func renderEdge(from firstVertex: Map.OdomVertex.vector3, to secondVertex: Map.OdomVertex.vector3, isPath: Bool) {
         var pathObj: SCNNode?
+        let verticalOffset: Float = -0.6
         
         let x = (secondVertex.x + firstVertex.x) / 2
         let y = (secondVertex.y + firstVertex.y) / 2
@@ -189,7 +190,7 @@ class ViewController: UIViewController {
         if !isPath {
             let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
             odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
-            odometryNode.simdPosition = simd_float3(firstVertex.x, firstVertex.y, firstVertex.z)
+            odometryNode.simdPosition = simd_float3(firstVertex.x, firstVertex.y + verticalOffset, firstVertex.z)
             mapNode.addChildNode(odometryNode)
             
             pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
@@ -217,7 +218,7 @@ class ViewController: UIViewController {
             yAxis = simd_float3(yAxisXComponent, 0, yAxisZComponent)
         }
         let zAxis = simd_cross(xAxis, yAxis)
-        let pathTransform = simd_float4x4(columns: (simd_float4(xAxis, 0), simd_float4(yAxis, 0), simd_float4(zAxis, 0), simd_float4(x, y - 0.6, z, 1)))
+        let pathTransform = simd_float4x4(columns: (simd_float4(xAxis, 0), simd_float4(yAxis, 0), simd_float4(zAxis, 0), simd_float4(x, y + verticalOffset, z, 1)))
 
         pathObj!.simdTransform = pathTransform
         

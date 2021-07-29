@@ -71,11 +71,11 @@
 		86F39541210FA42500F209EC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F39540210FA42500F209EC /* ViewController.swift */; };
 		86F39544210FA42500F209EC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39542210FA42500F209EC /* Main.storyboard */; };
 		86F39549210FA42600F209EC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39547210FA42600F209EC /* LaunchScreen.storyboard */; };
-		98BF269C26AF2FF90076427E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269B26AF2FF90076427E /* AppDelegate.swift */; };
 		98BF26A026AF4F9E0076427E /* AppleSignInController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269526AF01F60076427E /* AppleSignInController.swift */; };
 		98BF26A126AF4F9E0076427E /* AuthenticationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */; };
 		98BF26A526B03EAA0076427E /* AppleSignInController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269526AF01F60076427E /* AppleSignInController.swift */; };
 		98BF26A626B03EB90076427E /* AuthenticationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */; };
+		98BF26AA26B1AFA00076427E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF26A926B1AF9F0076427E /* AppDelegate.swift */; };
 		C083FDE9792A57723D51077F /* Pods_InvisibleMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6AF86E1DAFC37BFE6141A79 /* Pods_InvisibleMap.framework */; };
 		E70E471D7C474EB907B3AC47 /* Pods_InvisibleMapCreator2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB5425F26FBD3AC1712F11A8 /* Pods_InvisibleMapCreator2.framework */; };
 /* End PBXBuildFile section */
@@ -147,7 +147,7 @@
 		98BF269526AF01F60076427E /* AppleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInController.swift; sourceTree = "<group>"; };
 		98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
 		98BF269926AF14D50076427E /* InvisibleMap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap.entitlements; sourceTree = "<group>"; };
-		98BF269B26AF2FF90076427E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		98BF26A926B1AF9F0076427E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A6C67955B6E8A782817AA66D /* Pods-InvisibleMapCreator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMapCreator/Pods-InvisibleMapCreator.debug.xcconfig"; sourceTree = "<group>"; };
 		BB5425F26FBD3AC1712F11A8 /* Pods_InvisibleMapCreator2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapCreator2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B323A62949E8BB9B0F9C91 /* Pods-InvisibleMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMap.release.xcconfig"; path = "Pods/Target Support Files/Pods-InvisibleMap/Pods-InvisibleMap.release.xcconfig"; sourceTree = "<group>"; };
@@ -210,13 +210,13 @@
 			children = (
 				1F32376526AEF09D008B9A11 /* InvisibleMapCreator2.entitlements */,
 				1447B705262421CC00230A58 /* InvisibleMapCreator2App.swift */,
-				98BF269B26AF2FF90076427E /* AppDelegate.swift */,
 				1447B7402624227E00230A58 /* Views */,
 				1447B749262422AB00230A58 /* State Machine */,
 				1F64364A269DD75B007BD526 /* Utils */,
 				1447B709262421CF00230A58 /* Assets.xcassets */,
 				1447B70E262421CF00230A58 /* Info.plist */,
 				1447B70B262421CF00230A58 /* Preview Content */,
+				98BF26A926B1AF9F0076427E /* AppDelegate.swift */,
 			);
 			path = InvisibleMapCreator2;
 			sourceTree = "<group>";
@@ -652,7 +652,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98BF269C26AF2FF90076427E /* AppDelegate.swift in Sources */,
 				14995FBC26263A0900A7C78B /* AprilTagTracker.swift in Sources */,
 				143011FE2629D8CD0042FDFC /* ManageLocationsButton.swift in Sources */,
 				14995FB8262639ED00A7C78B /* ImageConversion.mm in Sources */,
@@ -661,6 +660,7 @@
 				14995FC026263B3100A7C78B /* simd+ext.swift in Sources */,
 				98BF26A026AF4F9E0076427E /* AppleSignInController.swift in Sources */,
 				1447B706262421CC00230A58 /* InvisibleMapCreator2App.swift in Sources */,
+				98BF26AA26B1AFA00076427E /* AppDelegate.swift in Sources */,
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
@@ -781,6 +781,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				"OTHER_SWIFT_FLAGS[arch=*]" = "-D IS_MAP_CREATOR";
 				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMapCreator2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -811,6 +812,7 @@
 					"@executable_path/Frameworks",
 				);
 				MTL_FAST_MATH = YES;
+				"OTHER_SWIFT_FLAGS[arch=*]" = "-D IS_MAP_CREATOR";
 				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMapCreator2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

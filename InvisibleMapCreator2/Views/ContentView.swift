@@ -17,17 +17,6 @@ class MapDatabase: ObservableObject {
     var storageRef: StorageReference!
     
     init() {
-        if Auth.auth().currentUser == nil {
-            Auth.auth().signInAnonymously() { (authResult, error) in guard let _ = authResult
-                else {
-                    return
-                }
-                print("Successful login \(String(describing: Auth.auth().currentUser!.uid))")
-            }
-        } else {
-            print("User: \(String(describing: Auth.auth().currentUser!.uid))")
-        }
-        
         var userMapsPath = "maps/"
         if Auth.auth().currentUser != nil {
             userMapsPath = userMapsPath + String(Auth.auth().currentUser!.uid)
@@ -72,7 +61,17 @@ class MapDatabase: ObservableObject {
     }
 }
 
+class AuthListener: ObservableObject {
+    init() {
+        FirebaseApp.configure()
+        Auth.auth().addStateDidChangeListener { auth, user in
+            self.objectWillChange.send()
+        }
+    }
+}
+
 struct ContentView: View {
+    @ObservedObject var authListener = AuthListener()
     @ObservedObject var mapDatabase = MapDatabase()
     
     var body: some View {
@@ -151,6 +150,7 @@ struct AppleSignInControllerRepresentable: UIViewControllerRepresentable {
     typealias UIViewControllerType = AppleSignInController
     
     func makeUIViewController(context: Context) -> AppleSignInController {
+        print("Created AppleSignInController")
         return AppleSignInController()
     }
     func updateUIViewController(_ uiViewController: AppleSignInController, context: Context) {

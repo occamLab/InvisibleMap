@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 import ARKit
 import UIKit
+import FirebaseAuth
 
 // Stores the ARView
 struct NavigationIndicator: UIViewControllerRepresentable {
@@ -158,6 +159,10 @@ class RecordGlobalState: ObservableObject, RecordViewController {
 
 struct RecordMapView: View {
     @StateObject var recordGlobalState = RecordGlobalState()
+    
+    init() {
+        print("currentUser is \(Auth.auth().currentUser!.uid)")
+    }
     
     var body : some View {
         ZStack {
