@@ -130,13 +130,7 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
     func transitionToMainApp() {
         #if !IS_MAP_CREATOR
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.window?.rootViewController?.dismiss(animated: false)
-            appDelegate.window = UIWindow(frame:UIScreen.main.bounds)
-            appDelegate.window?.makeKeyAndVisible()
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "chooseMapController")
-            appDelegate.window?.rootViewController = vc
-            //appDelegate.vc = appDelegate.window?.rootViewController
+            appDelegate.transitionToMainApp()
         #endif
     }
 

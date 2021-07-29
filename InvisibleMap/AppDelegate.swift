@@ -18,22 +18,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         FirebaseApp.configure()
-        
+
         if Auth.auth().currentUser == nil {
-            window = UIWindow(frame:UIScreen.main.bounds)
-            window?.makeKeyAndVisible()
-            window?.rootViewController = AppleSignInController()
-            UIApplication.shared.isIdleTimerDisabled = true
+            self.transitionToSignIn()
             return true
         }
+        self.transitionToMainApp()
+        return true
+    }
+    
+    func transitionToSignIn() {
+        window = UIWindow(frame:UIScreen.main.bounds)
+        window?.makeKeyAndVisible()
+        window?.rootViewController = AppleSignInController()
+        UIApplication.shared.isIdleTimerDisabled = true
+    }
+    
+    func transitionToMainApp() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: "chooseMapController")
-       //let vc = ViewController()
+        let navigationController = UINavigationController(rootViewController: vc)
         window = UIWindow(frame:UIScreen.main.bounds)
-        window?.rootViewController = vc
+        window?.rootViewController = navigationController //vc
         window?.makeKeyAndVisible()
         UIApplication.shared.isIdleTimerDisabled = true
-        return true
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
