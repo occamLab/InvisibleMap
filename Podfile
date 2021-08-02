@@ -7,34 +7,11 @@ target 'InvisibleMap' do
 
   # Pods for InvisibleMap
   pod 'SwiftGraph'
-  pod 'Firebase/Core'
-  pod 'Firebase/Database'
-  pod 'Firebase/Storage'
-  pod 'Firebase/Auth'
-
 end
 
-target 'InvisibleMapCreator' do
-  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
-  use_frameworks!
-
-  # Pods for InvisibleMapCreator
-  pod 'Firebase/Core'
-  pod 'Firebase/Database'
-  pod 'Firebase/Storage'
-  pod 'Firebase/Auth'
-
-end
 
 target 'InvisibleMapCreator2' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
-
-  # Pods for InvisibleMapCreator
-  pod 'Firebase/Core'
-  pod 'Firebase/Database'
-  pod 'Firebase/Storage'
-  pod 'Firebase/Analytics'
-  pod 'Firebase/Auth'
 
 end
