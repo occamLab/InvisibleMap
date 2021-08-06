@@ -124,13 +124,38 @@ class MapRecorder: MapRecorderController, ObservableObject {
         
         let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData, "plane_data": planeDataList]
         
-        let imagePath = "rawMapData/" + String(describing: Auth.auth().currentUser!.uid) + "/" + mapId + ".jpg"
-        let filePath = "rawMapData/" + String(describing: Auth.auth().currentUser!.uid) + "/" + mapId + ".json"
+        let folderPath = "rawMapData/" + String(describing: Auth.auth().currentUser!.uid)
+        let imagePath = folderPath + "/" + mapId + ".jpg"
+        let filePath = folderPath + "/" + mapId + ".json"
         
         // TODO: handle errors when failing to upload image and json file
         // TODO: let the user pick their image
         // Upload the last image capture to Firebase
         firebaseStorageRef.child(imagePath).putData(mapImage.jpegData(compressionQuality: 0)!, metadata: StorageMetadata(dictionary: ["contentType": "image/jpeg"]))
+        
+        var log = ""
+        if JSONSerialization.isValidJSONObject(mapJsonFile) {
+            if !JSONSerialization.isValidJSONObject(["map_id": mapId]) {
+                log += "map_id \(mapId) is invalid\n"
+            }
+            if !JSONSerialization.isValidJSONObject(["pose_data": poseData]) {
+                log += "pose_data is invalid:\n\(poseData)\n"
+            }
+            if !JSONSerialization.isValidJSONObject(["tag_data": tagData]) {
+                log += "tag_data is invalid:\n\(tagData)\n"
+            }
+            if !JSONSerialization.isValidJSONObject(["location_data": locationData]) {
+                log += "location_data is invalid:\n\(locationData)\n"
+            }
+            if !JSONSerialization.isValidJSONObject(["plane_data": planeDataList]) {
+                log += "plane_data is invalid:\n\(planeDataList)\n"
+            }
+        }
+        else {
+            log += "mapJsonFile is valid"
+        }
+        print(log)
+        try? firebaseStorageRef.child(folderPath + "/\(mapId) serialization error.json").putData(JSONSerialization.data(withJSONObject: ["log": log]))
 
         // Upload raw file json
         if let jsonData = try? JSONSerialization.data(withJSONObject: mapJsonFile, options: []) {
