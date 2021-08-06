@@ -277,8 +277,12 @@ extension MapRecorder {
                 tagDict["tag_orientation_variance"] = [tagArray[i].quatVar.0, tagArray[i].quatVar.1, tagArray[i].quatVar.2, tagArray[i].quatVar.3]
                 tagDict["timestamp"] = timeStamp
                 tagDict["pose_id"] = poseId
-                // TODO: resolve the unsafe dangling pointer warning
-                tagDict["joint_covar"] = [Double](UnsafeBufferPointer(start: &tagArray[i].jointCovar.0, count: MemoryLayout.size(ofValue: tagArray[i].jointCovar)/MemoryLayout.stride(ofValue: tagArray[i].jointCovar.0)))
+                var jointCovarList: [Double] = []
+                let mirror = Mirror(reflecting: tagArray[i].jointCovar)
+                for child in mirror.children {
+                    jointCovarList.append(child.value as! Double)
+                }
+                tagDict["joint_covar"] = jointCovarList
                 allTags.append(tagDict)
             }
         }
