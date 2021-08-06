@@ -150,6 +150,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
         lastRecordedFrame = nil
         firstTagFound = false
         seesTag = false
+        recordTag = false
         poseId = 0
         poseData = []
         locationData = []
