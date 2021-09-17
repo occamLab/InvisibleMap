@@ -14,23 +14,22 @@ struct AddLocationButton: View {
     var body: some View {
         Button(action: {
             if recordGlobalState.tagFound {
-                recordGlobalState.instructionWrapper = .none // Removes on-screen instructions after the user has successfully added their first location
                 alert()
             } else {
-                recordGlobalState.instructionWrapper = .findTagReminder // Sends a find tag reminder to the user if they try to add a location before they've found their first tag
+                recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, locationRequested: true) // Sends a find tag reminder to the user if they try to add a location before they've found their first tag
             }
         }){
             HStack {
                 Image(systemName: "plus")
                 Text("Add Location")
             }
+            .frame(width: 200, height: 40)
+            .foregroundColor(.white)
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .foregroundColor(.blue))
         }
         // Button styling for the AddLocation button
-        .frame(width: 200, height: 40)
-        .foregroundColor(.white)
-        .background(
-            RoundedRectangle(cornerRadius: 15)
-                .foregroundColor(.blue))
         .opacity(recordGlobalState.tagFound ? 1 : 0.5)
     }
 }

@@ -2,4 +2,8 @@
 /opencv2.framework
 /visp3.framework
 /Frameworks
-/InvisibleMap/GoogleService-Info.plist
+/**/GoogleService-Info.plist
+/**/.DS_Store
+Pods/
+/InvisibleMap.xcodeproj/xcuserdata/
+/InvisibleMap.xcworkspace/xcuserdata/

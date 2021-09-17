@@ -1,6 +1,0 @@
-framework module FirebaseCore {
-  umbrella header "FirebaseCore-iOS14.4-umbrella.h"
-
-  export *
-  module * { export * }
-}

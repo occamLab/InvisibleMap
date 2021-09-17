@@ -8,7 +8,7 @@
 
 import Foundation
 import Firebase
-
+import FirebaseAuth
 
 /// A View Controller for handling map selection
 class ChooseMapViewController: UITableViewController {
@@ -28,10 +28,10 @@ class ChooseMapViewController: UITableViewController {
         storageRef = Storage.storage().reference()
         mapsRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference(withPath: "maps")
         mapsRef.observe(.childAdded) { (snapshot) -> Void in
-            self.processMap(key: snapshot.key, values: snapshot.value as! [String: Any])
+            self.processMapFromFirebase(key: snapshot.key, values: snapshot.value as! [String: Any])
         }
         mapsRef.observe(.childChanged) { (snapshot) -> Void in
-            self.processMap(key: snapshot.key, values: snapshot.value as! [String: Any])
+            self.processMapFromFirebase(key: snapshot.key, values: snapshot.value as! [String: Any])
         }
         mapsRef.observe(.childRemoved) { (snapshot) -> Void in
             if let existingMapIndex = self.maps.index(of: snapshot.key) {
@@ -53,22 +53,33 @@ class ChooseMapViewController: UITableViewController {
         performSegue(withIdentifier: "userSelectSegue", sender: self)
     }
     
-    func processMap(key: String, values: [String: Any]) {
+    func processMapFromFirebase(key: String, values: [String: Any]) {
         // only include in the list if it is processed
-        if let processedMapFile = values["map_file"] as? String {
-            // TODO: pick a sensible default image
-            let imageRef = storageRef.child((values["image"] as? String) ?? "olin_library.jpg")
-            imageRef.getData(maxSize: 10*1024*1024) { imageData, error in
-                if let error = error {
-                    print(error.localizedDescription)
-                    // Error occurred
-                } else {
-                    if let data = imageData {
-                        self.images.append(UIImage(data: data)!)
-                        self.files.append(processedMapFile)
-                        self.maps.append(key)
-                        self.tableView.reloadData()
-                    }
+        if let _ = values["map_file"] as? String { // if not in user folder, public map
+            processMap(mapName: values["name"] as! String, mapInfo: values)
+        } else if Auth.auth().currentUser?.uid == key {
+            for subkey in values.keys {
+                let subval = values[subkey] as? [String: Any]
+                if let _ = subval?["map_file"] as? String {
+                    processMap(mapName: subval!["name"] as! String, mapInfo: subval!)
+                }
+            }
+        }
+    }
+    
+    func processMap(mapName: String, mapInfo: [String: Any]) {
+        // TODO: pick a sensible default image
+        let imageRef = storageRef.child((mapInfo["image"] as? String) ?? "olin_library.jpg")
+        imageRef.getData(maxSize: 10*1024*1024) { imageData, error in
+            if let error = error {
+                print(error.localizedDescription)
+                // Error occurred
+            } else {
+                if let data = imageData {
+                    self.images.append(UIImage(data: data)!)
+                    self.files.append(mapInfo["map_file"] as! String)
+                    self.maps.append(mapName)
+                    self.tableView.reloadData()
                 }
             }
         }

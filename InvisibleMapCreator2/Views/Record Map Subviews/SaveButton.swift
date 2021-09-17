@@ -31,7 +31,8 @@ extension SaveButton { // Creates an alert with a textfield (functionality curre
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: "Save", style: .default) { (action: UIAlertAction) in
             if let text = alert.textFields?.first?.text {
-                AppController.shared.saveMapRequested(mapName: text) // Tells the state machine to save the map
+                let textNoSlash = text.replacingOccurrences(of: "/", with: "-")
+                AppController.shared.saveMapRequested(mapName: textNoSlash) // Tells the state machine to save the map
                 self.mode.wrappedValue.dismiss() 
             }
         })

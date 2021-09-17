@@ -13,7 +13,7 @@ class AppController {
     private var state = AppState.initialState
     
     // Various controllers for handling commands
-    let mapRecorder = MapRecorder() // Initialized in MapRecorder.swift
+    var mapRecorder = MapRecorder() // Initialized in MapRecorder.swift
     var arViewer: ARViewController? // Initialized in ARView.swift
     var recordViewer: RecordViewController? // Initialized in RecordMapView.swift
     
@@ -24,12 +24,15 @@ class AppController {
         for command in commands {
             switch command {
             // MapRecorder commands
-            case .RecordData(cameraFrame: let cameraFrame):
+            case .RecordData(let cameraFrame):
                 mapRecorder.recordData(cameraFrame: cameraFrame)
+            case .UpdatePlanes(let planes):
+                mapRecorder.updatePlanes(planes: planes)
             case .CacheLocation(let node, let picture, let textNode):
                 mapRecorder.cacheLocation(node: node, picture: picture, textNode: textNode)
             case .ClearData:
                 mapRecorder.clearData()
+                arViewer?.resetArSession()
             case .SendToFirebase(let mapName):
                 mapRecorder.sendToFirebase(mapName: mapName)
             // ARViewer commands
@@ -38,9 +41,9 @@ class AppController {
             case .PinLocation(let locationName):
                 arViewer?.pinLocation(locationName: locationName)
             // RecordViewer commands
-            case .EnableAddLocation:
-                recordViewer?.enableAddLocation()
-            case .UpdateLocationList(node: let node, picture: let picture, textNode: let textNode, poseId: let poseId):
+            case .UpdateInstructionText:
+                recordViewer?.updateInstructionText()
+            case .UpdateLocationList(let node, let picture, let textNode, let poseId):
                 recordViewer?.updateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)
             }
         }
@@ -62,6 +65,10 @@ extension AppController {
     
     func processNewTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         processCommands(commands: state.handleEvent(event: .NewTagFound(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)))
+    }
+    
+    func processPlanesUpdated(planes: [ARPlaneAnchor]) {
+        processCommands(commands: state.handleEvent(event: .PlanesUpdated(planes: planes)))
     }
     
     func saveLocationRequested(locationName: String) {
@@ -105,12 +112,15 @@ protocol MapRecorderController {
 
 protocol ARViewController {
     // Commands that interact with the ARView
+    var supportsLidar: Bool { get }
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
+    func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4?
     func pinLocation(locationName: String)
+    func resetArSession()
 }
 
 protocol RecordViewController {
     // Commands that impact the record map UI
-    func enableAddLocation()
+    func updateInstructionText()
     func updateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
 }
