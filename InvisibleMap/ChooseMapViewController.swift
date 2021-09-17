@@ -55,7 +55,7 @@ class ChooseMapViewController: UITableViewController {
     
     func processMapFromFirebase(key: String, values: [String: Any]) {
         // only include in the list if it is processed
-        if let _ = values["map_file"] as? String {
+        if let _ = values["map_file"] as? String { // if not in user folder, public map
             processMap(mapName: values["name"] as! String, mapInfo: values)
         } else if Auth.auth().currentUser?.uid == key {
             for subkey in values.keys {

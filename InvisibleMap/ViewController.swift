@@ -238,11 +238,10 @@ class ViewController: UIViewController {
                 // Only render path if it hasn't been rendered yet
                 if (neighbor < vertex.poseId){
                     let neighborVertex = odometryDict![neighbor]!
-
-                    let xDist = neighborVertex.x - vertex.translation.x
-                    let yDist = neighborVertex.y - vertex.translation.y
-                    let zDist = neighborVertex.z - vertex.translation.z
-                    let total_dist = sqrt(pow(xDist, 2) + pow(yDist, 2) + pow(zDist, 2))
+                    
+                    let vertexVec = simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z)
+                    let neighborVertexVec = simd_float3(neighborVertex.x, neighborVertex.y, neighborVertex.z)
+                    let total_dist = simd_distance(vertexVec, neighborVertexVec)
         
                     // Adding edge from vertex to neighbor
                     pathPlanningGraph!.addEdge(from: String(vertex.poseId), to:String(neighbor), weight:total_dist)
@@ -261,23 +260,25 @@ class ViewController: UIViewController {
         // get user's phone location
         if coordinates == nil {
             let (_, _, cameraTransform, _) = self.getVideoFrames()
-            coordinates = simd_float3(cameraTransform!.columns.3.x, cameraTransform!.columns.3.y, cameraTransform!.columns.3.z)
+            guard let cameraTransform = cameraTransform else {
+                return nil
+            }
+            coordinates = simd_float3(cameraTransform.columns.3.x, cameraTransform.columns.3.y, cameraTransform.columns.3.z)
         }
         
         // get node closest to the current camera position
-        var closest_node: Int = 0
-        var min_dist = 100000.0
+        var closestNode: Int = 0
+        var minDist = 100000.0
         for node in odometryDict!{
-            let x_dist = node.value.x - coordinates!.x
-            let y_dist = node.value.y - coordinates!.y
-            let z_dist = node.value.z - coordinates!.z
-            let dist = sqrt(pow(x_dist, 2) + pow(y_dist, 2) + pow(z_dist, 2))
-            if (Double)(dist) < min_dist && (endpoint == nil || node.key != endpoint) {
-                min_dist = (Double)(dist)
-                closest_node = node.key
+            let nodeVec = simd_float3(node.value.x, node.value.y, node.value.z)
+            let dist = simd_distance(nodeVec, coordinates!)
+            
+            if (Double)(dist) < minDist && (endpoint == nil || node.key != endpoint) {
+                minDist = (Double)(dist)
+                closestNode = node.key
             }
         }
-        return closest_node
+        return closestNode
     }
     
     
@@ -413,6 +414,7 @@ class ViewController: UIViewController {
         }
         self.playSound(type: "ping")
         let volume = self.audioPlayers["ping"]!!.volume
+        // Audio volume was set to a cubic scale, revert back to linear
         let hapticScale = pow(volume, 1.0 / 3.0)
         if hapticScale > 0.75 {
             self.hapticGenerator = UIImpactFeedbackGenerator(style: .heavy)

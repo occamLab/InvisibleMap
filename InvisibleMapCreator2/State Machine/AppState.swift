@@ -48,7 +48,6 @@ enum AppState: StateType {
     
     // In response to an event, a state may transition to a new state, and it may emit a command
     mutating func handleEvent(event: Event) -> [Command] {
-        print("AppState Handle Event: \(self),\n event is \(event)")
         switch (self, event) {
         case (.MainScreen, .StartRecordingRequested):
             self = .RecordMap(.RecordMap)
@@ -105,6 +104,8 @@ enum RecordMapState: StateType {
                 return [.DetectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)]
             case(.RecordMap, .PlanesUpdated(let planes)):
                 return [.UpdatePlanes(planes: planes)]
+            // Uncomment to implement pausing map recording feature
+            // TODO: Implement pausing map feature
             // case(.RecordMap, .PauseRecordingPressed):
             //     self = .RecordingPaused
             //     return []

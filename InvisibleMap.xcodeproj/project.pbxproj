@@ -35,6 +35,12 @@
 		14F15C94263954F2008DB04C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
 		1F4C30C626A1D70C008CBE3C /* RecordTagButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4C30C526A1D70C008CBE3C /* RecordTagButton.swift */; };
 		1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F64364E269DDD08007BD526 /* MemoryChecker.m */; };
+		1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A36126F2493A0044BE18 /* InvisibleMap2App.swift */; };
+		1F77A36426F2493A0044BE18 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A36326F2493A0044BE18 /* ContentView.swift */; };
+		1F77A36626F249480044BE18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F77A36526F249480044BE18 /* Assets.xcassets */; };
+		1F77A36926F249480044BE18 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F77A36826F249480044BE18 /* Preview Assets.xcassets */; };
+		1F77A37126F251D20044BE18 /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A37026F251D20044BE18 /* StateType.swift */; };
+		1F77A37326F2522E0044BE18 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A37226F2522E0044BE18 /* AppState.swift */; };
 		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
 		822FA78624E2FB3E0001F463 /* AprilTagTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */; };
 		82A8259F24B3854000AFC390 /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
@@ -91,6 +97,14 @@
 		1F4C30C526A1D70C008CBE3C /* RecordTagButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordTagButton.swift; sourceTree = "<group>"; };
 		1F64364E269DDD08007BD526 /* MemoryChecker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MemoryChecker.m; sourceTree = "<group>"; };
 		1F643651269DDD92007BD526 /* MemoryChecker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemoryChecker.h; sourceTree = "<group>"; };
+		1F77A35F26F2493A0044BE18 /* InvisibleMap2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisibleMap2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F77A36126F2493A0044BE18 /* InvisibleMap2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMap2App.swift; sourceTree = "<group>"; };
+		1F77A36326F2493A0044BE18 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1F77A36526F249480044BE18 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1F77A36826F249480044BE18 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1F77A36A26F249480044BE18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F77A37026F251D20044BE18 /* StateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
+		1F77A37226F2522E0044BE18 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		822FA78224E2F9750001F463 /* DebugHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugHelpers.swift; sourceTree = "<group>"; };
 		822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AprilTagTracker.swift; sourceTree = "<group>"; };
 		82A8259E24B3854000AFC390 /* simd+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "simd+ext.swift"; sourceTree = "<group>"; };
@@ -133,6 +147,13 @@
 				14995FC426263BA800A7C78B /* visp3.framework in Frameworks */,
 				984C21DE26B44F99006EEF4F /* FirebaseStorage in Frameworks */,
 				984C21D826B44F88006EEF4F /* FirebaseAnalytics in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F77A35C26F2493A0044BE18 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,6 +261,36 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		1F77A36026F2493A0044BE18 /* InvisibleMap2 */ = {
+			isa = PBXGroup;
+			children = (
+				1F77A36F26F251A90044BE18 /* State Machine */,
+				1F77A36126F2493A0044BE18 /* InvisibleMap2App.swift */,
+				1F77A36326F2493A0044BE18 /* ContentView.swift */,
+				1F77A36526F249480044BE18 /* Assets.xcassets */,
+				1F77A36A26F249480044BE18 /* Info.plist */,
+				1F77A36726F249480044BE18 /* Preview Content */,
+			);
+			path = InvisibleMap2;
+			sourceTree = "<group>";
+		};
+		1F77A36726F249480044BE18 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				1F77A36826F249480044BE18 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		1F77A36F26F251A90044BE18 /* State Machine */ = {
+			isa = PBXGroup;
+			children = (
+				1F77A37026F251D20044BE18 /* StateType.swift */,
+				1F77A37226F2522E0044BE18 /* AppState.swift */,
+			);
+			path = "State Machine";
+			sourceTree = "<group>";
+		};
 		86F39532210FA42500F209EC = {
 			isa = PBXGroup;
 			children = (
@@ -247,6 +298,7 @@
 				86F3953D210FA42500F209EC /* InvisibleMap */,
 				86F39552210FA42600F209EC /* InvisibleMapTests */,
 				1447B704262421CC00230A58 /* InvisibleMapCreator2 */,
+				1F77A36026F2493A0044BE18 /* InvisibleMap2 */,
 				86F3953C210FA42500F209EC /* Products */,
 				126D761BA492BEFEDB8E7347 /* Frameworks */,
 			);
@@ -257,6 +309,7 @@
 			children = (
 				86F3953B210FA42500F209EC /* InvisibleMap.app */,
 				1447B703262421CC00230A58 /* InvisibleMapCreator2.app */,
+				1F77A35F26F2493A0044BE18 /* InvisibleMap2.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -333,6 +386,23 @@
 			productReference = 1447B703262421CC00230A58 /* InvisibleMapCreator2.app */;
 			productType = "com.apple.product-type.application";
 		};
+		1F77A35E26F2493A0044BE18 /* InvisibleMap2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F77A36D26F249480044BE18 /* Build configuration list for PBXNativeTarget "InvisibleMap2" */;
+			buildPhases = (
+				1F77A35B26F2493A0044BE18 /* Sources */,
+				1F77A35C26F2493A0044BE18 /* Frameworks */,
+				1F77A35D26F2493A0044BE18 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InvisibleMap2;
+			productName = InvisibleMap2;
+			productReference = 1F77A35F26F2493A0044BE18 /* InvisibleMap2.app */;
+			productType = "com.apple.product-type.application";
+		};
 		86F3953A210FA42500F209EC /* InvisibleMap */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 86F39558210FA42600F209EC /* Build configuration list for PBXNativeTarget "InvisibleMap" */;
@@ -363,12 +433,15 @@
 		86F39533210FA42500F209EC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1240;
+				LastSwiftUpdateCheck = 1250;
 				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "Occam Lab";
 				TargetAttributes = {
 					1447B702262421CC00230A58 = {
 						CreatedOnToolsVersion = 12.4;
+					};
+					1F77A35E26F2493A0044BE18 = {
+						CreatedOnToolsVersion = 12.5;
 					};
 					86F3953A210FA42500F209EC = {
 						CreatedOnToolsVersion = 9.4.1;
@@ -395,6 +468,7 @@
 			targets = (
 				86F3953A210FA42500F209EC /* InvisibleMap */,
 				1447B702262421CC00230A58 /* InvisibleMapCreator2 */,
+				1F77A35E26F2493A0044BE18 /* InvisibleMap2 */,
 			);
 		};
 /* End PBXProject section */
@@ -407,6 +481,15 @@
 				1447B70D262421CF00230A58 /* Preview Assets.xcassets in Resources */,
 				1447B70A262421CF00230A58 /* Assets.xcassets in Resources */,
 				984C21CB26B445C9006EEF4F /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F77A35D26F2493A0044BE18 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F77A36926F249480044BE18 /* Preview Assets.xcassets in Resources */,
+				1F77A36626F249480044BE18 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -453,6 +536,17 @@
 				14E164732633523B0087A426 /* EditMapView.swift in Sources */,
 				1447B75E2624230200230A58 /* MapRecorder.swift in Sources */,
 				14995FB2262639DA00A7C78B /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F77A35B26F2493A0044BE18 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F77A37126F251D20044BE18 /* StateType.swift in Sources */,
+				1F77A36426F2493A0044BE18 /* ContentView.swift in Sources */,
+				1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */,
+				1F77A37326F2522E0044BE18 /* AppState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -555,6 +649,53 @@
 				MTL_FAST_MATH = YES;
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-D IS_MAP_CREATOR";
 				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMapCreator;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1F77A36B26F249480044BE18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
+				DEVELOPMENT_TEAM = 787TUDMR8Q;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = InvisibleMap2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMap2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1F77A36C26F249480044BE18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
+				DEVELOPMENT_TEAM = 787TUDMR8Q;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = InvisibleMap2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMap2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -752,6 +893,15 @@
 			buildConfigurations = (
 				1447B70F262421CF00230A58 /* Debug */,
 				1447B710262421CF00230A58 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F77A36D26F249480044BE18 /* Build configuration list for PBXNativeTarget "InvisibleMap2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F77A36B26F249480044BE18 /* Debug */,
+				1F77A36C26F249480044BE18 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
