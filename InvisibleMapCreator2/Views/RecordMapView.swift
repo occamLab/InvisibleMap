@@ -68,7 +68,7 @@ enum InstructionType: Equatable {
         let previousInstruction = self
         switch self {
         case .findTag:
-            if AppController.shared.mapRecorder.seesTag {
+            if InvisibleMapCreatorController.shared.mapRecorder.seesTag {
                 self = .saveLocation(startTime: NSDate().timeIntervalSince1970)
             } else if locationRequested {
                 self = .findTagReminder(startTime: NSDate().timeIntervalSince1970)
@@ -76,7 +76,7 @@ enum InstructionType: Equatable {
                 self = .recordTagReminder(startTime: NSDate().timeIntervalSince1970)
             }
         case .saveLocation, .tagFound:
-            if !AppController.shared.mapRecorder.seesTag {
+            if !InvisibleMapCreatorController.shared.mapRecorder.seesTag {
                 self = .none
             }
         case .findTagReminder:
@@ -86,14 +86,14 @@ enum InstructionType: Equatable {
                 self = .recordTagReminder(startTime: NSDate().timeIntervalSince1970)
             }
         case .recordTagReminder:
-            if AppController.shared.mapRecorder.seesTag {
+            if InvisibleMapCreatorController.shared.mapRecorder.seesTag {
                 self = .tagFound(startTime: NSDate().timeIntervalSince1970)
             }
             else if !tagFound && locationRequested {
                 self = .findTagReminder(startTime: NSDate().timeIntervalSince1970)
             }
         case .none:
-            if AppController.shared.mapRecorder.seesTag {
+            if InvisibleMapCreatorController.shared.mapRecorder.seesTag {
                 self = .tagFound(startTime: NSDate().timeIntervalSince1970)
             } else if recordTagRequested {
                 self = .recordTagReminder(startTime: NSDate().timeIntervalSince1970)
@@ -137,13 +137,13 @@ class RecordGlobalState: ObservableObject, RecordViewController {
         tagFound = false
         instructionWrapper = .findTag(startTime: NSDate().timeIntervalSince1970)
         nodeList = []
-        AppController.shared.recordViewer = self
+        InvisibleMapCreatorController.shared.recordViewer = self
     }
     
     // Record view controller commands
     func updateInstructionText() {
         DispatchQueue.main.async {
-            if !AppController.shared.mapRecorder.firstTagFound {
+            if !InvisibleMapCreatorController.shared.mapRecorder.firstTagFound {
                 self.tagFound = false
             } else {
                 self.tagFound = true
@@ -192,14 +192,14 @@ struct RecordMapView: View {
                         .animation(.easeInOut)
                 }
                 RecordTagButton(recordGlobalState: recordGlobalState)
-                    .environmentObject(AppController.shared.mapRecorder)
+                    .environmentObject(InvisibleMapCreatorController.shared.mapRecorder)
                     .frame(maxHeight: .infinity, alignment: .bottom)
             }
             .padding()
         }
         .ignoresSafeArea(.keyboard)
         .onAppear {
-            AppController.shared.startRecordingRequested()
+            InvisibleMapCreatorController.shared.startRecordingRequested()
         }
     }
 }

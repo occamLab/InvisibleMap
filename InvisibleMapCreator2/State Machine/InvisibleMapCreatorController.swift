@@ -8,8 +8,8 @@
 import Foundation
 import ARKit
 
-class AppController {
-    public static var shared = AppController()
+class InvisibleMapCreatorController: AppController {
+    public static var shared = InvisibleMapCreatorController()
     private var state = AppState.initialState
     
     // Various controllers for handling commands
@@ -20,7 +20,7 @@ class AppController {
     private init() {
     }
 
-    private func processCommands(commands: [AppState.Command]) {
+    private func process(commands: [AppState.Command]) {
         for command in commands {
             switch command {
             // MapRecorder commands
@@ -48,9 +48,13 @@ class AppController {
             }
         }
     }
+    
+    func process(event: Event) {
+        process(commands: state.handle(event: event))
+    }
 }
 
-extension AppController {
+extension InvisibleMapCreatorController {
     // MainScreen events
     func startRecordingRequested() {
         print(state)

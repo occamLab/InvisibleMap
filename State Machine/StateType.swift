@@ -18,7 +18,7 @@ protocol StateType {
     associatedtype OutputCommand
 
     /// In response to an event, a state may transition to some new value, and it may emit a command.
-    mutating func handleEvent(event: InputEvent) -> [OutputCommand]
+    mutating func handle(event: InputEvent) -> [OutputCommand]
 
     // If you're not familiar with Swift, the mutation semantics here may seem like a very big red
     // flag, destroying the purity of this type. In fact, because states have *value semantics*,

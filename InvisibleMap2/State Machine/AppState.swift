@@ -47,7 +47,7 @@ enum AppState: StateType {
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
-    mutating func handleEvent(event: Event) -> [Command] {
+    mutating func handle(event: Event) -> [Command] {
         switch (self, event) {
             case (.MainScreen, .MapSelected):
                 self = .NavigateMap(.SelectPath)

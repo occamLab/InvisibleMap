@@ -40,7 +40,7 @@ class ARView: UIViewController {
         super.viewDidLoad()
         arView.session.delegate = self
         arView.scene = SCNScene()
-        AppController.shared.arViewer = self
+        InvisibleMapCreatorController.shared.arViewer = self
         configuration.planeDetection = [.horizontal, .vertical]
         //if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
         //    configuration.sceneReconstruction = .mesh
@@ -70,7 +70,7 @@ extension ARView: ARSessionDelegate {
     }
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        AppController.shared.processNewARFrame(frame: frame)
+        InvisibleMapCreatorController.shared.processNewARFrame(frame: frame)
         self.memoryChecker.printRemainingMemory()
         if(self.memoryChecker.getRemainingMemory() < 500) {
             arView.session.pause()
@@ -228,7 +228,7 @@ extension ARView: ARViewController {
             self.arView.scene.rootNode.addChildNode(textNode)
             
             let snapshot = self.arView.snapshot()
-            AppController.shared.cacheLocationRequested(node: boxNode, picture: snapshot, textNode: textNode)
+            InvisibleMapCreatorController.shared.cacheLocationRequested(node: boxNode, picture: snapshot, textNode: textNode)
         }
     }
     

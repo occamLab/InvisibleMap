@@ -87,7 +87,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
             
             if let pendingLocation = pendingLocation {
                 locationData.append(getLocationCoordinates(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId, location: pendingLocation))
-                AppController.shared.updateLocationListRequested(node: pendingNode!.0, picture: pendingNode!.1, textNode: pendingNode!.2, poseId: poseId)
+                InvisibleMapCreatorController.shared.updateLocationListRequested(node: pendingNode!.0, picture: pendingNode!.1, textNode: pendingNode!.2, poseId: poseId)
                 self.pendingLocation = nil
                 self.pendingNode = nil
             }
@@ -240,8 +240,8 @@ extension MapRecorder {
                 var tagDict:[String:Any] = [:]
                 
                 
-                if ((AppController.shared.arViewer?.supportsLidar) != nil ? AppController.shared.arViewer?.supportsLidar as! Bool : false) {
-                    let raycastPose: simd_float4x4? = AppController.shared.arViewer?.raycastTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical)
+                if ((InvisibleMapCreatorController.shared.arViewer?.supportsLidar) != nil ? InvisibleMapCreatorController.shared.arViewer?.supportsLidar as! Bool : false) {
+                    let raycastPose: simd_float4x4? = InvisibleMapCreatorController.shared.arViewer?.raycastTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical)
                     
                     if raycastPose == nil {
                         continue
@@ -250,7 +250,7 @@ extension MapRecorder {
                     }
                 }
                 
-                AppController.shared.processNewTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical) // Generates event to detect new tag
+                InvisibleMapCreatorController.shared.processNewTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical) // Generates event to detect new tag
                 
                 var pose = tagArray[i].poseData
                 

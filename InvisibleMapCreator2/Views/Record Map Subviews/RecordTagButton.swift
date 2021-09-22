@@ -36,6 +36,6 @@ struct RecordTagButton_Previews: PreviewProvider {
     @StateObject static var recordGlobalState = RecordGlobalState()
     
     static var previews: some View {
-        RecordTagButton(recordGlobalState: recordGlobalState).environmentObject(AppController.shared.mapRecorder)
+        RecordTagButton(recordGlobalState: recordGlobalState).environmentObject(InvisibleMapCreatorController.shared.mapRecorder)
     }
 }

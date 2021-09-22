@@ -47,7 +47,7 @@ enum AppState: StateType {
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
-    mutating func handleEvent(event: Event) -> [Command] {
+    mutating func handle(event: Event) -> [Command] {
         switch (self, event) {
         case (.MainScreen, .StartRecordingRequested):
             self = .RecordMap(.RecordMap)
@@ -96,7 +96,7 @@ enum RecordMapState: StateType {
     typealias Command = AppState.Command
     
     // In response to an event, RecordMapState may emit a command
-    mutating func handleEvent(event: Event) -> [Command] {
+    mutating func handle(event: Event) -> [Command] {
         switch (self, event) {
             case(.RecordMap, .NewARFrame(let cameraFrame)):
                 return [.RecordData(cameraFrame: cameraFrame), .UpdateInstructionText]
