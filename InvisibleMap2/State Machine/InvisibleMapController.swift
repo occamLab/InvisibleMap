@@ -15,7 +15,7 @@ class InvisibleMapController: AppController {
     func process(commands: [AppState.Command]) {
         for command in commands {
             switch command {
-                default break;
+                default: break;
             }
         }
     }

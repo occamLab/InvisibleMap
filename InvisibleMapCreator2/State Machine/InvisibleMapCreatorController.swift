@@ -20,7 +20,7 @@ class InvisibleMapCreatorController: AppController {
     private init() {
     }
 
-    private func process(commands: [AppState.Command]) {
+    func process(commands: [AppState.Command]) {
         for command in commands {
             switch command {
             // MapRecorder commands
@@ -56,11 +56,11 @@ class InvisibleMapCreatorController: AppController {
 
 extension InvisibleMapCreatorController {
     func cacheLocationRequested(node: SCNNode, picture: UIImage, textNode: SCNNode) {
-        processCommands(commands: [AppState.Command.CacheLocation(node: node, picture: picture, textNode: textNode)])
+        process(commands: [AppState.Command.CacheLocation(node: node, picture: picture, textNode: textNode)])
     }
     
     func updateLocationListRequested(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
-        processCommands(commands: [AppState.Command.UpdateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)])
+        process(commands: [AppState.Command.UpdateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)])
     }
 }
 

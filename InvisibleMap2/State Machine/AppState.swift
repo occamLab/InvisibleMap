@@ -26,7 +26,7 @@ enum AppState: StateType {
         // NavigateMap events
         case NewARFrame(cameraFrame: ARFrame)
         case TagFound(tag: AprilTags, cameraTransform: simd_float4x4)
-        case WaypointReached(finalWaypoint: bool)
+        case WaypointReached(finalWaypoint: Bool)
         case EditMapRequested
         case CancelEditRequested
         case SaveEditRequested
@@ -50,7 +50,7 @@ enum AppState: StateType {
     mutating func handle(event: Event) -> [Command] {
         switch (self, event) {
             case (.MainScreen, .MapSelected):
-                self = .NavigateMap(.SelectPath)
+                self = .SelectPath
                 return []
             case (.NavigateMap, .LeaveMapRequested):
                 self = .MainScreen

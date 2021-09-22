@@ -60,7 +60,7 @@ enum AppState: StateType {
             return [.SendToFirebase(mapName: mapName), .ClearData]
         case (.RecordMap(let state), _) where RecordMapState.Event(event) != nil:
             var newState = state
-            let commands = newState.handleEvent(event: RecordMapState.Event(event)!)
+            let commands = newState.handle(event: RecordMapState.Event(event)!)
             self = .RecordMap(newState)
             return commands
             
