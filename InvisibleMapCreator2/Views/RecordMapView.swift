@@ -199,7 +199,7 @@ struct RecordMapView: View {
         }
         .ignoresSafeArea(.keyboard)
         .onAppear {
-            InvisibleMapCreatorController.shared.startRecordingRequested()
+            InvisibleMapCreatorController.shared.process(event: .StartRecordingRequested)
         }
     }
 }

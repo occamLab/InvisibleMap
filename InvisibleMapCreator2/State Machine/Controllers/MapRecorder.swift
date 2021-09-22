@@ -250,7 +250,7 @@ extension MapRecorder {
                     }
                 }
                 
-                InvisibleMapCreatorController.shared.processNewTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical) // Generates event to detect new tag
+                InvisibleMapCreatorController.shared.process(event: .NewTagFound(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical)) // Generates event to detect new tag
                 
                 var pose = tagArray[i].poseData
                 

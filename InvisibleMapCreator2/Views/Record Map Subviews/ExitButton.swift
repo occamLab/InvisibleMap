@@ -26,7 +26,7 @@ struct ExitButton: View {
     var body: some View {
         Button(action: {
             self.mode.wrappedValue.dismiss()
-            InvisibleMapCreatorController.shared.cancelRecordingRequested() // Tells the state machine to cancel the map recording
+            InvisibleMapCreatorController.shared.process(event: .CancelRecordingRequested) // Tells the state machine to cancel the map recording
         }){
             Image(systemName: "xmark")
                 .accessibility(label: Text("Cancel Map"))

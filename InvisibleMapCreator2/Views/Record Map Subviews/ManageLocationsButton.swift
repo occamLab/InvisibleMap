@@ -15,7 +15,7 @@ struct ManageLocationsButton: View {
     var body: some View {
         Button(action: {
             showLocations = true
-            InvisibleMapCreatorController.shared.viewLocationsRequested() // Tells the state machine that the manage locations menu has been opened
+            InvisibleMapCreatorController.shared.process(event: .ViewLocationsRequested) // Tells the state machine that the manage locations menu has been opened
         }){
             Image(systemName: "line.horizontal.3")
                 .accessibility(label: Text("Manage Locations"))
@@ -30,7 +30,7 @@ struct ManageLocationsButton: View {
                     .stroke(Color.blue, lineWidth: 1)
             })
         .sheet(isPresented: $showLocations, onDismiss: {
-            InvisibleMapCreatorController.shared.dismissLocationsRequested() // Tells the state machine that the manage locations menu has been closed
+            InvisibleMapCreatorController.shared.process(event: .DismissLocationsRequested) // Tells the state machine that the manage locations menu has been closed
         }) {
             ManageLocationsView(recordGlobalState: recordGlobalState, showLocations: $showLocations)
         }

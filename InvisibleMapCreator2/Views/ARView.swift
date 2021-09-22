@@ -70,7 +70,7 @@ extension ARView: ARSessionDelegate {
     }
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        InvisibleMapCreatorController.shared.processNewARFrame(frame: frame)
+        InvisibleMapCreatorController.shared.process(event: .NewARFrame(cameraFrame: frame))
         self.memoryChecker.printRemainingMemory()
         if(self.memoryChecker.getRemainingMemory() < 500) {
             arView.session.pause()
@@ -80,12 +80,12 @@ extension ARView: ARSessionDelegate {
     
     public func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
         // let newAnchors = anchors.compactMap({$0 as? ARPlaneAnchor})
-        // AppController.shared.processPlanesUpdated(planes: newAnchors)
+        // InvisibleMapCreatorController.shared.process(event: .PlanesUpdated(planes: newAnchors))
     }
     
     public func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
         // let updatedAnchors = anchors.compactMap({$0 as? ARPlaneAnchor})
-        // AppController.shared.processPlanesUpdated(planes: updatedAnchors)
+        // InvisibleMapCreatorController.shared.process(event: .PlanesUpdated(planes: updatedAnchors))
     }
 }
 

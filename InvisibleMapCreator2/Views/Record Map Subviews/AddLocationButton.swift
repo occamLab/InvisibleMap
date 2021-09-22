@@ -43,7 +43,7 @@ extension AddLocationButton { // Creates an alert with a textfield (functionalit
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: "Save", style: .default) { (action: UIAlertAction) in
             if let text = alert.textFields?.first?.text {
-                InvisibleMapCreatorController.shared.saveLocationRequested(locationName: text) // Tells the state machine to save the location
+                InvisibleMapCreatorController.shared.process(event: .SaveLocationRequested(locationName: text)) // Tells the state machine to save the location
             }
         })
         showAlert(alert: alert)

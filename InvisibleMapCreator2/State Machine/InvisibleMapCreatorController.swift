@@ -49,60 +49,18 @@ class InvisibleMapCreatorController: AppController {
         }
     }
     
-    func process(event: Event) {
+    func process(event: AppState.Event) {
         process(commands: state.handle(event: event))
     }
 }
 
 extension InvisibleMapCreatorController {
-    // MainScreen events
-    func startRecordingRequested() {
-        print(state)
-        processCommands(commands: state.handleEvent(event: .StartRecordingRequested))
-        print(state)
-    }
-    
-    // RecordMap events
-    func processNewARFrame(frame: ARFrame) {
-        processCommands(commands: state.handleEvent(event: .NewARFrame(cameraFrame: frame)))
-    }
-    
-    func processNewTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
-        processCommands(commands: state.handleEvent(event: .NewTagFound(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)))
-    }
-    
-    func processPlanesUpdated(planes: [ARPlaneAnchor]) {
-        processCommands(commands: state.handleEvent(event: .PlanesUpdated(planes: planes)))
-    }
-    
-    func saveLocationRequested(locationName: String) {
-        processCommands(commands: state.handleEvent(event: .SaveLocationRequested(locationName: locationName)))
-    }
-    
     func cacheLocationRequested(node: SCNNode, picture: UIImage, textNode: SCNNode) {
         processCommands(commands: [AppState.Command.CacheLocation(node: node, picture: picture, textNode: textNode)])
     }
     
     func updateLocationListRequested(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
         processCommands(commands: [AppState.Command.UpdateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)])
-    }
-    
-    func viewLocationsRequested() {
-        processCommands(commands: state.handleEvent(event: .ViewLocationsRequested))
-    }
-    
-    func dismissLocationsRequested() {
-        processCommands(commands: state.handleEvent(event: .DismissLocationsRequested))
-    }
-    
-    func cancelRecordingRequested() {
-        processCommands(commands: state.handleEvent(event: .CancelRecordingRequested))
-        print(state)
-    }
-    
-    func saveMapRequested(mapName: String) {
-        processCommands(commands: state.handleEvent(event: .SaveMapRequested(mapName: mapName)))
-        print(state)
     }
 }
 
