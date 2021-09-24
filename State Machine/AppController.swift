@@ -2,7 +2,7 @@
 //  AppController.swift
 //  InvisibleMap
 //
-//  Created by tad on 9/22/21.
+//  Created by Allison Li and Ben Morris on 9/22/21.
 //  Copyright © 2021 Occam Lab. All rights reserved.
 //
 

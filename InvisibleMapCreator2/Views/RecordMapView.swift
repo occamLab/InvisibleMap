@@ -15,8 +15,8 @@ import FirebaseAuth
 // Stores the ARView
 struct NavigationIndicator: UIViewControllerRepresentable {
    typealias UIViewControllerType = ARView
-   func makeUIViewController(context: Context) -> ARView {
-      return ARView()
+    func makeUIViewController(context: Context) -> ARView {
+        return ARView()
    }
    func updateUIViewController(_ uiViewController:
    NavigationIndicator.UIViewControllerType, context:

@@ -641,128 +641,128 @@ class ViewController: UIViewController {
             case waypointsVertices = "waypoints_vertices"
         }
         
-            struct WaypointVertex: Decodable {
-                let id: String
-                let translation: vector3
-                let rotation: quaternion
+        struct WaypointVertex: Decodable {
+            let id: String
+            let translation: vector3
+            let rotation: quaternion
+            
+            enum CodingKeys: String, CodingKey {
+                case id
+                case translation = "translation"
+                case rotation = "rotation"
+            }
+            
+            struct vector3: Decodable {
+                let x: Float
+                let y: Float
+                let z: Float
                 
                 enum CodingKeys: String, CodingKey {
-                    case id
-                    case translation = "translation"
-                    case rotation = "rotation"
-                }
-                
-                struct vector3: Decodable {
-                    let x: Float
-                    let y: Float
-                    let z: Float
-                    
-                    enum CodingKeys: String, CodingKey {
-                        case x = "x"
-                        case y = "y"
-                        case z = "z"
-                    }
-                }
-                
-                struct quaternion:Decodable {
-                    let x: Float
-                    let y: Float
-                    let z: Float
-                    let w: Float
-                    
-                    
-                    enum CodingKeys: String, CodingKey {
-                        case x = "x"
-                        case y = "y"
-                        case z = "z"
-                        case w = "w"
-                    }
+                    case x = "x"
+                    case y = "y"
+                    case z = "z"
                 }
             }
-        
-            struct Vertex: Decodable {
-                let id: Int
-                let translation: vector3
-                var rotation: quaternion
+            
+            struct quaternion:Decodable {
+                let x: Float
+                let y: Float
+                let z: Float
+                let w: Float
+                
                 
                 enum CodingKeys: String, CodingKey {
-                    case id
-                    case translation = "translation"
-                    case rotation = "rotation"
+                    case x = "x"
+                    case y = "y"
+                    case z = "z"
+                    case w = "w"
                 }
-                
-                struct vector3: Decodable {
-                    let x: Float
-                    let y: Float
-                    let z: Float
-                    
-                    enum CodingKeys: String, CodingKey {
-                        case x = "x"
-                        case y = "y"
-                        case z = "z"
-                    }
-                }
-                
-                struct quaternion:Decodable {
-                    var x: Float
-                    var y: Float
-                    var z: Float
-                    var w: Float
-                    
-                    
-                    enum CodingKeys: String, CodingKey {
-                        case x = "x"
-                        case y = "y"
-                        case z = "z"
-                        case w = "w"
-                    }
-                }
-                
             }
+        }
+        
+        struct Vertex: Decodable {
+            let id: Int
+            let translation: vector3
+            var rotation: quaternion
+            
+            enum CodingKeys: String, CodingKey {
+                case id
+                case translation = "translation"
+                case rotation = "rotation"
+            }
+            
+            struct vector3: Decodable {
+                let x: Float
+                let y: Float
+                let z: Float
+                
+                enum CodingKeys: String, CodingKey {
+                    case x = "x"
+                    case y = "y"
+                    case z = "z"
+                }
+            }
+            
+            struct quaternion:Decodable {
+                var x: Float
+                var y: Float
+                var z: Float
+                var w: Float
+                
+                
+                enum CodingKeys: String, CodingKey {
+                    case x = "x"
+                    case y = "y"
+                    case z = "z"
+                    case w = "w"
+                }
+            }
+            
+        }
         
         
-            struct OdomVertex: Decodable {
-                let poseId: Int
-                let translation: vector3
-                var rotation: quaternion
-                var neighbors: [Int] = []
+        struct OdomVertex: Decodable {
+            let poseId: Int
+            let translation: vector3
+            var rotation: quaternion
+            var neighbors: [Int] = []
 
+            
+            enum CodingKeys: String, CodingKey {
+                case poseId
+                case translation = "translation"
+                case rotation = "rotation"
+                case neighbors = "neighbors"
+            }
+            
+            struct vector3: Decodable {
+                let x: Float
+                let y: Float
+                let z: Float
                 
                 enum CodingKeys: String, CodingKey {
-                    case poseId
-                    case translation = "translation"
-                    case rotation = "rotation"
-                    case neighbors = "neighbors"
+                    case x = "x"
+                    case y = "y"
+                    case z = "z"
                 }
-                
-                struct vector3: Decodable {
-                    let x: Float
-                    let y: Float
-                    let z: Float
-                    
-                    enum CodingKeys: String, CodingKey {
-                        case x = "x"
-                        case y = "y"
-                        case z = "z"
-                    }
-                }
-                
-                struct quaternion:Decodable {
-                    var x: Float
-                    var y: Float
-                    var z: Float
-                    var w: Float
-                    
-                    
-                    enum CodingKeys: String, CodingKey {
-                        case x = "x"
-                        case y = "y"
-                        case z = "z"
-                        case w = "w"
-                    }
-                }
-                
             }
+            
+            struct quaternion:Decodable {
+                var x: Float
+                var y: Float
+                var z: Float
+                var w: Float
+                
+                
+                enum CodingKeys: String, CodingKey {
+                    case x = "x"
+                    case y = "y"
+                    case z = "z"
+                    case w = "w"
+                }
+            }
+            
+        }
     }
     
     

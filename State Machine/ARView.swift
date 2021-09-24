@@ -9,22 +9,38 @@ import Foundation
 import ARKit
 import SwiftUI
 
-// ARViewIndicator
-struct ARViewIndicator: UIViewControllerRepresentable {
-   typealias UIViewControllerType = ARView
-   
-   func makeUIViewController(context: Context) -> ARView {
-      return ARView()
-   }
-   func updateUIViewController(_ uiViewController:
-   ARViewIndicator.UIViewControllerType, context:
-   UIViewControllerRepresentableContext<ARViewIndicator>) { }
+
+protocol ARViewController {
+    // Commands that interact with the ARView
+    var supportsLidar: Bool { get }
+    func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
+    func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4?
+    func pinLocation(locationName: String)
+    func resetArSession()
 }
+
+//TODO: Check if this is needed
+// ARViewIndicator
+//struct ARViewIndicator: UIViewControllerRepresentable {
+//   typealias UIViewControllerType = ARView
+//
+//   func makeUIViewController(context: Context) -> ARView {
+//      return ARView()
+//   }
+//   func updateUIViewController(_ uiViewController:
+//   ARViewIndicator.UIViewControllerType, context:
+//   UIViewControllerRepresentableContext<ARViewIndicator>) { }
+//}
 
 class ARView: UIViewController {
     var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
     let memoryChecker : MemoryChecker = MemoryChecker()
     let configuration = ARWorldTrackingConfiguration()
+    #if IS_MAP_CREATOR
+        let sharedController = InvisibleMapCreatorController.shared
+    #else
+        let sharedController = InvisibleMapController.shared
+    #endif
     
     // Create an AR view
     var arView: ARSCNView {
@@ -40,7 +56,7 @@ class ARView: UIViewController {
         super.viewDidLoad()
         arView.session.delegate = self
         arView.scene = SCNScene()
-        InvisibleMapCreatorController.shared.arViewer = self
+        sharedController.arViewer = self
         configuration.planeDetection = [.horizontal, .vertical]
         //if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
         //    configuration.sceneReconstruction = .mesh
@@ -70,7 +86,7 @@ extension ARView: ARSessionDelegate {
     }
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        InvisibleMapCreatorController.shared.process(event: .NewARFrame(cameraFrame: frame))
+        sharedController.process(event: .NewARFrame(cameraFrame: frame))
         self.memoryChecker.printRemainingMemory()
         if(self.memoryChecker.getRemainingMemory() < 500) {
             arView.session.pause()
@@ -228,7 +244,9 @@ extension ARView: ARViewController {
             self.arView.scene.rootNode.addChildNode(textNode)
             
             let snapshot = self.arView.snapshot()
-            InvisibleMapCreatorController.shared.cacheLocationRequested(node: boxNode, picture: snapshot, textNode: textNode)
+            #if IS_MAP_CREATOR
+            self.sharedController.cacheLocationRequested(node: boxNode, picture: snapshot, textNode: textNode)
+            #endif
         }
     }
     

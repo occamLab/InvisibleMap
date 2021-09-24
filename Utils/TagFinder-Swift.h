@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <stdint.h>
-#import "../InvisibleMapCreator2/Utils/MemoryChecker.h"
+#import "../Utils/MemoryChecker.h"
 
 @interface imageToData : NSObject
 

@@ -72,15 +72,6 @@ protocol MapRecorderController {
     func clearData()
 }
 
-protocol ARViewController {
-    // Commands that interact with the ARView
-    var supportsLidar: Bool { get }
-    func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
-    func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4?
-    func pinLocation(locationName: String)
-    func resetArSession()
-}
-
 protocol RecordViewController {
     // Commands that impact the record map UI
     func updateInstructionText()

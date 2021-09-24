@@ -12,6 +12,8 @@ class InvisibleMapController: AppController {
     public static var shared = InvisibleMapController()
     private var state = AppState.initialState
     
+    public var arViewer: ARView?
+    
     func process(commands: [AppState.Command]) {
         for command in commands {
             switch command {
