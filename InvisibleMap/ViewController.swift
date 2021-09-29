@@ -254,7 +254,7 @@ class ViewController: UIViewController {
     
     
     
-    // Gets the poseID of the node closest to the current camera position that is not the desired endpoint
+    /// Gets the poseID of the node closest to the current camera position that is not the desired endpoint
     func getClosestGraphNode(to location: simd_float3? = nil, ignoring endpoint: Int? = nil) -> Int?{
         var coordinates = location
         // get user's phone location

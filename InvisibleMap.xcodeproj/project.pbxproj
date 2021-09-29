@@ -57,6 +57,8 @@
 		1FE9718C26FE63C600DEB00A /* ImageConversion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4521133939007343B4 /* ImageConversion.mm */; };
 		1FE9718D26FE63C900DEB00A /* ImageDisplay.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4721133939007343B4 /* ImageDisplay.mm */; };
 		1FE9718E26FE63CB00DEB00A /* TagFinder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4C2113394B007343B4 /* TagFinder.mm */; };
+		1FE971902703AC9600DEB00A /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9718F2703AC9600DEB00A /* Map.swift */; };
+		1FE971922704D8AE00DEB00A /* SwiftGraph in Frameworks */ = {isa = PBXBuildFile; productRef = 1FE971912704D8AE00DEB00A /* SwiftGraph */; };
 		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
 		822FA78624E2FB3E0001F463 /* AprilTagTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */; };
 		82A8259F24B3854000AFC390 /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
@@ -120,6 +122,7 @@
 		1FE9717726FB89DB00DEB00A /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		1FE9717C26FB8B2D00DEB00A /* InvisibleMapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapController.swift; sourceTree = "<group>"; };
 		1FE9718126FE50E400DEB00A /* MapNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapNavigator.swift; sourceTree = "<group>"; };
+		1FE9718F2703AC9600DEB00A /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		822FA78224E2F9750001F463 /* DebugHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugHelpers.swift; sourceTree = "<group>"; };
 		822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AprilTagTracker.swift; sourceTree = "<group>"; };
 		82A8259E24B3854000AFC390 /* simd+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "simd+ext.swift"; sourceTree = "<group>"; };
@@ -171,6 +174,7 @@
 			files = (
 				1FE9718A26FE62F000DEB00A /* opencv2.framework in Frameworks */,
 				1FE9718826FE62E900DEB00A /* visp3.framework in Frameworks */,
+				1FE971922704D8AE00DEB00A /* SwiftGraph in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -327,6 +331,7 @@
 			isa = PBXGroup;
 			children = (
 				1FE9718126FE50E400DEB00A /* MapNavigator.swift */,
+				1FE9718F2703AC9600DEB00A /* Map.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -434,6 +439,9 @@
 			dependencies = (
 			);
 			name = InvisibleMap2;
+			packageProductDependencies = (
+				1FE971912704D8AE00DEB00A /* SwiftGraph */,
+			);
 			productName = InvisibleMap2;
 			productReference = 1F77A35F26F2493A0044BE18 /* InvisibleMap2.app */;
 			productType = "com.apple.product-type.application";
@@ -589,6 +597,7 @@
 				1FE9718426FE614B00DEB00A /* ImageDisplay.mm in Sources */,
 				1FE9718726FE616000DEB00A /* simd+ext.swift in Sources */,
 				1FE9717626FB88BE00DEB00A /* StateType.swift in Sources */,
+				1FE971902703AC9600DEB00A /* Map.swift in Sources */,
 				1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */,
 				1FE9717D26FB8B2D00DEB00A /* InvisibleMapController.swift in Sources */,
 				1FE9718226FE50E400DEB00A /* MapNavigator.swift in Sources */,
@@ -1004,6 +1013,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1FE971912704D8AE00DEB00A /* SwiftGraph */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9860ED6826B4532400C1EC55 /* XCRemoteSwiftPackageReference "SwiftGraph" */;
+			productName = SwiftGraph;
+		};
 		984C21CF26B44F4D006EEF4F /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
