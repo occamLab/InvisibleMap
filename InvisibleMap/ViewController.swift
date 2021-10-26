@@ -399,44 +399,44 @@ class ViewController: UIViewController {
     func scheduledLocalizationTimer() {
         tagFinderTimer.invalidate()
         tagFinderTimer = Timer()
-        tagFinderTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.updateLandmarks), userInfo: nil, repeats: true)
+        tagFinderTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.updateTags), userInfo: nil, repeats: true)
     }
     
     func scheduledPingTimer() {
-        self.pingTimer.invalidate()
-        self.pingTimer = Timer()
-        self.pingTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.ping), userInfo: nil, repeats: true)
-    }
-    
-    @objc func ping() {
-        if !self.firstTagFound {
-            return
-        }
-        self.playSound(type: "ping")
-        let volume = self.audioPlayers["ping"]!!.volume
-        // Audio volume was set to a cubic scale, revert back to linear
-        let hapticScale = pow(volume, 1.0 / 3.0)
-        if hapticScale > 0.75 {
-            self.hapticGenerator = UIImpactFeedbackGenerator(style: .heavy)
-        } else if hapticScale > 0.5 {
-            self.hapticGenerator = UIImpactFeedbackGenerator(style: .medium)
-        } else if hapticScale > 0.25 {
-            self.hapticGenerator = UIImpactFeedbackGenerator(style: .light)
-        } else {
-            self.hapticGenerator = nil
-        }
-        self.hapticGenerator?.impactOccurred()
-    }
-    @objc func playSound(type: String) {
-        do {
-            try AVAudioSession.sharedInstance().setCategory("AVAudioSessionCategoryPlayback")
-            try AVAudioSession.sharedInstance().setActive(true)
-            guard let player = self.audioPlayers[type]! else { return }
-            player.play()
-        } catch let error {
-            print(error.localizedDescription)
-        }
-    }
+         self.pingTimer.invalidate()
+         self.pingTimer = Timer()
+         self.pingTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.ping), userInfo: nil, repeats: true)
+     }
+     
+     @objc func ping() {
+         if !self.firstTagFound {
+             return
+         }
+         self.playSound(type: "ping")
+         let volume = self.audioPlayers["ping"]!!.volume
+         // Audio volume was set to a cubic scale, revert back to linear
+         let hapticScale = pow(volume, 1.0 / 3.0)
+         if hapticScale > 0.75 {
+             self.hapticGenerator = UIImpactFeedbackGenerator(style: .heavy)
+         } else if hapticScale > 0.5 {
+             self.hapticGenerator = UIImpactFeedbackGenerator(style: .medium)
+         } else if hapticScale > 0.25 {
+             self.hapticGenerator = UIImpactFeedbackGenerator(style: .light)
+         } else {
+             self.hapticGenerator = nil
+         }
+         self.hapticGenerator?.impactOccurred()
+     }
+     @objc func playSound(type: String) {
+         do {
+             try AVAudioSession.sharedInstance().setCategory(AVAudioSession.C)
+             try AVAudioSession.sharedInstance().setActive(true)
+             guard let player = self.audioPlayers[type]! else { return }
+             player.play()
+         } catch let error {
+             print(error.localizedDescription)
+         }
+     }
     
     
     /// Starts and stops the live detection of april tags.
@@ -561,7 +561,7 @@ class ViewController: UIViewController {
             }
             /// Add or update the tags that are detected
             for i in 0...tagArray.count-1 {
-                addTagDetectionNode(sceneView: sceneView, snapTagsToVertical: snapTagsToVertical, doKalman: false, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
+                addTagDetectionNode(detectionNodes: sceneView.scene.rootNode, snapTagsToVertical: snapTagsToVertical, doKalman: false, aprilTagDetectionDictionary: &aprilTagDetectionDictionary, tag: tagArray[i], cameraTransform: cameraTransform)
                 /// Update the root to map transform if the tag detected is in the map
                 if let tagVertex = tagDictionary[Int(tagArray[i].number)], let originShift = updateRootToMap(vertex: tagVertex) {
                     lastAppliedOriginShift = originShift

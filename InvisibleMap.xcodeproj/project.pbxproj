@@ -33,6 +33,12 @@
 		14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FE9262713EC00A7C78B /* RecordMapView.swift */; };
 		14E164732633523B0087A426 /* EditMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E164722633523B0087A426 /* EditMapView.swift */; };
 		14F15C94263954F2008DB04C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
+		1F131D72271F5FCC00568FEC /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F131D71271F5FCC00568FEC /* FirebaseManager.swift */; };
+		1F131D73271F5FCC00568FEC /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F131D71271F5FCC00568FEC /* FirebaseManager.swift */; };
+		1F131D75271F607A00568FEC /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 1F131D74271F607A00568FEC /* FirebaseDatabase */; };
+		1F131D77271F608100568FEC /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 1F131D76271F608100568FEC /* FirebaseStorage */; };
+		1F131D79271F60B000568FEC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 1F131D78271F60B000568FEC /* FirebaseAnalytics */; };
+		1F131D7B271F60B500568FEC /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1F131D7A271F60B500568FEC /* FirebaseAuth */; };
 		1F4C30C626A1D70C008CBE3C /* RecordTagButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4C30C526A1D70C008CBE3C /* RecordTagButton.swift */; };
 		1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F64364E269DDD08007BD526 /* MemoryChecker.m */; };
 		1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A36126F2493A0044BE18 /* InvisibleMap2App.swift */; };
@@ -59,6 +65,7 @@
 		1FE9718E26FE63CB00DEB00A /* TagFinder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4C2113394B007343B4 /* TagFinder.mm */; };
 		1FE971902703AC9600DEB00A /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9718F2703AC9600DEB00A /* Map.swift */; };
 		1FE971922704D8AE00DEB00A /* SwiftGraph in Frameworks */ = {isa = PBXBuildFile; productRef = 1FE971912704D8AE00DEB00A /* SwiftGraph */; };
+		1FE97193271619F200DEB00A /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9718F2703AC9600DEB00A /* Map.swift */; };
 		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
 		822FA78624E2FB3E0001F463 /* AprilTagTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */; };
 		82A8259F24B3854000AFC390 /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
@@ -108,6 +115,7 @@
 		14995FD626269B0900A7C78B /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
 		14E164722633523B0087A426 /* EditMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMapView.swift; sourceTree = "<group>"; };
+		1F131D71271F5FCC00568FEC /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 		1F32376526AEF09D008B9A11 /* InvisibleMapCreator2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMapCreator2.entitlements; sourceTree = "<group>"; };
 		1F4C30C526A1D70C008CBE3C /* RecordTagButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordTagButton.swift; sourceTree = "<group>"; };
 		1F64364E269DDD08007BD526 /* MemoryChecker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MemoryChecker.m; sourceTree = "<group>"; };
@@ -174,6 +182,10 @@
 			files = (
 				1FE9718A26FE62F000DEB00A /* opencv2.framework in Frameworks */,
 				1FE9718826FE62E900DEB00A /* visp3.framework in Frameworks */,
+				1F131D79271F60B000568FEC /* FirebaseAnalytics in Frameworks */,
+				1F131D75271F607A00568FEC /* FirebaseDatabase in Frameworks */,
+				1F131D77271F608100568FEC /* FirebaseStorage in Frameworks */,
+				1F131D7B271F60B500568FEC /* FirebaseAuth in Frameworks */,
 				1FE971922704D8AE00DEB00A /* SwiftGraph in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -273,6 +285,7 @@
 		1F64364A269DD75B007BD526 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				1FE9718F2703AC9600DEB00A /* Map.swift */,
 				868CBA4D2113394B007343B4 /* TagFinder-Swift.h */,
 				868CBA4B2113394B007343B4 /* TagFinder.h */,
 				868CBA4C2113394B007343B4 /* TagFinder.mm */,
@@ -282,6 +295,7 @@
 				868CBA4521133939007343B4 /* ImageConversion.mm */,
 				1F64364E269DDD08007BD526 /* MemoryChecker.m */,
 				1F643651269DDD92007BD526 /* MemoryChecker.h */,
+				1F131D71271F5FCC00568FEC /* FirebaseManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -331,7 +345,6 @@
 			isa = PBXGroup;
 			children = (
 				1FE9718126FE50E400DEB00A /* MapNavigator.swift */,
-				1FE9718F2703AC9600DEB00A /* Map.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -441,6 +454,10 @@
 			name = InvisibleMap2;
 			packageProductDependencies = (
 				1FE971912704D8AE00DEB00A /* SwiftGraph */,
+				1F131D74271F607A00568FEC /* FirebaseDatabase */,
+				1F131D76271F608100568FEC /* FirebaseStorage */,
+				1F131D78271F60B000568FEC /* FirebaseAnalytics */,
+				1F131D7A271F60B500568FEC /* FirebaseAuth */,
 			);
 			productName = InvisibleMap2;
 			productReference = 1F77A35F26F2493A0044BE18 /* InvisibleMap2.app */;
@@ -563,6 +580,7 @@
 				98BF26A026AF4F9E0076427E /* AppleSignInController.swift in Sources */,
 				1447B706262421CC00230A58 /* InvisibleMapCreator2App.swift in Sources */,
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
+				1F131D72271F5FCC00568FEC /* FirebaseManager.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
 				141497E62645A41700BF0ABC /* InstructionOverlay.swift in Sources */,
@@ -570,6 +588,7 @@
 				14995FB6262639E400A7C78B /* TagFinder.mm in Sources */,
 				1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */,
 				1FE9717A26FB8AFB00DEB00A /* AppController.swift in Sources */,
+				1FE97193271619F200DEB00A /* Map.swift in Sources */,
 				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
 				143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */,
 				141FF9C226499FCE00845059 /* ManageLocationsView.swift in Sources */,
@@ -592,6 +611,7 @@
 				1FE9717B26FB8AFC00DEB00A /* AppController.swift in Sources */,
 				1FE9717F26FBA29E00DEB00A /* ARView.swift in Sources */,
 				1FE9718B26FE635D00DEB00A /* MemoryChecker.m in Sources */,
+				1F131D73271F5FCC00568FEC /* FirebaseManager.swift in Sources */,
 				1FE9718626FE615600DEB00A /* AprilTagTracker.swift in Sources */,
 				1FE9718526FE614F00DEB00A /* ImageConversion.mm in Sources */,
 				1FE9718426FE614B00DEB00A /* ImageDisplay.mm in Sources */,
@@ -1013,6 +1033,26 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1F131D74271F607A00568FEC /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		1F131D76271F608100568FEC /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		1F131D78271F60B000568FEC /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		1F131D7A271F60B500568FEC /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
 		1FE971912704D8AE00DEB00A /* SwiftGraph */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9860ED6826B4532400C1EC55 /* XCRemoteSwiftPackageReference "SwiftGraph" */;

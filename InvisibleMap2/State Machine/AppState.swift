@@ -2,7 +2,7 @@
 //  AppState.swift
 //  InvisibleMap2
 //
-//  Created by Ben Morris on 9/15/21.
+//  Created by Allison Li and Ben Morris on 9/15/21.
 //  Copyright © 2021 Occam Lab. All rights reserved.
 //
 
@@ -33,6 +33,7 @@ enum AppState: StateType {
         case ViewPathRequested
         case DismissPathRequested
         case LeaveMapRequested
+        case PlanPath
     }
     
     // All the effectful outputs which the state desires to have performed on the app
@@ -44,6 +45,7 @@ enum AppState: StateType {
         case EditMap
         case FinishedNavigation
         case LeaveMap
+        case PlanPath
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
@@ -70,9 +72,8 @@ enum AppState: StateType {
             case (.SelectPath, .DismissPathRequested):
                 self = .NavigateMap
                 return []
-            case (.NavigateMap, .EditMapRequested):
-                self = .EditMap
-                return []
+            case (.NavigateMap, .PlanPath):
+                return [.PlanPath]
             case (.EditMap, .CancelEditRequested):
                 self = .NavigateMap
                 return []

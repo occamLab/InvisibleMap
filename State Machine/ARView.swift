@@ -1,14 +1,16 @@
 //
 //  ARView.swift
-//  InvisibleMapCreator
 //
 //  Created by Marion Madanguit on 3/19/21.
 //
 
 import Foundation
 import ARKit
+import GLKit
 import SwiftUI
-
+import AVFoundation
+import AudioToolbox
+import MediaPlayer
 
 protocol ARViewController {
     // Commands that interact with the ARView
@@ -41,6 +43,30 @@ class ARView: UIViewController {
     #else
         let sharedController = InvisibleMapController.shared
     #endif
+    let recordInterval = 0.1
+    var lastRecordedTimestamp = -0.1
+    let distanceToAnnounceWaypoint: Float = 1.5
+    
+    var mapNode: SCNNode!
+    var detectionNode: SCNNode!
+    var cameraNode: SCNNode!
+    @IBOutlet var sceneView: ARSCNView!
+    let locationNodeName = "Locations"
+    let tagNodeName = "Tags"
+    let crumbNodeName = "Crumbs"
+    let edgeNodeName = "Edges"
+    
+    /// Speech synthesis objects (reuse these or memory will leak)
+    let synth = AVSpeechSynthesizer()
+    let voice = AVSpeechSynthesisVoice(language: "en-US")
+    var lastSpeechTime : [String:Date] = [:]
+    
+    // audio and haptic feedback
+    var audioPlayers: [String: AVAudioPlayer?] = [:]
+    var pingTimer = Timer()
+    var hapticGenerator : UIImpactFeedbackGenerator?
+    
+    var pathObjs: [SCNNode] = []
     
     // Create an AR view
     var arView: ARSCNView {
@@ -73,6 +99,7 @@ class ARView: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         arView.session.run(configuration)
+        sharedController.initialize()
     }
     override func viewWillDisappear(_ animated: Bool) {
        super.viewWillDisappear(animated)
@@ -86,7 +113,14 @@ extension ARView: ARSessionDelegate {
     }
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        sharedController.process(event: .NewARFrame(cameraFrame: frame))
+        #if IS_MAP_CREATOR
+            let processingFrame = self.sharedController.mapRecorder.processingFrame
+        #else
+            let processingFrame = self.sharedController.mapNavigator.processingFrame
+        #endif
+        if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame {
+            sharedController.process(event: .NewARFrame(cameraFrame: frame))
+        }
         self.memoryChecker.printRemainingMemory()
         if(self.memoryChecker.getRemainingMemory() < 500) {
             arView.session.pause()
@@ -106,6 +140,7 @@ extension ARView: ARSessionDelegate {
 }
 
 extension ARView: ARViewController {
+    
     /// Transforms the AprilTag position into world frame
     var supportsLidar: Bool {
         get {
@@ -163,7 +198,7 @@ extension ARView: ARViewController {
             aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar, doKalman: doKalman)
 
             let tagNode: SCNNode
-            if let existingTagNode = self.arView.scene.rootNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
+            if let existingTagNode = self.detectionNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
                 tagNode = existingTagNode
                 tagNode.simdPosition = aprilTagTracker.tagPosition
                 tagNode.simdOrientation = aprilTagTracker.tagOrientation
@@ -174,7 +209,7 @@ extension ARView: ARViewController {
                 tagNode.geometry = SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0)
                 tagNode.name = "Tag_\(String(tag.number))"
                 tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
-                self.arView.scene.rootNode.addChildNode(tagNode)
+                self.detectionNode.addChildNode(tagNode)
             }
 
             /// Adds axes to the tag to aid in the visualization
@@ -233,15 +268,14 @@ extension ARView: ARViewController {
             textNode.geometry = text
             textNode.name = locationName + "Text"
             let boxPosition = SCNVector3(0,0,0)
-            let textPosition = SCNVector3(0,0.1,0)
+            textNode.position = SCNVector3(0,0.1,0)
             
             self.updatePositionAndOrientationOf(boxNode, withPosition: boxPosition, relativeTo: cameraNode!)
-            self.updatePositionAndOrientationOf(textNode, withPosition: textPosition, relativeTo: boxNode)
             
             textNode.scale = SCNVector3(0.005,0.005,0.005)
             
-            self.arView.scene.rootNode.addChildNode(boxNode)
-            self.arView.scene.rootNode.addChildNode(textNode)
+            self.mapNode.childNode(withName: locationName, recursively: false)!.addChildNode(boxNode)
+            boxNode.addChildNode(textNode)
             
             let snapshot = self.arView.snapshot()
             #if IS_MAP_CREATOR
@@ -268,4 +302,220 @@ extension ARView: ARViewController {
         arView.session.pause()
         arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction])
     }
+    
+    /// Initializes the map node, of which all of the tags and waypoints downloaded from firebase are children
+    func createMapNode() {
+        mapNode = SCNNode()
+        mapNode.position = SCNVector3(x: 0, y: 0, z: 0)
+        sceneView.scene.rootNode.addChildNode(mapNode)
+        for nodeName in [locationNodeName, tagNodeName, crumbNodeName, edgeNodeName] {
+            let node = SCNNode()
+            node.name = nodeName
+            node.position = SCNVector3(x: 0, y: 0, z: 0)
+            mapNode.addChildNode(node)
+        }
+        
+        detectionNode = SCNNode()
+        detectionNode.position = SCNVector3(x: 0, y: 0, z: 0)
+        sceneView.scene.rootNode.addChildNode(detectionNode)
+    }
+    
+    /// Initialize the ARSession
+    func startSession() {
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.planeDetection = [.horizontal, .vertical]
+        sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+    }
+    
+    // Setup audio elements
+    func setupPing() {
+        do {
+            try self.audioPlayers["startNav"] = AVAudioPlayer(contentsOf: URL(fileURLWithPath: "/System/Library/Audio/UISounds/tweet_sent.caf"))
+            try self.audioPlayers["arrived"] = AVAudioPlayer(contentsOf: URL(fileURLWithPath: "/System/Library/Audio/UISounds/New/Fanfare.caf"))
+            try self.audioPlayers["ping"] = AVAudioPlayer(contentsOf: URL(fileURLWithPath: "/System/Library/Audio/UISounds/Tock.caf"))
+            self.hapticGenerator = UIImpactFeedbackGenerator(style: .light)
+            self.hapticGenerator!.prepare()
+            for p in self.audioPlayers.values {
+                p!.prepareToPlay()
+            }
+            self.scheduledPingTimer()
+        }
+        catch let audioError {
+          print("Could not setup audio: \(audioError)")
+        }
+    }
+
+    /// Creates a node for a path edge between two vertices
+    func renderEdge(from firstVertex: RawMap.OdomVertex.vector3, to secondVertex: RawMap.OdomVertex.vector3, isPath: Bool) {
+        var pathObj: SCNNode?
+        let verticalOffset: Float = -0.6
+        
+        let x = (secondVertex.x + firstVertex.x) / 2
+        let y = (secondVertex.y + firstVertex.y) / 2
+        let z = (secondVertex.z + firstVertex.z) / 2
+        let xDist = secondVertex.x - firstVertex.x
+        let yDist = secondVertex.y - firstVertex.y
+        let zDist = secondVertex.z - firstVertex.z
+        let dist = sqrt(pow(xDist, 2) + pow(yDist, 2) + pow(zDist, 2))
+
+        /// SCNNode of the bar path
+        pathObj = SCNNode(geometry: SCNBox(width: CGFloat(dist), height: 0.06, length: 0.06, chamferRadius: 1))
+        pathObjs.append(pathObj!)
+
+        //configure node attributes
+        if !isPath {
+            let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
+            odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
+            odometryNode.simdPosition = simd_float3(firstVertex.x, firstVertex.y + verticalOffset, firstVertex.z)
+            mapNode.childNode(withName: crumbNodeName, recursively: false)!.addChildNode(odometryNode)
+            
+            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
+            pathObj!.opacity = CGFloat(1)
+        } else {
+            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.red
+            pathObj!.opacity = CGFloat(1)
+        }
+        
+        let xAxis = simd_normalize(simd_float3(xDist, yDist, zDist))
+        let yAxis: simd_float3
+        if xDist == 0 && zDist == 0 {
+            // this is the case where the path goes straight up and we can set yAxis more or less arbitrarily
+            yAxis = simd_float3(1, 0, 0)
+        } else if xDist == 0 {
+            // zDist must be non-zero, which means that for yAxis to be perpendicular to the xAxis and have a zero y-component, we must make yAxis equal to simd_float3(1, 0, 0)
+            yAxis = simd_float3(1, 0, 0)
+        } else if zDist == 0 {
+            // xDist must be non-zero, which means that for yAxis to be perpendicular to the xAxis and have a zero y-component, we must make yAxis equal to simd_float3(0, 0, 1)
+            yAxis = simd_float3(0, 0, 1)
+        } else {
+            // TODO: real math
+            let yAxisZComponent = sqrt(1 / (zDist*zDist/(xDist*xDist) + 1))
+            let yAxisXComponent = -zDist*yAxisZComponent/xDist
+            yAxis = simd_float3(yAxisXComponent, 0, yAxisZComponent)
+        }
+        let zAxis = simd_cross(xAxis, yAxis)
+        let pathTransform = simd_float4x4(columns: (simd_float4(xAxis, 0), simd_float4(yAxis, 0), simd_float4(zAxis, 0), simd_float4(x, y + verticalOffset, z, 1)))
+
+        pathObj!.simdTransform = pathTransform
+        
+        if isPath {
+            mapNode.childNode(withName: edgeNodeName, recursively: false)!.addChildNode(pathObj!)
+        }
+    }
+    
+    /// Renders graph used for path planning and initializes dictionary and graph used
+    func renderGraphPath(){
+        for vertex in self.sharedController.mapNavigator.map.rawData.odometryVertices {
+            for neighbor in vertex.neighbors{
+                // Only render path if it hasn't been rendered yet
+                if (neighbor < vertex.poseId){
+                    let neighborVertex = self.sharedController.mapNavigator.map.odometryDict![neighbor]!
+                    
+                    // Render edge
+                    self.renderEdge(from: vertex.translation, to: neighborVertex, isPath: false)
+                }
+            }
+        }
+    }
+    
+    
+    
+    /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
+    func announceNearbyWaypoints(){
+        let curr_pose = cameraNode.position
+        var potentialAnnouncements : [String:(String, Double)] = [:]
+        for waypointNode in self.mapNode.childNode(withName: locationNodeName, recursively: false)!.childNodes {
+            let nodeName = waypointNode.name!
+            let waypointName = String(nodeName[nodeName.index(nodeName.firstIndex(of: "_")!, offsetBy: 1)...])
+            let waypoint_pose = sceneView.scene.rootNode.convertPosition(waypointNode.position, from: mapNode)
+            let distanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2) + pow((waypoint_pose.z - curr_pose.z),2))
+            if distanceToCurrPose < self.distanceToAnnounceWaypoint, (lastSpeechTime[waypointName] ?? Date.distantPast).timeIntervalSinceNow < -5.0, !synth.isSpeaking {
+                let twoDimensionalDistanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2))
+                let announcement: String = waypointName + " is " + String(format: "%.1f", twoDimensionalDistanceToCurrPose) + " meters away."
+                potentialAnnouncements[waypointName] = (announcement, (lastSpeechTime[waypointName] ?? Date.distantPast).timeIntervalSinceNow)
+            }
+        }
+        // If multiple announcements are possible, pick the one that was least recently spoken
+        let leastRecentlyAnnounced = potentialAnnouncements.min { a, b in a.value.1 < b.value.1 }
+        if let leastRecentlyAnnounced = leastRecentlyAnnounced {
+            let utterance = AVSpeechUtterance(string: leastRecentlyAnnounced.value.0)
+            utterance.voice = voice
+            lastSpeechTime[leastRecentlyAnnounced.key] = Date()
+            synth.speak(utterance)
+        }
+    }
+    
+    func scheduledPingTimer() {
+         self.pingTimer.invalidate()
+         self.pingTimer = Timer()
+         self.pingTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.ping), userInfo: nil, repeats: true)
+     }
+     
+     @objc func ping() {
+         #if IS_MAP_CREATOR
+            return
+         #endif
+         if !self.sharedController.mapNavigator.map.firstTagFound {
+             return
+         }
+         self.playSound(type: "ping")
+         let volume = self.audioPlayers["ping"]!!.volume
+         // Audio volume was set to a cubic scale, revert back to linear
+         let hapticScale = pow(volume, 1.0 / 3.0)
+         if hapticScale > 0.75 {
+             self.hapticGenerator = UIImpactFeedbackGenerator(style: .heavy)
+         } else if hapticScale > 0.5 {
+             self.hapticGenerator = UIImpactFeedbackGenerator(style: .medium)
+         } else if hapticScale > 0.25 {
+             self.hapticGenerator = UIImpactFeedbackGenerator(style: .light)
+         } else {
+             self.hapticGenerator = nil
+         }
+         self.hapticGenerator?.impactOccurred()
+     }
+     @objc func playSound(type: String) {
+         do {
+             try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
+             try AVAudioSession.sharedInstance().setActive(true)
+             guard let player = self.audioPlayers[type]! else { return }
+             player.play()
+         } catch let error {
+             print(error.localizedDescription)
+         }
+     }
+    
+    /// Updates the root to map transform if a tag currently being detected exists in the map
+    ///
+    /// - Parameter vertex: the tag vertex from firebase corresponding to the tag currently being detected
+    func updateRootToMap(vertex: RawMap.Vertex)->simd_float4x4? {
+        let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
+        let tagNode = SCNNode(geometry: SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0))
+        // TODO: we need to be doing something with setWorldOrigin here so corrections are not applied multiple times (also of interest is to look at the discrepancies between the turquoise square and the black square.  The turquoise square seems to track the AR session adjustments in a way that the black one doesn't).
+        
+        tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
+        tagNode.transform = tagMatrix
+        mapNode.childNode(withName: tagNodeName, recursively: false)!.addChildNode(tagNode)
+        tagNode.name = String("Tag_\(vertex.id)")
+        return computeRootToMap(tagId: vertex.id)
+    }
+    
+    /// Computes and updates the root to map transform
+    ///
+    /// - Parameter tagId: the id number of an april tag as an integer
+    func computeRootToMap(tagId: Int)->simd_float4x4? {
+        if aprilTagDetectionDictionary[tagId] != nil {
+            let rootToTag = simd_float4x4(detectionNode.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
+            let mapToTag = simd_float4x4(mapNode.childNode(withName: tagNodeName, recursively: false)!.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
+            // the call to .alignY() flattens the transform so that it only rotates about the globoal y-axis (translation can happen along all dimensions)
+            let originTransform = (rootToTag*mapToTag.inverse).alignY()
+            mapNode.transform = SCNMatrix4(originTransform)
+            // TODO: there still seems to be a little ringing going on
+            sceneView.session.setWorldOrigin(relativeTransform: originTransform)
+            mapNode.geometry = SCNBox(width: 0.25, height: 0.25, length: 0.25, chamferRadius: 0)
+            mapNode.geometry?.firstMaterial?.diffuse.contents = UIColor.green
+            return originTransform
+        }
+        return nil
+    }
+
 }

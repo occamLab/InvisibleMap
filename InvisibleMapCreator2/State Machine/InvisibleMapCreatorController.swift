@@ -13,11 +13,13 @@ class InvisibleMapCreatorController: AppController {
     private var state = AppState.initialState
     
     // Various controllers for handling commands
-    var mapRecorder = MapRecorder() // Initialized in MapRecorder.swift
+    var mapRecorder = MapRecorder()
     var arViewer: ARViewController? // Initialized in ARView.swift
     var recordViewer: RecordViewController? // Initialized in RecordMapView.swift
     
     private init() {
+    }
+    func initialize() {
     }
 
     func process(commands: [AppState.Command]) {

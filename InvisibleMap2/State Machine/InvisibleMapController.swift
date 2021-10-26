@@ -7,18 +7,24 @@
 //
 
 import Foundation
+import ARKit
 
 class InvisibleMapController: AppController {
     public static var shared = InvisibleMapController()
     private var state = AppState.initialState
     
     public var arViewer: ARView?
+    public var mapNavigator = MapNavigator()
+    
+    func initialize() {
+        InvisibleMapController.shared.arViewer?.startSession()
+        InvisibleMapController.shared.arViewer?.setupPing()
+        InvisibleMapController.shared.arViewer?.createMapNode()
+    }
     
     func process(commands: [AppState.Command]) {
         for command in commands {
-            switch command {
-                default: break;
-            }
+
         }
     }
     

@@ -105,27 +105,6 @@ class Map {
             }
         }
     }
-    
-    // Plans a path from the current location to the end and visualizes it in red
-    @objc func planPath(from startCoords: simd_float3, to endpointId: Int) -> [String]? {
-        if !self.firstTagFound {
-            return nil
-        }
-
-        let tagLocation = rawData.tagVertices.first(where: {$0.id == endpointId})!.translation
-        
-        let endpoint = getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
-        let startpoint = getClosestGraphNode(to: startCoords, ignoring: endpoint)
-
-        let (_, pathDict) = pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
-        print("startpoint:", startpoint!)
-        print("endpoint:", endpoint)
-        // find path from startpoint to endpointß
-        let path: [WeightedEdge<Float>] = pathDictToPath(from: pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
-        let stops: [String] = pathPlanningGraph!.edgesToVertices(edges: path)
-        
-        return stops
-    }
 }
 
 struct RawMap: Decodable {
