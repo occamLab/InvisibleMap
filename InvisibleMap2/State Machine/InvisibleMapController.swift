@@ -17,9 +17,8 @@ class InvisibleMapController: AppController {
     public var mapNavigator = MapNavigator()
     
     func initialize() {
-        InvisibleMapController.shared.arViewer?.startSession()
+        InvisibleMapController.shared.arViewer?.initialize()
         InvisibleMapController.shared.arViewer?.setupPing()
-        InvisibleMapController.shared.arViewer?.createMapNode()
     }
     
     func process(commands: [AppState.Command]) {

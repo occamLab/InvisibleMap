@@ -15,8 +15,6 @@ class MapRecorder: MapRecorderController, ObservableObject {
     var currentFrameTransform: simd_float4x4 = simd_float4x4.init()
     /// Tracks last recorded frame to set map image to
     var lastRecordedFrame: ARFrame?
-    /// Timestamp of frame that was last recorded
-    var lastRecordedTimestamp: Double?
     /// Time interval at which pose, tag, location, and node data is recorded
     let recordInterval = 0.5
     /// Allows you to asynchronously run a job on a background thread
@@ -63,40 +61,22 @@ class MapRecorder: MapRecorderController, ObservableObject {
     
     /// Record pose, tag, location, and node data after a specified period of time
     func recordData(cameraFrame: ARFrame) {
-        if lastRecordedTimestamp == nil {
-            lastRecordedTimestamp = cameraFrame.timestamp
-            lastRecordedFrame = cameraFrame
-            
-            recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
-            poseId += 1
-            
-            print("Running \(poseId)")
+        processingFrame = true
+        lastRecordedFrame = cameraFrame
+        
+        recordPoseData(cameraFrame: cameraFrame, timestamp: InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp, poseId: poseId)
+        recordTags(cameraFrame: cameraFrame, timestamp: InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp, poseId: poseId)
+        recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
+        poseId += 1
+        
+        if let pendingLocation = pendingLocation {
+            locationData.append(getLocationCoordinates(cameraFrame: cameraFrame, timestamp: InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp, poseId: poseId, location: pendingLocation))
+            InvisibleMapCreatorController.shared.updateLocationListRequested(node: pendingNode!.0, picture: pendingNode!.1, textNode: pendingNode!.2, poseId: poseId)
+            self.pendingLocation = nil
+            self.pendingNode = nil
         }
-        // Only record data if a specific period of time has passed and if a frame is not already being processed
-        else if lastRecordedTimestamp! + recordInterval < cameraFrame.timestamp && !processingFrame {
-            processingFrame = true
-            lastRecordedTimestamp = lastRecordedTimestamp! + recordInterval
-            lastRecordedFrame = cameraFrame
-            
-            recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
-            recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
-            poseId += 1
-            
-            if let pendingLocation = pendingLocation {
-                locationData.append(getLocationCoordinates(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId, location: pendingLocation))
-                InvisibleMapCreatorController.shared.updateLocationListRequested(node: pendingNode!.0, picture: pendingNode!.1, textNode: pendingNode!.2, poseId: poseId)
-                self.pendingLocation = nil
-                self.pendingNode = nil
-            }
-            print("Running \(poseId)")
-            processingFrame = false
-        }
-        else {
-            return
-        }
+        print("Running \(poseId)")
+        processingFrame = false
     }
     
     /// Add new planes and update existing planes
@@ -116,7 +96,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
     /// Upload pose data, last image frame to Firebase under "maps" and "unprocessed_maps" nodes
     func sendToFirebase(mapName: String) {
         let mapImage = convertToUIImage(cameraFrame: lastRecordedFrame!)
-        let mapId =  mapName + " " + String(lastRecordedTimestamp!).replacingOccurrences(of: ".", with: "")
+        let mapId =  mapName + " " + String(InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp).replacingOccurrences(of: ".", with: "")
         var planeDataList: [[String: Any]] = planeData.keys.map({planeData[$0]}) as! [[String: Any]]
         planeDataList.sort{
             ($0["id"] as! Int) < ($1["id"] as! Int)
@@ -171,7 +151,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
     
     /// Clear timestamp, pose, tag, and location data
     func clearData() {
-        lastRecordedTimestamp = nil
+        InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp = -1
         lastRecordedFrame = nil
         firstTagFound = false
         seesTag = false

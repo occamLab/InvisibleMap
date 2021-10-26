@@ -15,6 +15,8 @@ import MediaPlayer
 protocol ARViewController {
     // Commands that interact with the ARView
     var supportsLidar: Bool { get }
+    var lastRecordedTimestamp: Double { get set }
+    func initialize()
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
     func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4?
     func pinLocation(locationName: String)
@@ -50,7 +52,6 @@ class ARView: UIViewController {
     var mapNode: SCNNode!
     var detectionNode: SCNNode!
     var cameraNode: SCNNode!
-    @IBOutlet var sceneView: ARSCNView!
     let locationNodeName = "Locations"
     let tagNodeName = "Tags"
     let crumbNodeName = "Crumbs"
@@ -69,8 +70,13 @@ class ARView: UIViewController {
     var pathObjs: [SCNNode] = []
     
     // Create an AR view
-    var arView: ARSCNView {
-       return self.view as! ARSCNView
+    @IBOutlet var arView: ARSCNView! {
+        get {
+            return self.view as? ARSCNView
+        }
+        set(newView) {
+            self.view = newView
+        }
     }
     
     override func loadView() {
@@ -87,6 +93,7 @@ class ARView: UIViewController {
         //if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
         //    configuration.sceneReconstruction = .mesh
         //}
+        sharedController.initialize()
     }
     
     // Functions for standard AR view handling
@@ -99,7 +106,6 @@ class ARView: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         arView.session.run(configuration)
-        sharedController.initialize()
     }
     override func viewWillDisappear(_ animated: Bool) {
        super.viewWillDisappear(animated)
@@ -119,6 +125,7 @@ extension ARView: ARSessionDelegate {
             let processingFrame = self.sharedController.mapNavigator.processingFrame
         #endif
         if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame {
+            lastRecordedTimestamp = frame.timestamp
             sharedController.process(event: .NewARFrame(cameraFrame: frame))
         }
         self.memoryChecker.printRemainingMemory()
@@ -146,6 +153,11 @@ extension ARView: ARViewController {
         get {
             return ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
         }
+    }
+    
+    func initialize() {
+        self.startSession()
+        self.createMapNode()
     }
     
     func tagPoseToWorld(tagPose: simd_float4x4, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4 {
@@ -274,7 +286,7 @@ extension ARView: ARViewController {
             
             textNode.scale = SCNVector3(0.005,0.005,0.005)
             
-            self.mapNode.childNode(withName: locationName, recursively: false)!.addChildNode(boxNode)
+            self.mapNode.childNode(withName: self.locationNodeName, recursively: false)!.childNode(withName: locationName, recursively: false)!.addChildNode(boxNode)
             boxNode.addChildNode(textNode)
             
             let snapshot = self.arView.snapshot()
@@ -307,7 +319,7 @@ extension ARView: ARViewController {
     func createMapNode() {
         mapNode = SCNNode()
         mapNode.position = SCNVector3(x: 0, y: 0, z: 0)
-        sceneView.scene.rootNode.addChildNode(mapNode)
+        arView.scene.rootNode.addChildNode(mapNode)
         for nodeName in [locationNodeName, tagNodeName, crumbNodeName, edgeNodeName] {
             let node = SCNNode()
             node.name = nodeName
@@ -315,16 +327,21 @@ extension ARView: ARViewController {
             mapNode.addChildNode(node)
         }
         
+        self.createDetectionNode()
+    }
+    
+    /// Initializes the detection node, which all tag detections are children of
+    func createDetectionNode() {
         detectionNode = SCNNode()
         detectionNode.position = SCNVector3(x: 0, y: 0, z: 0)
-        sceneView.scene.rootNode.addChildNode(detectionNode)
+        arView.scene.rootNode.addChildNode(detectionNode)
     }
     
     /// Initialize the ARSession
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal, .vertical]
-        sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+        arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
     // Setup audio elements
@@ -405,17 +422,19 @@ extension ARView: ARViewController {
     
     /// Renders graph used for path planning and initializes dictionary and graph used
     func renderGraphPath(){
-        for vertex in self.sharedController.mapNavigator.map.rawData.odometryVertices {
-            for neighbor in vertex.neighbors{
-                // Only render path if it hasn't been rendered yet
-                if (neighbor < vertex.poseId){
-                    let neighborVertex = self.sharedController.mapNavigator.map.odometryDict![neighbor]!
-                    
-                    // Render edge
-                    self.renderEdge(from: vertex.translation, to: neighborVertex, isPath: false)
+        #if !IS_MAP_CREATOR
+            for vertex in self.sharedController.mapNavigator.map.rawData.odometryVertices {
+                for neighbor in vertex.neighbors{
+                    // Only render path if it hasn't been rendered yet
+                    if (neighbor < vertex.poseId){
+                        let neighborVertex = self.sharedController.mapNavigator.map.odometryDict![neighbor]!
+                        
+                        // Render edge
+                        self.renderEdge(from: vertex.translation, to: neighborVertex, isPath: false)
+                    }
                 }
             }
-        }
+        #endif
     }
     
     
@@ -427,7 +446,7 @@ extension ARView: ARViewController {
         for waypointNode in self.mapNode.childNode(withName: locationNodeName, recursively: false)!.childNodes {
             let nodeName = waypointNode.name!
             let waypointName = String(nodeName[nodeName.index(nodeName.firstIndex(of: "_")!, offsetBy: 1)...])
-            let waypoint_pose = sceneView.scene.rootNode.convertPosition(waypointNode.position, from: mapNode)
+            let waypoint_pose = arView.scene.rootNode.convertPosition(waypointNode.position, from: mapNode)
             let distanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2) + pow((waypoint_pose.z - curr_pose.z),2))
             if distanceToCurrPose < self.distanceToAnnounceWaypoint, (lastSpeechTime[waypointName] ?? Date.distantPast).timeIntervalSinceNow < -5.0, !synth.isSpeaking {
                 let twoDimensionalDistanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2))
@@ -454,10 +473,11 @@ extension ARView: ARViewController {
      @objc func ping() {
          #if IS_MAP_CREATOR
             return
-         #endif
-         if !self.sharedController.mapNavigator.map.firstTagFound {
-             return
-         }
+         #else
+             if !self.sharedController.mapNavigator.map.firstTagFound {
+                 return
+             }
+        #endif
          self.playSound(type: "ping")
          let volume = self.audioPlayers["ping"]!!.volume
          // Audio volume was set to a cubic scale, revert back to linear
@@ -510,7 +530,7 @@ extension ARView: ARViewController {
             let originTransform = (rootToTag*mapToTag.inverse).alignY()
             mapNode.transform = SCNMatrix4(originTransform)
             // TODO: there still seems to be a little ringing going on
-            sceneView.session.setWorldOrigin(relativeTransform: originTransform)
+            arView.session.setWorldOrigin(relativeTransform: originTransform)
             mapNode.geometry = SCNBox(width: 0.25, height: 0.25, length: 0.25, chamferRadius: 0)
             mapNode.geometry?.firstMaterial?.diffuse.contents = UIColor.green
             return originTransform

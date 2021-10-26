@@ -39,6 +39,7 @@
 		1F131D77271F608100568FEC /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 1F131D76271F608100568FEC /* FirebaseStorage */; };
 		1F131D79271F60B000568FEC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 1F131D78271F60B000568FEC /* FirebaseAnalytics */; };
 		1F131D7B271F60B500568FEC /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1F131D7A271F60B500568FEC /* FirebaseAuth */; };
+		1F131D7D27288FA400568FEC /* SwiftGraph in Frameworks */ = {isa = PBXBuildFile; productRef = 1F131D7C27288FA400568FEC /* SwiftGraph */; };
 		1F4C30C626A1D70C008CBE3C /* RecordTagButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4C30C526A1D70C008CBE3C /* RecordTagButton.swift */; };
 		1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F64364E269DDD08007BD526 /* MemoryChecker.m */; };
 		1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A36126F2493A0044BE18 /* InvisibleMap2App.swift */; };
@@ -167,6 +168,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F131D7D27288FA400568FEC /* SwiftGraph in Frameworks */,
 				984C21DC26B44F93006EEF4F /* FirebaseDatabase in Frameworks */,
 				14995FC826263BB700A7C78B /* opencv2.framework in Frameworks */,
 				984C21DA26B44F8C006EEF4F /* FirebaseAuth in Frameworks */,
@@ -434,6 +436,7 @@
 				984C21D926B44F8C006EEF4F /* FirebaseAuth */,
 				984C21DB26B44F93006EEF4F /* FirebaseDatabase */,
 				984C21DD26B44F99006EEF4F /* FirebaseStorage */,
+				1F131D7C27288FA400568FEC /* SwiftGraph */,
 			);
 			productName = InvisibleMapCreator2;
 			productReference = 1447B703262421CC00230A58 /* InvisibleMapCreator2.app */;
@@ -1052,6 +1055,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
+		};
+		1F131D7C27288FA400568FEC /* SwiftGraph */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9860ED6826B4532400C1EC55 /* XCRemoteSwiftPackageReference "SwiftGraph" */;
+			productName = SwiftGraph;
 		};
 		1FE971912704D8AE00DEB00A /* SwiftGraph */ = {
 			isa = XCSwiftPackageProductDependency;

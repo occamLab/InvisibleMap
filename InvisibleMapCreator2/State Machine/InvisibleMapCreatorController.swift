@@ -20,6 +20,7 @@ class InvisibleMapCreatorController: AppController {
     private init() {
     }
     func initialize() {
+        self.arViewer?.initialize()
     }
 
     func process(commands: [AppState.Command]) {
