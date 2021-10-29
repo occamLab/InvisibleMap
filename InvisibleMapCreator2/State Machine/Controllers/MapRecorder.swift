@@ -76,7 +76,6 @@ class MapRecorder: MapRecorderController, ObservableObject {
             self.pendingNode = nil
         }
         print("Running \(poseId)")
-        processingFrame = false
     }
     
     /// Add new planes and update existing planes
@@ -174,17 +173,20 @@ extension MapRecorder {
     /// Append new april tag data to list
     @objc func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         let uiimage = cameraFrame.convertToUIImage()
-        DispatchQueue.main.async {
+        aprilTagQueue.async {
             let arTags = self.getArTags(cameraFrame: cameraFrame, image: uiimage, timeStamp: timestamp, poseId: poseId)
-            self.seesTag = !arTags.isEmpty
-            if !self.firstTagFound && self.seesTag {
-                self.firstTagFound = true
-            }
-            if self.recordTag && self.seesTag {
-                self.tagData.append(arTags)
-            }
-            if !self.seesTag {
-                self.recordTag = false
+            DispatchQueue.main.async {
+                self.seesTag = !arTags.isEmpty
+                if !self.firstTagFound && self.seesTag {
+                    self.firstTagFound = true
+                }
+                if self.recordTag && self.seesTag {
+                    self.tagData.append(arTags)
+                }
+                if !self.seesTag {
+                    self.recordTag = false
+                }
+                self.processingFrame = false
             }
         }
     }

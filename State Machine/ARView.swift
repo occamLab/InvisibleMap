@@ -126,6 +126,7 @@ extension ARView: ARSessionDelegate {
         #endif
         if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame {
             lastRecordedTimestamp = frame.timestamp
+            print("Timestamp: \(frame.timestamp)")
             sharedController.process(event: .NewARFrame(cameraFrame: frame))
         }
         self.memoryChecker.printRemainingMemory()
@@ -286,7 +287,7 @@ extension ARView: ARViewController {
             
             textNode.scale = SCNVector3(0.005,0.005,0.005)
             
-            self.mapNode.childNode(withName: self.locationNodeName, recursively: false)!.childNode(withName: locationName, recursively: false)!.addChildNode(boxNode)
+            self.mapNode.childNode(withName: self.locationNodeName, recursively: false)!.addChildNode(boxNode)
             boxNode.addChildNode(textNode)
             
             let snapshot = self.arView.snapshot()
