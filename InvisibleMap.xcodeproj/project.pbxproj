@@ -47,6 +47,8 @@
 		1F77A36626F249480044BE18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F77A36526F249480044BE18 /* Assets.xcassets */; };
 		1F77A36926F249480044BE18 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F77A36826F249480044BE18 /* Preview Assets.xcassets */; };
 		1F77A37326F2522E0044BE18 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A37226F2522E0044BE18 /* AppState.swift */; };
+		1F83DB6A272C7AE800D0148F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB69272C7AE800D0148F /* Utils.swift */; };
+		1F83DB6B272C7AE800D0148F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB69272C7AE800D0148F /* Utils.swift */; };
 		1FE9717626FB88BE00DEB00A /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7562624230200230A58 /* StateType.swift */; };
 		1FE9717A26FB8AFB00DEB00A /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9717726FB89DB00DEB00A /* AppController.swift */; };
 		1FE9717B26FB8AFC00DEB00A /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9717726FB89DB00DEB00A /* AppController.swift */; };
@@ -128,6 +130,7 @@
 		1F77A36826F249480044BE18 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1F77A36A26F249480044BE18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1F77A37226F2522E0044BE18 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		1F83DB69272C7AE800D0148F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		1FE9717726FB89DB00DEB00A /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		1FE9717C26FB8B2D00DEB00A /* InvisibleMapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapController.swift; sourceTree = "<group>"; };
 		1FE9718126FE50E400DEB00A /* MapNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapNavigator.swift; sourceTree = "<group>"; };
@@ -298,6 +301,7 @@
 				1F64364E269DDD08007BD526 /* MemoryChecker.m */,
 				1F643651269DDD92007BD526 /* MemoryChecker.h */,
 				1F131D71271F5FCC00568FEC /* FirebaseManager.swift */,
+				1F83DB69272C7AE800D0148F /* Utils.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -582,6 +586,7 @@
 				14995FC026263B3100A7C78B /* simd+ext.swift in Sources */,
 				98BF26A026AF4F9E0076427E /* AppleSignInController.swift in Sources */,
 				1447B706262421CC00230A58 /* InvisibleMapCreator2App.swift in Sources */,
+				1F83DB6A272C7AE800D0148F /* Utils.swift in Sources */,
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				1F131D72271F5FCC00568FEC /* FirebaseManager.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
@@ -618,6 +623,7 @@
 				1FE9718626FE615600DEB00A /* AprilTagTracker.swift in Sources */,
 				1FE9718526FE614F00DEB00A /* ImageConversion.mm in Sources */,
 				1FE9718426FE614B00DEB00A /* ImageDisplay.mm in Sources */,
+				1F83DB6B272C7AE800D0148F /* Utils.swift in Sources */,
 				1FE9718726FE616000DEB00A /* simd+ext.swift in Sources */,
 				1FE9717626FB88BE00DEB00A /* StateType.swift in Sources */,
 				1FE971902703AC9600DEB00A /* Map.swift in Sources */,

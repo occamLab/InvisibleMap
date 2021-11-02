@@ -38,7 +38,7 @@ class Map {
     func storeTagsInDictionary() {
         for (tagId, vertex) in rawData.tagVertices.enumerated() {
             if snapTagsToVertical {
-                let tagPose = simd_float4x4(translation: simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z), rotation: simd_quatf(ix: vertex.rotation.x, iy: vertex.rotation.y, iz: vertex.rotation.z, r: vertex.rotation.w))
+                let tagPose = convertToSimd4x4(from: vertex)
                 
                 // Note that the process of leveling the tag doesn't change translation
                 let modifiedOrientation = simd_quatf(tagPose.makeZFlat().alignY())
@@ -104,6 +104,19 @@ class Map {
                 }
             }
         }
+    }
+    
+    /// Computes and updates the root to map transform
+    ///
+    /// - Parameter withUpdate: the position, orientation, and id of the detected tag
+    func computeRootToMap(fromTag tagId: Int, withPosition camToTag: simd_float4x4, relativeTo rootToCam: simd_float4x4 = matrix_identity_float4x4)->simd_float4x4? {
+        if aprilTagDetectionDictionary[tagId] != nil {
+            let rootToTag = rootToCam * camToTag
+            let mapToTag = convertToSimd4x4(from: self.tagDictionary[tagId]!)
+            // the call to .alignY() flattens the transform so that it only rotates about the globoal y-axis (translation can happen along all dimensions)
+            return (rootToTag*mapToTag.inverse).alignY()
+        }
+        return nil
     }
 }
 

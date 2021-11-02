@@ -17,7 +17,6 @@ class MapNavigator {
     var processingFrame = false
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.invisiblemap", qos: DispatchQoS.userInitiated)
     var pathPlanningTimer = Timer()
-    var tagFinderTimer = Timer()
     
     /// Finds and visualizes path to the endpoint on a timer
     func scheduledPathPlanningTimer() {
@@ -73,20 +72,32 @@ class MapNavigator {
             for i in 0...tagFinder.getNumberOfTags()-1 {
                 tagArray.append(tagFinder.getTagAt(i))
             }
-            
         }
         return tagArray;
     }
     
     /// Processes the pose, april tags, and nearby waypoints.
-    func updateTags(image: UIImage, cameraIntrinsics: simd_float3x3) {
+    func updateTags(from cameraFrame: ARFrame) {
+        // Convert ARFrame to a UIImage
+        let pixelBuffer = cameraFrame.capturedImage
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        let context = CIContext(options: nil)
+        let cgImage = context.createCGImage(ciImage, from: ciImage.extent)
+        let uiImage = UIImage(cgImage: cgImage!)
+        
         if processingFrame {
             return
         }
         processingFrame = true
         aprilTagQueue.async {
-            let _ = self.checkTagDetection(image: image, cameraIntrinsics: cameraIntrinsics)
+            let _ = self.checkTagDetection(image: uiImage, cameraIntrinsics: cameraFrame.camera.intrinsics)
             self.processingFrame = false
         }
+    }
+    
+    func resetMap() {
+        self.stopPathPlanning()
+        self.map = nil
+        
     }
 }

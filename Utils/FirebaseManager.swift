@@ -13,13 +13,10 @@ import FirebaseStorage
 
 class FirebaseManager {
     
-    var storageRef: StorageReference!
-    var mapFileName: String = ""
+    static var storageRef: StorageReference = Storage.storage().reference()
     
     /// Downloads the selected map from firebase
-    func createMap() -> Map {
-        let storage = Storage.storage()
-        storageRef = storage.reference()
+    static func createMap(from mapFileName: String) -> Map {
         let mapRef = storageRef.child(mapFileName)
         var map: Map?
         mapRef.getData(maxSize: 10 * 1024 * 1024) { mapData, error in

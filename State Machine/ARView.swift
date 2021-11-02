@@ -538,5 +538,8 @@ extension ARView: ARViewController {
         }
         return nil
     }
-
+    
+    func updateRootToMap(to rootToMap: simd_float4x4) {
+        self.mapNode.transform = SCNMatrix4(rootToMap)
+    }
 }
