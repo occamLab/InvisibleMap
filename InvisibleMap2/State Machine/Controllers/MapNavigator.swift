@@ -34,7 +34,7 @@ class MapNavigator {
     }
     
     /// Plans a path from the current location to the end and visualizes it in red
-    func planPath(from currentLocation: simd_float3) -> [String]? {
+    func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex.vector3]? {
         if !self.map.firstTagFound {
             return nil
         }
@@ -49,7 +49,8 @@ class MapNavigator {
         print("endpoint:", endpoint)
         // find path from startpoint to endpointß
         let path: [WeightedEdge<Float>] = pathDictToPath(from: self.map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: self.map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
-        return self.map.pathPlanningGraph!.edgesToVertices(edges: path)
+        let stops = self.map.pathPlanningGraph!.edgesToVertices(edges: path)
+        return stops.map({self.map.odometryDict![$0]!})
     }
     
     /// Check if tag is detected and update the tag and map transforms
@@ -57,7 +58,7 @@ class MapNavigator {
     /// - Parameters:
     ///   - rotatedImage: the camera frame rotated by 90 degrees to enable accurate tag detection
     ///   - timestamp: the timestamp of the current frame
-    func checkTagDetection(image: UIImage, cameraIntrinsics: simd_float3x3)->Array<AprilTags> {
+    func checkTagDetection(image: UIImage, cameraIntrinsics: simd_float3x3, cameraTransform: simd_float4x4)->Array<AprilTags> {
         let intrinsics = cameraIntrinsics.columns
         tagFinder.findTags(image, intrinsics.0.x, intrinsics.1.y, intrinsics.2.x, intrinsics.2.y)
         var tagArray: Array<AprilTags> = Array()
@@ -71,6 +72,7 @@ class MapNavigator {
             
             for i in 0...tagFinder.getNumberOfTags()-1 {
                 tagArray.append(tagFinder.getTagAt(i))
+                InvisibleMapController.shared.process(event: .TagFound(tag: tagArray[-1], cameraTransform: cameraTransform))
             }
         }
         return tagArray;
@@ -90,7 +92,7 @@ class MapNavigator {
         }
         processingFrame = true
         aprilTagQueue.async {
-            let _ = self.checkTagDetection(image: uiImage, cameraIntrinsics: cameraFrame.camera.intrinsics)
+            let _ = self.checkTagDetection(image: uiImage,cameraIntrinsics: cameraFrame.camera.intrinsics, cameraTransform: cameraFrame.camera.transform)
             self.processingFrame = false
         }
     }

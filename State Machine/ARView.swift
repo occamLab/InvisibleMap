@@ -421,6 +421,30 @@ extension ARView: ARViewController {
         }
     }
     
+    func renderEdges(fromList vertices: [RawMap.OdomVertex.vector3], isPath: Bool) {
+        for i in 0..vertices.count-2 {
+            self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
+        }
+        
+        if isPath {
+            /// Ping audio from a few nodes down to ensure direction
+            if stops.count < 3 {
+                #if !IS_MAP_CREATOR
+                InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
+                #endif
+            } else {
+                let audioSource = odometryDict![Int(stops[2])!]!
+                let directionToSource = vector2(self.cameraNode.position.x, self.cameraNode.position.z) - vector2(audioSource.x, audioSource.z)
+                var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(self.cameraNode.transform.m31, self.cameraNode.transform.m33))
+                volumeScale = acos(volumeScale) / Float.pi
+                volumeScale = 1 - volumeScale
+                volumeScale = pow(volumeScale, 3)
+                self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
+                print("Volume scale: \(volumeScale)")
+            }
+        }
+    }
+    
     /// Renders graph used for path planning and initializes dictionary and graph used
     func renderGraphPath(){
         #if !IS_MAP_CREATOR
@@ -504,40 +528,6 @@ extension ARView: ARViewController {
              print(error.localizedDescription)
          }
      }
-    
-    /// Updates the root to map transform if a tag currently being detected exists in the map
-    ///
-    /// - Parameter vertex: the tag vertex from firebase corresponding to the tag currently being detected
-    func updateRootToMap(vertex: RawMap.Vertex)->simd_float4x4? {
-        let tagMatrix = SCNMatrix4Translate(SCNMatrix4FromGLKMatrix4(GLKMatrix4MakeWithQuaternion(GLKQuaternionMake(vertex.rotation.x, vertex.rotation.y, vertex.rotation.z, vertex.rotation.w))), vertex.translation.x, vertex.translation.y, vertex.translation.z)
-        let tagNode = SCNNode(geometry: SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0))
-        // TODO: we need to be doing something with setWorldOrigin here so corrections are not applied multiple times (also of interest is to look at the discrepancies between the turquoise square and the black square.  The turquoise square seems to track the AR session adjustments in a way that the black one doesn't).
-        
-        tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
-        tagNode.transform = tagMatrix
-        mapNode.childNode(withName: tagNodeName, recursively: false)!.addChildNode(tagNode)
-        tagNode.name = String("Tag_\(vertex.id)")
-        return computeRootToMap(tagId: vertex.id)
-    }
-    
-    /// Computes and updates the root to map transform
-    ///
-    /// - Parameter tagId: the id number of an april tag as an integer
-    func computeRootToMap(tagId: Int)->simd_float4x4? {
-        if aprilTagDetectionDictionary[tagId] != nil {
-            let rootToTag = simd_float4x4(detectionNode.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
-            let mapToTag = simd_float4x4(mapNode.childNode(withName: tagNodeName, recursively: false)!.childNode(withName: "Tag_\(tagId)", recursively: false)!.transform)
-            // the call to .alignY() flattens the transform so that it only rotates about the globoal y-axis (translation can happen along all dimensions)
-            let originTransform = (rootToTag*mapToTag.inverse).alignY()
-            mapNode.transform = SCNMatrix4(originTransform)
-            // TODO: there still seems to be a little ringing going on
-            arView.session.setWorldOrigin(relativeTransform: originTransform)
-            mapNode.geometry = SCNBox(width: 0.25, height: 0.25, length: 0.25, chamferRadius: 0)
-            mapNode.geometry?.firstMaterial?.diffuse.contents = UIColor.green
-            return originTransform
-        }
-        return nil
-    }
     
     func updateRootToMap(to rootToMap: simd_float4x4) {
         self.mapNode.transform = SCNMatrix4(rootToMap)

@@ -29,6 +29,7 @@ class InvisibleMapController: AppController {
                 case .StartPath(let tagId):
                     self.mapNavigator.endpointTagId = tagId
                     self.mapNavigator.scheduledPathPlanningTimer()
+                    self.arViewer?.scheduledPingTimer()
                 case .UpdatePoseVIO(let cameraFrame):
                     self.mapNavigator.updateTags(from: cameraFrame)
                 case .UpdatePoseTag(let tag, let cameraTransform):
@@ -37,11 +38,13 @@ class InvisibleMapController: AppController {
                         self.arViewer?.updateRootToMap(to: rootToMap)
                     }
                 case .FinishedNavigation:
+                    self.arViewer?.playSound(type: "arrived")
                     self.mapNavigator.stopPathPlanning()
                 case .LeaveMap:
                     self.mapNavigator.resetMap()
                 case .PlanPath
-                    self.mapNavigator.planPath(from: self.arViewer!.cameraNode.transform)
+                    let stops = self.mapNavigator.planPath(from: self.arViewer!.cameraNode.transform)
+                    self.arViewer.renderEdges(fromList: stops, isPath: true)
                 
                 // TODO: Add functionality for these
                 case .GetNewWaypoint:
