@@ -29,6 +29,7 @@ class InvisibleMapController: AppController {
                 case .StartPath(let tagId):
                     self.mapNavigator.endpointTagId = tagId
                     self.mapNavigator.scheduledPathPlanningTimer()
+                    self.arViewer?.scheduledPingTimer()
                 case .UpdatePoseVIO(let cameraFrame):
                     self.mapNavigator.updateTags(from: cameraFrame)
                 case .UpdatePoseTag(let tag, let cameraTransform):

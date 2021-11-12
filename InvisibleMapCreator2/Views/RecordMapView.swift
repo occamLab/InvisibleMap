@@ -12,17 +12,6 @@ import ARKit
 import UIKit
 import FirebaseAuth
 
-// Stores the ARView
-struct NavigationIndicator: UIViewControllerRepresentable {
-   typealias UIViewControllerType = ARView
-    func makeUIViewController(context: Context) -> ARView {
-        return ARView()
-   }
-   func updateUIViewController(_ uiViewController:
-   NavigationIndicator.UIViewControllerType, context:
-   UIViewControllerRepresentableContext<NavigationIndicator>) { }
-}
-
 // Describes all the instructions that will exist on-screen for the user
 enum InstructionType: Equatable {
     case findTag(startTime: Double)
@@ -166,10 +155,7 @@ struct RecordMapView: View {
     
     var body : some View {
         ZStack {
-            NavigationIndicator().edgesIgnoringSafeArea(.all)
-                // Hides the default navigation bar so that we can replace it with custom exit and save buttons
-                // .navigationBarHidden(true)
-                .navigationBarBackButtonHidden(true)
+            BaseNavigationView()
                 // Toolbar buttons
                 .toolbar(content: {
                     ToolbarItem(placement: .navigationBarLeading) {

@@ -49,6 +49,10 @@
 		1F77A37326F2522E0044BE18 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A37226F2522E0044BE18 /* AppState.swift */; };
 		1F83DB6A272C7AE800D0148F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB69272C7AE800D0148F /* Utils.swift */; };
 		1F83DB6B272C7AE800D0148F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB69272C7AE800D0148F /* Utils.swift */; };
+		1F83DB70273EFC0C00D0148F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7412624229600230A58 /* ContentView.swift */; };
+		1F83DB72273F02C100D0148F /* BaseNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB71273F02C100D0148F /* BaseNavigationView.swift */; };
+		1F83DB73273F02C100D0148F /* BaseNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB71273F02C100D0148F /* BaseNavigationView.swift */; };
+		1F83DB75273F081300D0148F /* NavigateMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB74273F081300D0148F /* NavigateMapView.swift */; };
 		1FE9717626FB88BE00DEB00A /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7562624230200230A58 /* StateType.swift */; };
 		1FE9717A26FB8AFB00DEB00A /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9717726FB89DB00DEB00A /* AppController.swift */; };
 		1FE9717B26FB8AFC00DEB00A /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9717726FB89DB00DEB00A /* AppController.swift */; };
@@ -131,6 +135,8 @@
 		1F77A36A26F249480044BE18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1F77A37226F2522E0044BE18 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		1F83DB69272C7AE800D0148F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		1F83DB71273F02C100D0148F /* BaseNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseNavigationView.swift; sourceTree = "<group>"; };
+		1F83DB74273F081300D0148F /* NavigateMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigateMapView.swift; sourceTree = "<group>"; };
 		1FE9717726FB89DB00DEB00A /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		1FE9717C26FB8B2D00DEB00A /* InvisibleMapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapController.swift; sourceTree = "<group>"; };
 		1FE9718126FE50E400DEB00A /* MapNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapNavigator.swift; sourceTree = "<group>"; };
@@ -261,7 +267,6 @@
 		1447B7402624227E00230A58 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				1447B7412624229600230A58 /* ContentView.swift */,
 				14E164722633523B0087A426 /* EditMapView.swift */,
 				14995FE9262713EC00A7C78B /* RecordMapView.swift */,
 				1447B71F2624227600230A58 /* Record Map Subviews */,
@@ -290,6 +295,7 @@
 		1F64364A269DD75B007BD526 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				98BF269A26AF2E4F0076427E /* Authentication */,
 				1FE9718F2703AC9600DEB00A /* Map.swift */,
 				868CBA4D2113394B007343B4 /* TagFinder-Swift.h */,
 				868CBA4B2113394B007343B4 /* TagFinder.h */,
@@ -309,6 +315,7 @@
 		1F77A36026F2493A0044BE18 /* InvisibleMap2 */ = {
 			isa = PBXGroup;
 			children = (
+				1F83DB6C273EF8D800D0148F /* Views */,
 				1F77A36F26F251A90044BE18 /* State Machine */,
 				1F77A36126F2493A0044BE18 /* InvisibleMap2App.swift */,
 				1F77A36326F2493A0044BE18 /* ContentView.swift */,
@@ -337,6 +344,23 @@
 			path = "State Machine";
 			sourceTree = "<group>";
 		};
+		1F83DB6C273EF8D800D0148F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1F83DB74273F081300D0148F /* NavigateMapView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		1F83DB6F273EFBDA00D0148F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1447B7412624229600230A58 /* ContentView.swift */,
+				1F83DB71273F02C100D0148F /* BaseNavigationView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		1FE9717526FB881F00DEB00A /* State Machine */ = {
 			isa = PBXGroup;
 			children = (
@@ -358,9 +382,9 @@
 		86F39532210FA42500F209EC = {
 			isa = PBXGroup;
 			children = (
+				1F83DB6F273EFBDA00D0148F /* Views */,
 				1F64364A269DD75B007BD526 /* Utils */,
 				1FE9717526FB881F00DEB00A /* State Machine */,
-				98BF269A26AF2E4F0076427E /* Authentication */,
 				86F3953D210FA42500F209EC /* InvisibleMap */,
 				86F39552210FA42600F209EC /* InvisibleMapTests */,
 				1447B704262421CC00230A58 /* InvisibleMapCreator2 */,
@@ -589,6 +613,7 @@
 				1F83DB6A272C7AE800D0148F /* Utils.swift in Sources */,
 				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
 				1F131D72271F5FCC00568FEC /* FirebaseManager.swift in Sources */,
+				1F83DB72273F02C100D0148F /* BaseNavigationView.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
 				141497E62645A41700BF0ABC /* InstructionOverlay.swift in Sources */,
@@ -626,8 +651,11 @@
 				1F83DB6B272C7AE800D0148F /* Utils.swift in Sources */,
 				1FE9718726FE616000DEB00A /* simd+ext.swift in Sources */,
 				1FE9717626FB88BE00DEB00A /* StateType.swift in Sources */,
+				1F83DB75273F081300D0148F /* NavigateMapView.swift in Sources */,
 				1FE971902703AC9600DEB00A /* Map.swift in Sources */,
 				1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */,
+				1F83DB70273EFC0C00D0148F /* ContentView.swift in Sources */,
+				1F83DB73273F02C100D0148F /* BaseNavigationView.swift in Sources */,
 				1FE9717D26FB8B2D00DEB00A /* InvisibleMapController.swift in Sources */,
 				1FE9718226FE50E400DEB00A /* MapNavigator.swift in Sources */,
 				1F77A37326F2522E0044BE18 /* AppState.swift in Sources */,

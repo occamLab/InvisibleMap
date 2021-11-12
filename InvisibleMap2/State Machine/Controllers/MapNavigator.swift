@@ -98,6 +98,5 @@ class MapNavigator {
     func resetMap() {
         self.stopPathPlanning()
         self.map = nil
-        
     }
 }
