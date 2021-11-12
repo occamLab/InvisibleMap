@@ -421,6 +421,30 @@ extension ARView: ARViewController {
         }
     }
     
+    func renderEdges(fromList vertices: [RawMap.OdomVertex.vector3], isPath: Bool) {
+        for i in 0..vertices.count-2 {
+            self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
+        }
+        
+        if isPath {
+            /// Ping audio from a few nodes down to ensure direction
+            if stops.count < 3 {
+                #if !IS_MAP_CREATOR
+                InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
+                #endif
+            } else {
+                let audioSource = odometryDict![Int(stops[2])!]!
+                let directionToSource = vector2(self.cameraNode.position.x, self.cameraNode.position.z) - vector2(audioSource.x, audioSource.z)
+                var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(self.cameraNode.transform.m31, self.cameraNode.transform.m33))
+                volumeScale = acos(volumeScale) / Float.pi
+                volumeScale = 1 - volumeScale
+                volumeScale = pow(volumeScale, 3)
+                self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
+                print("Volume scale: \(volumeScale)")
+            }
+        }
+    }
+    
     /// Renders graph used for path planning and initializes dictionary and graph used
     func renderGraphPath(){
         #if !IS_MAP_CREATOR
