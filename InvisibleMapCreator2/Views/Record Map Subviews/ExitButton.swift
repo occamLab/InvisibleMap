@@ -8,18 +8,6 @@
 
 import SwiftUI
 
-// Defines a button style for all the rectangle buttons on the RecordMap screen (excluding the AddLocation button)
-struct RectangleButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .frame(width: 80, height: 40)
-            .background(
-                RoundedRectangle(cornerRadius: 15)
-                    .foregroundColor(Color(UIColor.systemBackground))
-                    .opacity(0.7))
-    }
-}
-
 struct ExitButton: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode> // Tracks whether the RecordMap screen is being presented
 

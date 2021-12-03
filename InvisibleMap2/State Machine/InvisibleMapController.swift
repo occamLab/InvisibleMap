@@ -33,7 +33,7 @@ class InvisibleMapController: AppController {
                 case .UpdatePoseVIO(let cameraFrame):
                     self.mapNavigator.updateTags(from: cameraFrame)
                 case .UpdatePoseTag(let tag, let cameraTransform):
-                    let rootToMap = self.mapNavigator.map.computeRootToMap(fromTag: tag.number, withPosition: tag.poseData, relativeTo: cameraTransform)
+                    let rootToMap = self.mapNavigator.map.computeRootToMap(fromTag: Int(tag.number), withPosition: simd_float4x4(tag.poseData), relativeTo: cameraTransform)
                     if let rootToMap = rootToMap {
                         self.arViewer?.updateRootToMap(to: rootToMap)
                     }
@@ -42,9 +42,11 @@ class InvisibleMapController: AppController {
                     self.mapNavigator.stopPathPlanning()
                 case .LeaveMap:
                     self.mapNavigator.resetMap()
-                case .PlanPath
-                    let stops = self.mapNavigator.planPath(from: self.arViewer!.cameraNode.transform)
-                    self.arViewer.renderEdges(fromList: stops, isPath: true)
+                case .PlanPath:
+                    let stops = self.mapNavigator.planPath(from: self.arViewer!.cameraNode.simdTransform.getTrans())
+                    if let stops = stops {
+                        self.arViewer!.renderEdges(fromList: stops, isPath: true)
+                    }
                 
                 // TODO: Add functionality for these
                 case .GetNewWaypoint:

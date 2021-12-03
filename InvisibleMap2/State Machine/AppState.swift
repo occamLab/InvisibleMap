@@ -9,7 +9,7 @@
 import Foundation
 import ARKit
 
-enum AppState: StateType {
+indirect enum AppState: StateType {
     // Higher level app states
     case MainScreen
     case NavigateMap
@@ -70,7 +70,7 @@ enum AppState: StateType {
                 self = .EditMap
                 return []
             case (.NavigateMap, .ViewPathRequested):
-                self = .SelectPath
+                self = .SelectPath(lastState: .NavigateMap)
                 return []
             case (.SelectPath, .PathSelected(let tagId)):
                 self = .NavigateMap

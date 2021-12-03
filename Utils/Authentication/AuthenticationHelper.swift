@@ -136,10 +136,6 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
       }
     
     func transitionToMainApp() {
-        #if !IS_MAP_CREATOR
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.transitionToMainApp()
-        #endif
     }
 
 }

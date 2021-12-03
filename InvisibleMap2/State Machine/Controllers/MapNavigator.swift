@@ -50,7 +50,7 @@ class MapNavigator {
         // find path from startpoint to endpointß
         let path: [WeightedEdge<Float>] = pathDictToPath(from: self.map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: self.map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
         let stops = self.map.pathPlanningGraph!.edgesToVertices(edges: path)
-        return stops.map({self.map.odometryDict![$0]!})
+        return stops.map({self.map.odometryDict![Int($0)!]!})
     }
     
     /// Check if tag is detected and update the tag and map transforms

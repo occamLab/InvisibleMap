@@ -180,7 +180,7 @@ extension ARView: ARViewController {
         DispatchQueue.main.async {
             let pose = tag.poseData
 
-            let originalTagPose = simd_float4x4(rows: [simd_float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), simd_float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), simd_float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), simd_float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+            let originalTagPose = simd_float4x4(pose)
             
             let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
             let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
@@ -245,7 +245,7 @@ extension ARView: ARViewController {
     func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4? {
         let pose = tag.poseData
 
-        let originalTagPose = simd_float4x4(rows: [simd_float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), simd_float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), simd_float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), simd_float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+        let originalTagPose = simd_float4x4(pose)
         
         let scenePose = tagPoseToWorld(tagPose: originalTagPose, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
         
@@ -422,18 +422,18 @@ extension ARView: ARViewController {
     }
     
     func renderEdges(fromList vertices: [RawMap.OdomVertex.vector3], isPath: Bool) {
-        for i in 0..vertices.count-2 {
+        for i in 0...vertices.count-2 {
             self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
         }
         
         if isPath {
             /// Ping audio from a few nodes down to ensure direction
-            if stops.count < 3 {
+            if vertices.count < 3 {
                 #if !IS_MAP_CREATOR
                 InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
                 #endif
             } else {
-                let audioSource = odometryDict![Int(stops[2])!]!
+                let audioSource = vertices[2]
                 let directionToSource = vector2(self.cameraNode.position.x, self.cameraNode.position.z) - vector2(audioSource.x, audioSource.z)
                 var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(self.cameraNode.transform.m31, self.cameraNode.transform.m33))
                 volumeScale = acos(volumeScale) / Float.pi

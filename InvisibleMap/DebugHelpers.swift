@@ -21,7 +21,7 @@ func addTagDetectionNode(detectionNodes: SCNNode, snapTagsToVertical: Bool, doKa
     let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
     let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
 
-    let originalTagPose = simd_float4x4(rows: [float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+    let originalTagPose = simd_float4x4(pose)
     
     let aprilTagToARKit = simd_float4x4(diagonal:simd_float4(1, -1, -1, 1))
     // convert from April Tag's convention to ARKit's convention

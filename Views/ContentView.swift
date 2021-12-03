@@ -33,6 +33,7 @@ struct ContentView: View {
                     List {
                         // Populate list view with data from firebase as the app is loaded
                         ForEach(Array(zip(self.mapDatabase.images, self.mapDatabase.maps)), id: \.0) { map in
+                            #if IS_MAP_CREATOR
                             NavigationLink(
                                 destination: EditMapView() // TODO: Determine what each map should navigate to
                             ) {
@@ -46,6 +47,20 @@ struct ContentView: View {
                                     Text(map.1)
                                 }
                             }
+                            #else
+                            NavigationLink(destination: SelectPathView(map: map.1))
+                            {
+                                HStack {
+                                    Image(uiImage: map.0)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 100, height: 100)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                    Text(map.1)
+                                }
+                            }
+                            #endif
                         }
                     }
                     Divider()

@@ -237,7 +237,7 @@ extension MapRecorder {
                 var pose = tagArray[i].poseData
                 
                 if snapTagsToVertical {
-                    var simdPose = simd_float4x4(rows: [simd_float4(Float(pose.0), Float(pose.1), Float(pose.2),Float(pose.3)), simd_float4(Float(pose.4), Float(pose.5), Float(pose.6), Float(pose.7)), simd_float4(Float(pose.8), Float(pose.9), Float(pose.10), Float(pose.11)), simd_float4(Float(pose.12), Float(pose.13), Float(pose.14), Float(pose.15))])
+                    var simdPose = simd_float4x4(pose)
                     // convert from April Tags conventions to Apple's (TODO: could this be done in one rotation?)
                     simdPose = simdPose.rotate(radians: Float.pi, 0, 1, 0)
                     simdPose = simdPose.rotate(radians: Float.pi, 0, 0, 1)
