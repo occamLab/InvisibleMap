@@ -52,6 +52,7 @@
 		1F83DB72273F02C100D0148F /* BaseNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB71273F02C100D0148F /* BaseNavigationView.swift */; };
 		1F83DB73273F02C100D0148F /* BaseNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB71273F02C100D0148F /* BaseNavigationView.swift */; };
 		1F83DB75273F081300D0148F /* NavigateMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB74273F081300D0148F /* NavigateMapView.swift */; };
+		1F83DB76275AADA200D0148F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
 		1FE9717626FB88BE00DEB00A /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7562624230200230A58 /* StateType.swift */; };
 		1FE9717A26FB8AFB00DEB00A /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9717726FB89DB00DEB00A /* AppController.swift */; };
 		1FE9717B26FB8AFC00DEB00A /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9717726FB89DB00DEB00A /* AppController.swift */; };
@@ -587,6 +588,7 @@
 			files = (
 				1F77A36926F249480044BE18 /* Preview Assets.xcassets in Resources */,
 				1F77A36626F249480044BE18 /* Assets.xcassets in Resources */,
+				1F83DB76275AADA200D0148F /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -800,7 +802,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMap2;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Utils/TagFinder-Swift.h";
 				SWIFT_VERSION = 5.0;
@@ -828,7 +830,7 @@
 					"@executable_path/Frameworks",
 				);
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMap2;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Utils/TagFinder-Swift.h";
 				SWIFT_VERSION = 5.0;

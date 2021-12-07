@@ -25,7 +25,7 @@ struct ExitButton: View {
 }
 
 struct NavigateMapView: View {
-    init() {
+    init(map: Map) {
         print("currentUser is \(Auth.auth().currentUser!.uid)")
     }
     
@@ -55,6 +55,6 @@ extension UINavigationController {
 
 struct NavigateMapView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigateMapView()
+        NavigateMapView(map: FirebaseManager.createMap(from: "Test"))
     }
 }

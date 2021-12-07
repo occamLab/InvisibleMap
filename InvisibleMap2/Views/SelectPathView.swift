@@ -9,12 +9,28 @@
 import SwiftUI
 
 struct SelectPathView: View {
+    let mapFileName: String
+    var map: Map?
+    
     init(map: String) {
-        print(map)
+        self.mapFileName = map
+        self.onAppear() {
+            self.map = FirebaseManager.createMap(from: self.mapFileName)
+        }
     }
     
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationView {
+            VStack {
+                List {
+                    ForEach(Array(self.map!.tagDictionary.keys), id: \.self) { location in
+                        NavigationLink(destination: NavigateMapView(map: self.map!)) {
+                            Text("\(location)")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
