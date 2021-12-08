@@ -10,8 +10,12 @@ import Foundation
 import ARKit
 import SwiftGraph
 
-class MapNavigator {
-    var map: Map!
+class MapNavigator: ObservableObject {
+    var map: Map! {
+        didSet {
+            objectWillChange.send()
+        }
+    }
     var endpointTagId: Int = 0
     let tagFinder = imageToData()
     var processingFrame = false

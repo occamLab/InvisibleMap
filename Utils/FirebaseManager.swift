@@ -16,7 +16,7 @@ class FirebaseManager {
     static var storageRef: StorageReference = Storage.storage().reference()
     
     /// Downloads the selected map from firebase
-    static func createMap(from mapFileName: String) -> Map {
+    static func createMap(from mapFileName: String, completionHandler: @escaping (Map)->()) {
         let mapRef = storageRef.child(mapFileName)
         var map: Map?
         mapRef.getData(maxSize: 10 * 1024 * 1024) { mapData, error in
@@ -26,10 +26,10 @@ class FirebaseManager {
             } else {
                 if mapData != nil {
                     map = Map(from: mapData!)!
+                    completionHandler(map!)
                 }
             }
         }
-        return map!
     }
     
     static func createMapDatabase() -> MapDatabase {
@@ -43,6 +43,7 @@ class FirebaseManager {
 }
 
 class MapDatabase: ObservableObject {
+    @Published var mapData: [MapData] = []
     @Published var maps: [String] = []
     @Published var images: [UIImage] = []
     @Published var files: [String] = []
@@ -65,6 +66,7 @@ class MapDatabase: ObservableObject {
                 self.maps.remove(at: existingMapIndex)
                 self.images.remove(at: existingMapIndex)
                 self.files.remove(at: existingMapIndex)
+                self.mapData.remove(at: existingMapIndex)
             }
         }
     }
@@ -80,12 +82,26 @@ class MapDatabase: ObservableObject {
                     // Error occurred
                 } else {
                     if let data = imageData {
-                        self.images.append(UIImage(data: data)!)
+                        let image = UIImage(data: data)!
+                        self.images.append(image)
                         self.files.append(processedMapFile)
                         self.maps.append(key)
+                        self.mapData.append(MapData(name: key, image: image, file: processedMapFile))
                     }
                 }
             }
         }
+    }
+}
+
+struct MapData {
+    var name: String
+    var image: UIImage
+    var file: String
+    
+    init(name: String, image: UIImage, file: String) {
+        self.name = name
+        self.image = image
+        self.file = file
     }
 }

@@ -9,23 +9,16 @@
 import SwiftUI
 
 struct SelectPathView: View {
-    let mapFileName: String
-    var map: Map?
-    
-    init(map: String) {
-        self.mapFileName = map
-        self.onAppear() {
-            self.map = FirebaseManager.createMap(from: self.mapFileName)
-        }
-    }
-    
+    @ObservedObject var mapNavigator = InvisibleMapController.shared.mapNavigator
     var body: some View {
         NavigationView {
-            VStack {
-                List {
-                    ForEach(Array(self.map!.tagDictionary.keys), id: \.self) { location in
-                        NavigationLink(destination: NavigateMapView(map: self.map!)) {
-                            Text("\(location)")
+            if mapNavigator.map != nil {
+                VStack {
+                    List {
+                        ForEach(Array(mapNavigator.map.tagDictionary.keys), id: \.self) { location in
+                            NavigationLink(destination: NavigateMapView()) {
+                                Text("\(location)")
+                            }
                         }
                     }
                 }
@@ -36,6 +29,6 @@ struct SelectPathView: View {
 
 struct SelectPathView_Previews: PreviewProvider {
     static var previews: some View {
-        SelectPathView(map: "Test")
+        SelectPathView()
     }
 }

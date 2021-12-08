@@ -29,6 +29,8 @@ class Map {
     init?(from data: Data) {
         do {
             self.rawData = try JSONDecoder().decode(RawMap.self, from: data)
+            storeTagsInDictionary()
+            storeWaypointsInDictionary()
         } catch let error {
             print(error)
             return nil

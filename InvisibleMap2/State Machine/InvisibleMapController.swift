@@ -25,7 +25,9 @@ class InvisibleMapController: AppController {
         for command in commands {
             switch (command) {
                 case .LoadMap(let mapFileName):
-                    self.mapNavigator.map = FirebaseManager.createMap(from: mapFileName)
+                    FirebaseManager.createMap(from: mapFileName) { newMap in
+                         self.mapNavigator.map = newMap
+                    }
                 case .StartPath(let tagId):
                     self.mapNavigator.endpointTagId = tagId
                     self.mapNavigator.scheduledPathPlanningTimer()

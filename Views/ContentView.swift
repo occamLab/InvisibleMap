@@ -32,32 +32,34 @@ struct ContentView: View {
                     // All maps list
                     List {
                         // Populate list view with data from firebase as the app is loaded
-                        ForEach(Array(zip(self.mapDatabase.images, self.mapDatabase.maps)), id: \.0) { map in
+                        ForEach(self.mapDatabase.mapData, id: \.image) { map in
                             #if IS_MAP_CREATOR
                             NavigationLink(
                                 destination: EditMapView() // TODO: Determine what each map should navigate to
                             ) {
                                 HStack {
-                                    Image(uiImage: map.0)
+                                    Image(uiImage: map.image)
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 100, height: 100)
                                         .clipped()
                                         .cornerRadius(8)
-                                    Text(map.1)
+                                    Text(map.name)
                                 }
                             }
                             #else
-                            NavigationLink(destination: SelectPathView(map: map.1))
+                            NavigationLink(destination: SelectPathView().onAppear() {
+                                InvisibleMapController.shared.process(event: .MapSelected(mapFileName: map.file))
+                            })
                             {
                                 HStack {
-                                    Image(uiImage: map.0)
+                                    Image(uiImage: map.image)
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 100, height: 100)
                                         .clipped()
                                         .cornerRadius(8)
-                                    Text(map.1)
+                                    Text(map.name)
                                 }
                             }
                             #endif
