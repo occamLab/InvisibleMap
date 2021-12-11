@@ -10,12 +10,12 @@ import SwiftUI
 import FirebaseAuth
 
 struct ExitButton: View {
-    @Environment(\.presentationMode) var mode: Binding<PresentationMode> // Tracks whether the RecordMap screen is being presented
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
         Button(action: {
             self.mode.wrappedValue.dismiss()
-            InvisibleMapController.shared.process(event: .LeaveMapRequested) // Tells the state machine to cancel the map recording
+            InvisibleMapController.shared.process(event: .LeaveMapRequested)
         }){
             Image(systemName: "xmark")
                 .accessibility(label: Text("Exit Navigation"))
@@ -24,24 +24,33 @@ struct ExitButton: View {
     }
 }
 
+// Provides persistent storage for on-screen instructions and state variables outside of the view struct
+class NavigateGlobalState: ObservableObject {
+    init() {
+    }
+}
+
 struct NavigateMapView: View {
+    @StateObject var navigateGlobalState = NavigateGlobalState()
+    
     init() {
         print("currentUser is \(Auth.auth().currentUser!.uid)")
-        self.onAppear()
-        {
-            InvisibleMapController.shared.process(event: .PathSelected(tagId: 0))
-        }
     }
     
     var body : some View {
-        BaseNavigationView()
-            // Toolbar buttons
-            .toolbar(content: {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    ExitButton()
-                }
-            })
-        .ignoresSafeArea(.keyboard)
+        ZStack {
+            BaseNavigationView()
+                // Toolbar buttons
+                .toolbar(content: {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        ExitButton()
+                    }
+                })
+            .ignoresSafeArea(.keyboard)
+            TagDetectionButton(navigateGlobalState: navigateGlobalState)
+                .environmentObject(InvisibleMapController.shared.mapNavigator)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+        }
     }
 }
 

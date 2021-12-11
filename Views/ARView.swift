@@ -124,7 +124,18 @@ extension ARView: ARSessionDelegate {
         #else
             let processingFrame = self.sharedController.mapNavigator.processingFrame
         #endif
+        
         if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame {
+            let scene = SCNMatrix4(frame.camera.transform)
+            if self.cameraNode == nil {
+                // TODO: remove camera node when we have some waypoints to test with (we can use ARFrame.camera.transform instead
+                cameraNode = SCNNode()
+                cameraNode.transform = scene
+                cameraNode.name = "camera"
+                arView.scene.rootNode.addChildNode(cameraNode)
+            } else {
+                cameraNode.transform = scene
+            }
             lastRecordedTimestamp = frame.timestamp
             print("Timestamp: \(frame.timestamp)")
             sharedController.process(event: .NewARFrame(cameraFrame: frame))
@@ -159,6 +170,11 @@ extension ARView: ARViewController {
     func initialize() {
         self.startSession()
         self.createMapNode()
+    }
+    
+    func reset() {
+        self.pingTimer.invalidate()
+        self.pingTimer = Timer()
     }
     
     func tagPoseToWorld(tagPose: simd_float4x4, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4 {
@@ -460,6 +476,25 @@ extension ARView: ARViewController {
                 }
             }
         #endif
+    }
+    
+    func renderTags() {
+        #if !IS_MAP_CREATOR
+        for tagId in self.sharedController.mapNavigator.map.tagDictionary.keys {
+            let tag = self.sharedController.mapNavigator.map.tagDictionary[tagId]!
+            let tagNode = SCNNode()
+            tagNode.geometry = SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0)
+            tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
+            tagNode.name = "Tag_\(tagId)"
+            tagNode.transform = SCNMatrix4(simd_float4x4(tag))
+            self.mapNode.childNode(withName: self.tagNodeName, recursively: false)?.addChildNode(tagNode)
+        }
+        #endif
+    }
+    
+    func renderGraph(fromStops stops: [RawMap.OdomVertex.vector3]) {
+        self.renderEdges(fromList: stops, isPath: true)
+        self.renderTags()
     }
     
     

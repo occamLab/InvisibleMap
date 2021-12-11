@@ -16,7 +16,9 @@ struct SelectPathView: View {
                 VStack {
                     List {
                         ForEach(Array(mapNavigator.map.tagDictionary.keys), id: \.self) { location in
-                            NavigationLink(destination: NavigateMapView()) {
+                            NavigationLink(destination: NavigateMapView().onAppear() {
+                                InvisibleMapController.shared.process(event: .PathSelected(tagId: location))
+                            }) {
                                 Text("\(location)")
                             }
                         }

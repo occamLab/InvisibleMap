@@ -18,6 +18,7 @@ class MapNavigator: ObservableObject {
     }
     var endpointTagId: Int = 0
     let tagFinder = imageToData()
+    @Published var detectTags = true
     var processingFrame = false
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.invisiblemap", qos: DispatchQoS.userInitiated)
     var pathPlanningTimer = Timer()
@@ -68,15 +69,26 @@ class MapNavigator: ObservableObject {
         var tagArray: Array<AprilTags> = Array()
         let numTags = tagFinder.getNumberOfTags()
         if numTags > 0 {
-            if !self.map.firstTagFound {
-                print("Starting path planning")
-                self.map.renderGraphPath()
-                self.map.firstTagFound = true
+            print("Tags found!")
+            
+            if let map = self.map {
+                if !map.firstTagFound {
+                    print("Starting path planning")
+                    map.renderGraphPath()
+                    map.firstTagFound = true
+                }
             }
             
+            for child in InvisibleMapController.shared.arViewer!.detectionNode.childNodes {
+                child.removeFromParentNode()
+            }
             for i in 0...tagFinder.getNumberOfTags()-1 {
-                tagArray.append(tagFinder.getTagAt(i))
-                InvisibleMapController.shared.process(event: .TagFound(tag: tagArray[-1], cameraTransform: cameraTransform))
+                let tag = tagFinder.getTagAt(i)
+                tagArray.append(tag)
+                InvisibleMapController.shared.process(event: .TagFound(tag: tagArray[tagArray.count-1], cameraTransform: cameraTransform))
+                if let map = InvisibleMapController.shared.mapNavigator.map {
+                    InvisibleMapController.shared.arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: map.snapTagsToVertical)
+                }
             }
         }
         return tagArray;
@@ -84,6 +96,10 @@ class MapNavigator: ObservableObject {
     
     /// Processes the pose, april tags, and nearby waypoints.
     func updateTags(from cameraFrame: ARFrame) {
+        if !detectTags {
+            return
+        }
+        print("Update Tags")
         // Convert ARFrame to a UIImage
         let pixelBuffer = cameraFrame.capturedImage
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
@@ -104,5 +120,6 @@ class MapNavigator: ObservableObject {
     func resetMap() {
         self.stopPathPlanning()
         self.map = nil
+        self.detectTags = true
     }
 }

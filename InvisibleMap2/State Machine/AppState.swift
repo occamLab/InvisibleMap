@@ -53,6 +53,7 @@ indirect enum AppState: StateType {
     
     // In response to an event, a state may transition to a new state, and it may emit a command
     mutating func handle(event: Event) -> [Command] {
+        print("Current State: \(self), \(event)")
         switch (self, event) {
             case (.MainScreen, .MapSelected(let mapFileName)):
                 self = .SelectPath(lastState: AppState.MainScreen)

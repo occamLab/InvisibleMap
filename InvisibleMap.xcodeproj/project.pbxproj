@@ -53,6 +53,7 @@
 		1F83DB73273F02C100D0148F /* BaseNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB71273F02C100D0148F /* BaseNavigationView.swift */; };
 		1F83DB75273F081300D0148F /* NavigateMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB74273F081300D0148F /* NavigateMapView.swift */; };
 		1F83DB76275AADA200D0148F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A84771210FA6440004C325 /* GoogleService-Info.plist */; };
+		1FE46D8027644F93001A3812 /* TagDetectionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE46D7F27644F93001A3812 /* TagDetectionButton.swift */; };
 		1FE9717626FB88BE00DEB00A /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7562624230200230A58 /* StateType.swift */; };
 		1FE9717A26FB8AFB00DEB00A /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9717726FB89DB00DEB00A /* AppController.swift */; };
 		1FE9717B26FB8AFC00DEB00A /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9717726FB89DB00DEB00A /* AppController.swift */; };
@@ -141,6 +142,7 @@
 		1F83DB69272C7AE800D0148F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		1F83DB71273F02C100D0148F /* BaseNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseNavigationView.swift; sourceTree = "<group>"; };
 		1F83DB74273F081300D0148F /* NavigateMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigateMapView.swift; sourceTree = "<group>"; };
+		1FE46D7F27644F93001A3812 /* TagDetectionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagDetectionButton.swift; sourceTree = "<group>"; };
 		1FE9717726FB89DB00DEB00A /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		1FE9717C26FB8B2D00DEB00A /* InvisibleMapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapController.swift; sourceTree = "<group>"; };
 		1FE9718126FE50E400DEB00A /* MapNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapNavigator.swift; sourceTree = "<group>"; };
@@ -352,6 +354,7 @@
 		1F83DB6C273EF8D800D0148F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				1FE46D7E27644F72001A3812 /* NavigateMap Subviews */,
 				1F83DB74273F081300D0148F /* NavigateMapView.swift */,
 				98E9BE9A2756C104001B5A2B /* SelectPathView.swift */,
 			);
@@ -361,6 +364,7 @@
 		1F83DB6F273EFBDA00D0148F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				1447B71E2624227600230A58 /* ARView.swift */,
 				1447B7412624229600230A58 /* ContentView.swift */,
 				1F83DB71273F02C100D0148F /* BaseNavigationView.swift */,
 				98E9BE972756BAE9001B5A2B /* ViewStructs.swift */,
@@ -368,10 +372,17 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		1FE46D7E27644F72001A3812 /* NavigateMap Subviews */ = {
+			isa = PBXGroup;
+			children = (
+				1FE46D7F27644F93001A3812 /* TagDetectionButton.swift */,
+			);
+			path = "NavigateMap Subviews";
+			sourceTree = "<group>";
+		};
 		1FE9717526FB881F00DEB00A /* State Machine */ = {
 			isa = PBXGroup;
 			children = (
-				1447B71E2624227600230A58 /* ARView.swift */,
 				1447B7562624230200230A58 /* StateType.swift */,
 				1FE9717726FB89DB00DEB00A /* AppController.swift */,
 			);
@@ -650,6 +661,7 @@
 			files = (
 				1FE9718326FE614700DEB00A /* TagFinder.mm in Sources */,
 				1FE9717B26FB8AFC00DEB00A /* AppController.swift in Sources */,
+				1FE46D8027644F93001A3812 /* TagDetectionButton.swift in Sources */,
 				1FE9717F26FBA29E00DEB00A /* ARView.swift in Sources */,
 				1FE9718B26FE635D00DEB00A /* MemoryChecker.m in Sources */,
 				1F131D73271F5FCC00568FEC /* FirebaseManager.swift in Sources */,

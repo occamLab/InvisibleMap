@@ -44,10 +44,13 @@ class InvisibleMapController: AppController {
                     self.mapNavigator.stopPathPlanning()
                 case .LeaveMap:
                     self.mapNavigator.resetMap()
+                    self.arViewer?.reset()
                 case .PlanPath:
-                    let stops = self.mapNavigator.planPath(from: self.arViewer!.cameraNode.simdTransform.getTrans())
-                    if let stops = stops {
-                        self.arViewer!.renderEdges(fromList: stops, isPath: true)
+                    if let cameraNode = self.arViewer!.cameraNode {
+                        let stops = self.mapNavigator.planPath(from: cameraNode.simdTransform.getTrans())
+                        if let stops = stops {
+                            self.arViewer!.renderGraph(fromStops: stops)
+                        }
                     }
                 
                 // TODO: Add functionality for these
