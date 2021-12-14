@@ -37,7 +37,6 @@ protocol ARViewController {
 //}
 
 class ARView: UIViewController {
-    var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
     let memoryChecker : MemoryChecker = MemoryChecker()
     let configuration = ARWorldTrackingConfiguration()
     #if IS_MAP_CREATOR
@@ -220,8 +219,8 @@ extension ARView: ARViewController {
             let scenePoseTranslation = scenePose.getTrans()
                         
             let doKalman = false
-            let aprilTagTracker = self.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
-            self.aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
+            let aprilTagTracker = InvisibleMapController.shared.mapNavigator.map.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
+            InvisibleMapController.shared.mapNavigator.map.aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
 
             // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
             aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar, doKalman: doKalman)
@@ -565,6 +564,6 @@ extension ARView: ARViewController {
      }
     
     func updateRootToMap(to rootToMap: simd_float4x4) {
-        self.mapNode.transform = SCNMatrix4(rootToMap)
+        self.mapNode.simdTransform = rootToMap
     }
 }

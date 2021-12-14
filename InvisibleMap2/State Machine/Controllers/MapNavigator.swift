@@ -85,9 +85,11 @@ class MapNavigator: ObservableObject {
             for i in 0...tagFinder.getNumberOfTags()-1 {
                 let tag = tagFinder.getTagAt(i)
                 tagArray.append(tag)
-                InvisibleMapController.shared.process(event: .TagFound(tag: tagArray[tagArray.count-1], cameraTransform: cameraTransform))
-                if let map = InvisibleMapController.shared.mapNavigator.map {
-                    InvisibleMapController.shared.arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: map.snapTagsToVertical)
+                if let map = self.map {
+                    if let _ = map.tagDictionary[Int(tag.number)] {
+                        InvisibleMapController.shared.process(event: .TagFound(tag: tagArray[tagArray.count-1], cameraTransform: cameraTransform))
+                        InvisibleMapController.shared.arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: map.snapTagsToVertical)
+                    }
                 }
             }
         }
