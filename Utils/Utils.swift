@@ -18,3 +18,17 @@ extension simd_float4x4 {
         self.init(rows: [simd_float4(Float(from.0), Float(from.1), Float(from.2),Float(from.3)), simd_float4(Float(from.4), Float(from.5), Float(from.6), Float(from.7)), simd_float4(Float(from.8), Float(from.9), Float(from.10), Float(from.11)), simd_float4(Float(from.12), Float(from.13), Float(from.14), Float(from.15))])
     }
 }
+
+func detectionFrameToGlobal(tagPose tagToDetection: simd_float4x4, cameraTransform cameraToGlobal: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4 {
+    let detectionToCamera = simd_float4x4(diagonal:simd_float4(1, -1, -1, 1))
+    // convert from April Tag's convention to ARKit's convention
+    let tagToCamera = detectionToCamera*tagToDetection
+    // project into world coordinates
+    var tagToGlobal = cameraToGlobal*tagToCamera
+    
+    if snapTagsToVertical {
+        tagToGlobal = tagToGlobal.makeZFlat().alignY()
+    }
+    
+    return tagToGlobal
+}

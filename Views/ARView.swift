@@ -176,20 +176,6 @@ extension ARView: ARViewController {
         self.pingTimer = Timer()
     }
     
-    func tagPoseToWorld(tagPose: simd_float4x4, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4 {
-        let aprilTagToARKit = simd_float4x4(diagonal:simd_float4(1, -1, -1, 1))
-        // convert from April Tag's convention to ARKit's convention
-        let tagPoseARKit = aprilTagToARKit*tagPose
-        // project into world coordinates
-        var scenePose = cameraTransform*tagPoseARKit
-
-        if snapTagsToVertical {
-            scenePose = scenePose.makeZFlat().alignY()
-        }
-        
-        return scenePose
-    }
-    
     /// Adds or updates a tag node when a tag is detected
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         DispatchQueue.main.async {
@@ -200,7 +186,7 @@ extension ARView: ARViewController {
             let transVar = simd_float3(Float(tag.transVecVar.0), Float(tag.transVecVar.1), Float(tag.transVecVar.2))
             let quatVar = simd_float4(x: Float(tag.quatVar.0), y: Float(tag.quatVar.1), z: Float(tag.quatVar.2), w: Float(tag.quatVar.3))
             
-            let scenePose = self.tagPoseToWorld(tagPose: originalTagPose, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
+            let scenePose = detectionFrameToGlobal(tagPose: originalTagPose, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
             let transVarMatrix = simd_float3x3(diagonal: transVar)
             let quatVarMatrix = simd_float4x4(diagonal: quatVar)
 
@@ -262,7 +248,7 @@ extension ARView: ARViewController {
 
         let originalTagPose = simd_float4x4(pose)
         
-        let scenePose = tagPoseToWorld(tagPose: originalTagPose, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
+        let scenePose = detectionFrameToGlobal(tagPose: originalTagPose, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
         
         let tagPos = simd_float3(scenePose.columns.3.x, scenePose.columns.3.y, scenePose.columns.3.z)
         let cameraPos = simd_float3(cameraTransform.columns.3.x, cameraTransform.columns.3.y, cameraTransform.columns.3.z)
@@ -437,6 +423,8 @@ extension ARView: ARViewController {
     }
     
     func renderEdges(fromList vertices: [RawMap.OdomVertex.vector3], isPath: Bool) {
+        pathObjs.map({$0.removeFromParentNode()})
+        pathObjs = []
         for i in 0...vertices.count-2 {
             self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
         }
@@ -460,8 +448,8 @@ extension ARView: ARViewController {
         }
     }
     
-    /// Renders graph used for path planning and initializes dictionary and graph used
-    func renderGraphPath(){
+    /// Renders entire path for debugging
+    func renderDebugGraph(){
         #if !IS_MAP_CREATOR
             for vertex in self.sharedController.mapNavigator.map.rawData.odometryVertices {
                 for neighbor in vertex.neighbors{
@@ -563,7 +551,7 @@ extension ARView: ARViewController {
          }
      }
     
-    func updateRootToMap(to rootToMap: simd_float4x4) {
-        self.mapNode.simdTransform = rootToMap
+    func updateMapPose(to mapToGlobal: simd_float4x4) {
+        self.mapNode.simdTransform = mapToGlobal
     }
 }

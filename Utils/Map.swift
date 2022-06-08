@@ -111,16 +111,13 @@ class Map {
     /// Computes and updates the root to map transform
     ///
     /// - Parameter withUpdate: the position, orientation, and id of the detected tag
-    func computeRootToMap(fromTag tagId: Int, withPosition camToTag: simd_float4x4, relativeTo rootToCam: simd_float4x4 = matrix_identity_float4x4)->simd_float4x4? {
-        print("Relocalizing on tag \(tagId)")
+    func computeMapPose(fromTag tagId: Int, withPosition tagToDetection: simd_float4x4, relativeTo cameraToGlobal: simd_float4x4 = matrix_identity_float4x4)->simd_float4x4? {
+        // print("Relocalizing on tag \(tagId)")
         if aprilTagDetectionDictionary[tagId] != nil {
-            print("Computing root to map")
-            let rootToTag = rootToCam * camToTag
-            let mapToTag = simd_float4x4(self.tagDictionary[tagId]!)
-            print("Tag Transform \(self.tagDictionary[tagId]!)")
-            print("mapToTag \(mapToTag)")
+            let tagToGlobal = detectionFrameToGlobal(tagPose: tagToDetection, cameraTransform: cameraToGlobal, snapTagsToVertical: self.snapTagsToVertical)
+            let tagToMap = simd_float4x4(self.tagDictionary[tagId]!)
             // the call to .alignY() flattens the transform so that it only rotates about the globoal y-axis (translation can happen along all dimensions)
-            return (rootToTag*mapToTag.inverse).alignY()
+            return (tagToGlobal*tagToMap.inverse).alignY()
         }
         return nil
     }
