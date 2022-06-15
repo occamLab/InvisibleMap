@@ -7,8 +7,8 @@
 //
 
 import SwiftUI
-
-@main
+ 
+@main 
 struct InvisbleMapCreator2App: App {    
     var body: some Scene {
         WindowGroup {

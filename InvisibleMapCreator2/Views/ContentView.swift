@@ -70,63 +70,106 @@ class AuthListener: ObservableObject {
     }
 }
 
+
 struct ContentView: View {
     @ObservedObject var authListener = AuthListener()
     @ObservedObject var mapDatabase = MapDatabase()
+    @State var showMenu = false
+    @State private var searchText = ""
+    
+    /// function to delete a map from the list of maps
+    func deleteMap(at offsets: IndexSet) {
+        mapDatabase.maps.remove(atOffsets: offsets)
+    }
     
     var body: some View {
+        
         if Auth.auth().currentUser == nil {
             AppleSignInControllerRepresentable()
         }
         else {
-            NavigationView {
-                VStack {
-                    // All maps list
-                    List {
-                        // Populate list view with data from firebase as the app is loaded
-                        ForEach(Array(zip(self.mapDatabase.images, self.mapDatabase.maps)), id: \.0) { map in
-                            NavigationLink(
-                                destination: EditMapView() // TODO: Determine what each map should navigate to
-                            ) {
-                                HStack {
-                                    Image(uiImage: map.0)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 100, height: 100)
-                                        .clipped()
-                                        .cornerRadius(8)
-                                    Text(map.1)
-                                }
-                            }
+            //menu drag in, drag out feature
+            let drag = DragGesture()
+                .onEnded {
+                    if $0.translation.width < -100 {
+                        withAnimation {
+                            self.showMenu = false
                         }
                     }
-                    Divider()
-                    // New map button
-                    NavigationLink(
-                        destination: RecordMapView()
-                    ) {
-                        Text("New Map")
-                            .frame(width: 200, height: 40)
-                            .foregroundColor(.blue)
-                            .background(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.blue, lineWidth: 1))
-                    }
                 }
+            
+            NavigationView {
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        VStack {
+                            // All maps list
+                            Text("My Invisible Maps")
+                                .font(.largeTitle)
+                                .bold()
+                            List {
+                                // Populate list view with data from firebase as the app is loaded
+                                ForEach(Array(zip(self.mapDatabase.images, self.mapDatabase.maps)), id: \.0) { map in
+                                    NavigationLink(
+                                        destination: EditMapView() // TODO: Determine what each map should navigate to
+                                    ) {
+                                        HStack {
+                                            Image(uiImage: map.0)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 100, height: 100)
+                                                .clipped()
+                                                .cornerRadius(8)
+                                            Text(map.1)
+                                        }
+                                    }
+                                }
+                                //slide to delete
+                                .onDelete(perform: deleteMap)
+                            }
+                            
+                            Divider()
+                            // New map button
+                            NavigationLink(
+                                destination: RecordMapView()
+                            ) {
+                                Text("Create New Map")
+                                    .frame(width: 200, height: 40)
+                                    .foregroundColor(.blue)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .stroke(Color.blue, lineWidth: 1))
+                            }
+                        } //VStack
+                        
+                        //if user presses burger menu bar, show the menu
+                        if self.showMenu {
+                            MenuView()
+                                .frame(width: geometry.size.width/2)
+                                .transition(.move(edge: .leading))
+                                .background(Color.white)
+                        }
+                    } //ZStack
+                    .gesture(drag)
+                } //geometryreader
                 .listStyle(PlainListStyle())
-                .navigationTitle("All Maps")
-                .navigationBarItems(trailing:
+            //    .navigationBarTitle("My Invisible Maps", displayMode: .inline)
+                .navigationBarItems(leading:
+                    //burger menu bar button to drag in/out menu from top, left corner
                     Button(action: {
-                        // TODO: Build settings menu
+                        withAnimation {
+                            self.showMenu.toggle()
+                        }
                     }) {
-                        Image(systemName: "gearshape").imageScale(.large)
+                        Image(systemName: "line.horizontal.3")
+                            .imageScale(.large)
                             .foregroundColor(.black)
                     }
-                    .accessibilityLabel(Text("Settings"))
+                    .accessibilityLabel(Text("Menu Bar"))
                 )
             }
-            .listStyle(PlainListStyle())
-            .navigationTitle("All Maps")
+    
+        //    .listStyle(PlainListStyle())
+         //   .navigationTitle("All Maps")
 //            .navigationBarItems(trailing:
 //                Button(action: {
 //                    // TODO: Build settings menu
@@ -137,14 +180,12 @@ struct ContentView: View {
 //                .accessibilityLabel(Text("Settings"))
 //            )
         }
+        
     }
+    
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
+
 
 struct AppleSignInControllerRepresentable: UIViewControllerRepresentable {
     typealias UIViewControllerType = AppleSignInController
@@ -155,6 +196,13 @@ struct AppleSignInControllerRepresentable: UIViewControllerRepresentable {
     }
     func updateUIViewController(_ uiViewController: AppleSignInController, context: Context) {
         return
+    }
+}
+
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
     }
 }
 
