@@ -1,4 +1,5 @@
 *.mov
+Packaged.resolved
 /opencv2.framework
 /visp3.framework
 /Frameworks
@@ -7,3 +8,4 @@
 Pods/
 /InvisibleMap.xcodeproj/xcuserdata/
 /InvisibleMap.xcworkspace/xcuserdata/
+*.xcuserstate
