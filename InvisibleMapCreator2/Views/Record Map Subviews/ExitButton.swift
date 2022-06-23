@@ -22,21 +22,35 @@ struct RectangleButtonStyle: ButtonStyle {
 
 struct ExitButton: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode> // Tracks whether the RecordMap screen is being presented
+    @State private var showCancelConfirmation = false
 
     var body: some View {
+        
         Button(action: {
-            self.mode.wrappedValue.dismiss()
-            AppController.shared.cancelRecordingRequested() // Tells the state machine to cancel the map recording
+            showCancelConfirmation = true
         }){
             Image(systemName: "xmark")
                 .accessibility(label: Text("Cancel Map"))
         }
         .buttonStyle(RectangleButtonStyle())
+        .alert(isPresented: $showCancelConfirmation) {
+            Alert(
+                title: Text("Would you like to exit without saving the map?"),
+                primaryButton: .destructive(Text("Exit")) {
+                    print("canceling map without saving...")
+                    self.mode.wrappedValue.dismiss()
+                    AppController.shared.cancelRecordingRequested() // Tells the state machine to cancel the map recording
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 }
 
+/*
 struct ExitButton_Previews: PreviewProvider {
     static var previews: some View {
         ExitButton()
     }
 }
+*/

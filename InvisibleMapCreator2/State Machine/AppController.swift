@@ -16,6 +16,7 @@ class AppController {
     var mapRecorder = MapRecorder() // Initialized in MapRecorder.swift
     var arViewer: ARViewController? // Initialized in ARView.swift
     var recordViewer: RecordViewController? // Initialized in RecordMapView.swift
+    var mapsController = MapDatabase()  // Initialized in ContentView.swift
     
     private init() {
     }
@@ -45,6 +46,9 @@ class AppController {
                 recordViewer?.updateInstructionText()
             case .UpdateLocationList(let node, let picture, let textNode, let poseId):
                 recordViewer?.updateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)
+            // MapsController commands
+            case .DeleteMap(let mapID):
+                mapsController.deleteMap(mapID: mapID)
             }
         }
     }
@@ -52,9 +56,9 @@ class AppController {
 
 extension AppController {
     // MainScreen events
-    func startRecordingRequested() {
+    func createMapRequested() {
         print(state)
-        processCommands(commands: state.handleEvent(event: .StartRecordingRequested))
+        processCommands(commands: state.handleEvent(event: .CreateMapRequested))
         print(state)
     }
     
@@ -100,6 +104,12 @@ extension AppController {
         processCommands(commands: state.handleEvent(event: .SaveMapRequested(mapName: mapName)))
         print(state)
     }
+    
+    // EditMapScreen events
+    // when function doesn't change states but just emits a command writing it like this is ok (with no state.handleEvent)
+    func deleteMap(mapName: String) {
+        processCommands(commands: [.DeleteMap(mapID: mapName)])
+    }
 }
 
 protocol MapRecorderController {
@@ -123,4 +133,8 @@ protocol RecordViewController {
     // Commands that impact the record map UI
     func updateInstructionText()
     func updateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
+}
+
+protocol MapsController {
+    func deleteMap(mapID: String)
 }

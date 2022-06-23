@@ -10,6 +10,9 @@ import SwiftUI
 struct EditMapView: View {
     
     @State private var showingDeleteConfirmation = false
+    @ObservedObject var mapDatabase = MapDatabase()
+  //  var map: (UIImage, String)
+    var map: String
     
     var body: some View {
         // TODO: Determine what the edit map view should look like
@@ -50,7 +53,6 @@ struct EditMapView: View {
         
         // delete map button
         Button(action: {
-            // TODO: delete map from list and in cloud
             showingDeleteConfirmation = true
         }) {
             Text("Delete Map")
@@ -70,7 +72,9 @@ struct EditMapView: View {
                 Alert(
                     title: Text("Are you sure?"),
                     primaryButton: .destructive(Text("Delete")) {
-                        //TODO: delete map from list and IM app 
+                        print("deleting map..")
+                        //AppController.shared.deleteMap(mapName: map.1)
+                        AppController.shared.deleteMap(mapName: map)
                     },
                     secondaryButton: .cancel()
                 )
@@ -95,8 +99,10 @@ struct EditMapView: View {
     }
 }
 
+/*
 struct EditMapView_Previews: PreviewProvider {
     static var previews: some View {
         EditMapView()
     }
 }
+*/

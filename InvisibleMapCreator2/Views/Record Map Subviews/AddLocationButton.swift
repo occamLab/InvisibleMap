@@ -23,10 +23,13 @@ struct AddLocationButton: View {
                 Image(systemName: "plus")
                 Text("Add Location")
             }
-            .frame(width: 200, height: 40)
-            .foregroundColor(.white)
+            .frame(width: 200, height: 50)
+            .foregroundColor(.black)
             .background(
                 RoundedRectangle(cornerRadius: 15)
+               // Circle()
+                    .fill(Color.white.opacity(0.9))
+                    .frame(width: 200, height: 60)
                     .foregroundColor(.blue))
         }
         // Button styling for the AddLocation button

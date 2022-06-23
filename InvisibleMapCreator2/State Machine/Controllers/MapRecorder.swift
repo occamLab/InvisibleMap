@@ -41,6 +41,8 @@ class MapRecorder: MapRecorderController, ObservableObject {
     /// Tracks whether the user has asked for a tag to be recorded
     @Published var recordTag = false
     @Published var seesTag = false
+    /// Tracks whether the user is recording a map
+  //  @Published var recordMap = false
     
     /// Correct the orientation estimate such that the normal vector of the tag is perpendicular to gravity
     let snapTagsToVertical = true
@@ -176,6 +178,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
         firstTagFound = false
         seesTag = false
         recordTag = false
+    //recordMap = false
         poseId = 0
         poseData = []
         locationData = []

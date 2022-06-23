@@ -30,16 +30,19 @@ enum InstructionType: Equatable {
     case tagFound(startTime: Double)
     case findTagReminder(startTime: Double)
     case recordTagReminder(startTime: Double)
+    case tagMarked(startTime: Double)
     case none
     
     var text: String? {
         get {
             switch self {
-            case .findTag: return "Point your camera at a tag"
-            case .saveLocation: return "First tag found! \nYou can now save a location"
-            case .tagFound: return "Tag detected. \nYou can now start recording a tag"
-            case .findTagReminder: return "You must find a tag before you can save a location"
-            case .recordTagReminder:  return "You must be detecting a tag to start recording tag position"
+            case .findTag: return "Point your camera at a tag. \nOnce you detect a tag, \nyou can mark the tags to create a map \nand add locations of interest at any point \non the map to navigate to in the future."
+            case .saveLocation: return "First tag found! \nMark the tag to start creating a map. \nYou can save a location of interest at any point as you create the map."
+            case .tagFound: return "Tag detected. \nYou can now mark the tag."
+            case .findTagReminder: return "WARNING: You must find a tag before you can save a location"
+            case .recordTagReminder:  return "WARNING: You must first detect a tag to mark the tag position"
+                //TODO: make this popup after a tag is marked
+            case .tagMarked: return "Tag was marked on the map. \n Find the next tag to mark on the map."
             case .none: return nil
             }
         }
@@ -50,6 +53,7 @@ enum InstructionType: Equatable {
             case .tagFound: self = .tagFound(startTime: NSDate().timeIntervalSince1970)
             case .findTagReminder: self = .findTagReminder(startTime: NSDate().timeIntervalSince1970)
             case .recordTagReminder: self = .recordTagReminder(startTime: NSDate().timeIntervalSince1970)
+            case .tagMarked: self = .tagMarked(startTime: NSDate().timeIntervalSince1970)
             case .none: self = .none
             }
         }
@@ -57,7 +61,7 @@ enum InstructionType: Equatable {
     
     func getStartTime() -> Double {
         switch self {
-        case .findTag(let startTime), .saveLocation(let startTime), .tagFound(let startTime), .findTagReminder(let startTime), .recordTagReminder(let startTime):
+        case .findTag(let startTime), .saveLocation(let startTime), .tagFound(let startTime), .findTagReminder(let startTime), .recordTagReminder(let startTime), .tagMarked(let startTime):
             return startTime
         default:
             return -1
@@ -91,6 +95,11 @@ enum InstructionType: Equatable {
             }
             else if !tagFound && locationRequested {
                 self = .findTagReminder(startTime: NSDate().timeIntervalSince1970)
+            }
+            //??? check
+        case .tagMarked:
+            if !AppController.shared.mapRecorder.recordTag {
+                self = .none
             }
         case .none:
             if AppController.shared.mapRecorder.seesTag {
@@ -130,11 +139,13 @@ struct NodeData: Identifiable {
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
 class RecordGlobalState: ObservableObject, RecordViewController {
     @Published var tagFound: Bool
+    @Published var tagMarked: Bool
     @Published var instructionWrapper: InstructionType
     @Published var nodeList: [NodeData]
 
     init() {
         tagFound = false
+        tagMarked = false
         instructionWrapper = .findTag(startTime: NSDate().timeIntervalSince1970)
         nodeList = []
         AppController.shared.recordViewer = self
@@ -147,6 +158,12 @@ class RecordGlobalState: ObservableObject, RecordViewController {
                 self.tagFound = false
             } else {
                 self.tagFound = true
+            }
+            
+            if !AppController.shared.mapRecorder.recordTag {
+                self.tagMarked = false
+            } else {
+                self.tagMarked = true
             }
             self.instructionWrapper.transition(tagFound: self.tagFound)
         }
@@ -191,15 +208,24 @@ struct RecordMapView: View {
                     InstructionOverlay(instruction: $recordGlobalState.instructionWrapper.text)
                         .animation(.easeInOut)
                 }
-                RecordTagButton(recordGlobalState: recordGlobalState)
-                    .environmentObject(AppController.shared.mapRecorder)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
+                HStack{
+                   // ManageLocationsButton(recordGlobalState: recordGlobalState)
+                   //     .frame(maxHeight: .infinity, alignment: .bottomLeading)
+                   // Spacer()
+                    RecordTagButton(recordGlobalState: recordGlobalState)
+                        .environmentObject(AppController.shared.mapRecorder)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                  //  Spacer()
+                  //  AddLocationButton(recordGlobalState: recordGlobalState)
+                  //      .frame(maxHeight: .infinity, alignment: .bottomTrailing)
+                    
+                }
             }
             .padding()
         }
         .ignoresSafeArea(.keyboard)
         .onAppear {
-            AppController.shared.startRecordingRequested()
+            AppController.shared.createMapRequested()
         }
     }
 }

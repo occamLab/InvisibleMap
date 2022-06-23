@@ -23,8 +23,9 @@ struct SaveButton: View {
 }
 
 extension SaveButton { // Creates an alert with a textfield (functionality currently unavailable in SwiftUI)
-    private func alert() {
-        let alert = UIAlertController(title: "Name Map", message: nil, preferredStyle: .alert)
+    //private func alert() {
+        func alert() {
+        let alert = UIAlertController(title: "Save Map", message: "Name your map then save it.", preferredStyle: .alert)
         alert.addTextField() { textField in
             textField.placeholder = ""
         }
