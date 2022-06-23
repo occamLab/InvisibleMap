@@ -16,6 +16,7 @@ class InvisibleMapCreatorController: AppController {
     var mapRecorder = MapRecorder()
     var arViewer: ARViewController? // Initialized in ARView.swift
     var recordViewer: RecordViewController? // Initialized in RecordMapView.swift
+    var mapDatabase = FirebaseManager.createMapDatabase()
     
     private init() {
     }
@@ -48,6 +49,9 @@ class InvisibleMapCreatorController: AppController {
                 recordViewer?.updateInstructionText()
             case .UpdateLocationList(let node, let picture, let textNode, let poseId):
                 recordViewer?.updateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)
+            // MapDatabase commands
+            case .DeleteMap(let mapID):
+                mapDatabase.deleteMap(mapID: mapID)
             }
         }
     }
@@ -65,6 +69,10 @@ extension InvisibleMapCreatorController {
     func updateLocationListRequested(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
         process(commands: [AppState.Command.UpdateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)])
     }
+    
+    func deleteMap(mapName: String) {
+        process(commands: [.DeleteMap(mapID: mapName)])
+    }
 }
 
 protocol MapRecorderController {
@@ -79,4 +87,8 @@ protocol RecordViewController {
     // Commands that impact the record map UI
     func updateInstructionText()
     func updateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
+}
+
+protocol MapsController {
+    func deleteMap(mapID: String)
 }

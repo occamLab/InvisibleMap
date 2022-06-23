@@ -12,6 +12,7 @@ enum AppState: StateType {
     // Higher level app states
     case MainScreen
     case RecordMap(RecordMapState)
+    case EditMapScreen
     
     // Initial state upon opening the app
     static let initialState = AppState.MainScreen
@@ -20,6 +21,8 @@ enum AppState: StateType {
     enum Event {
         // MainScreen events
         case StartRecordingRequested
+        // EditMapScreen events
+        case MapDeleted(mapID: String)
         // RecordMap events
         case NewARFrame(cameraFrame: ARFrame)
         case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
@@ -44,6 +47,7 @@ enum AppState: StateType {
         case UpdateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
         case SendToFirebase(mapName: String)
         case ClearData
+        case DeleteMap(mapID: String)
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
@@ -63,6 +67,9 @@ enum AppState: StateType {
             let commands = newState.handle(event: RecordMapState.Event(event)!)
             self = .RecordMap(newState)
             return commands
+        case (.EditMapScreen, .MapDeleted(let mapID)):
+            self = .MainScreen
+              return []
             
         default: break
         }

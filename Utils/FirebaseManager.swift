@@ -94,6 +94,22 @@ class MapDatabase: ObservableObject {
     }
 }
 
+extension MapDatabase: MapsController {
+    func deleteMap(mapID: String) {
+        // get index of map in maps array (same index in images and files array)
+        if let mapIndex = maps.firstIndex(of: mapID) {
+            // remove map and its info from map list in Home Page by removing map from map array
+            maps.remove(at: mapIndex)
+            images.remove(at: mapIndex)
+            files.remove(at: mapIndex)
+            // remove map from Firebase
+            mapsRef.child(mapID).removeValue()
+        }
+    }
+}
+
+
+// a map object
 struct MapData {
     var name: String
     var image: UIImage

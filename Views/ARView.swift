@@ -241,6 +241,7 @@ extension ARView: ARViewController {
             tagNode.addChildNode(zAxis)
         }
     }
+
     
     /// Raycasts from camera to tag and places tag on the nearest mesh if the device supports LiDAR
     func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4? {
