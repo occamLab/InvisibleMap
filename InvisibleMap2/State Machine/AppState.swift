@@ -55,15 +55,14 @@ indirect enum AppState: StateType {
     mutating func handle(event: Event) -> [Command] {
         print("Current State: \(self), \(event)")
         switch (self, event) {
-            // TODO: case(when at .MainScreen, and a map is selected) -> go to select path view for that map and load the map's locations
-            case (_, .MapSelected(let mapFileName)):
+            case (.MainScreen, .MapSelected(let mapFileName)):
                 self = .SelectPath(lastState: AppState.MainScreen)
                 return [.LoadMap(mapFileName: mapFileName)]
             case (.NavigateMap, .LeaveMapRequested):
                // self = .MainScreen
-               // return [.LeaveMap]
                 self = .SelectPath(lastState: AppState.NavigateMap)  // go back to saved location list [SelectPathView] when cancel button is pressed
-                return []
+               // return [.LeaveMap]  -> cancel button takes you out of the app???
+                return[]
             case (.NavigateMap, .NewARFrame(let cameraFrame)):
                 return [.UpdatePoseVIO(cameraFrame: cameraFrame)]
             case (.NavigateMap, .TagFound(let tag, let cameraTransform)):

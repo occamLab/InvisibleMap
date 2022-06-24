@@ -95,7 +95,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
     /// Upload pose data, last image frame to Firebase under "maps" and "unprocessed_maps" nodes
     func sendToFirebase(mapName: String) {
         let mapImage = convertToUIImage(cameraFrame: lastRecordedFrame!)
-        let mapId =  mapName + " " + String(InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp).replacingOccurrences(of: ".", with: "")
+        let mapId =  mapName //+ " " + String(InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp).replacingOccurrences(of: ".", with: "")
         var planeDataList: [[String: Any]] = planeData.keys.map({planeData[$0]}) as! [[String: Any]]
         planeDataList.sort{
             ($0["id"] as! Int) < ($1["id"] as! Int)
