@@ -24,11 +24,11 @@ enum InstructionType: Equatable {
     var text: String? {
         get {
             switch self {
-            case .findTag: return "Point your camera at a tag"
-            case .saveLocation: return "First tag found! \nYou can now save a location"
-            case .tagFound: return "Tag detected. \nYou can now start recording a tag"
-            case .findTagReminder: return "You must find a tag before you can save a location"
-            case .recordTagReminder:  return "You must be detecting a tag to start recording tag position"
+            case .findTag: return "Point your camera at a tag. \nOnce you detect a tag, you can mark \nthe tags to create a map and add locations \nof interest at any point on the map to \nnavigate to in the future."
+            case .saveLocation: return "First tag found! \nMark the tag to start creating a map. \nYou can save a location of interest at any point as you create the map."
+            case .tagFound: return "Tag detected. \nYou can now mark the tag."
+            case .findTagReminder: return "WARNING: You must find a tag before you can save a location"
+            case .recordTagReminder:  return "WARNING: You must first detect a tag to mark the tag position"
             case .none: return nil
             }
         }

@@ -88,16 +88,17 @@ struct ContentView: View {
                             }
                             Divider()
                             #if IS_MAP_CREATOR
-                                // New map button
+                                // Create new map button
                                 NavigationLink(
                                     destination: RecordMapView()
                                 ) {
-                                    Text("New Map")
+                                    Text("Create New Map")
                                         .frame(width: 200, height: 40)
                                         .foregroundColor(.blue)
                                         .background(
                                             RoundedRectangle(cornerRadius: 15)
                                                 .stroke(Color.blue, lineWidth: 1))
+                                   
                                 }
                             #endif
                             }

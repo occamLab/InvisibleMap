@@ -12,11 +12,13 @@ struct EditMapView: View {
     var map: String
     
     var body: some View {
-        // TODO: Determine what the edit map view should look like
-        
+        Text("Map Name: \(map)")
+            .font(.title)
+            .bold()
+         
         // location in this map button
         Button(action: {
-            // TODO: put in list of locations in map
+            // TODO: put in list of locations in selected map
         }) {
             Text("View Locations in this Map")
                 .frame(minWidth: 0, maxWidth: 300)

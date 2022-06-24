@@ -11,6 +11,7 @@ import SwiftUI
 struct RecordTagButton: View {
     @EnvironmentObject var mapRecorder: MapRecorder
     @ObservedObject var recordGlobalState: RecordGlobalState
+    @State private var showingAlert = false
     
     var body: some View {
         Button(action: {
@@ -20,13 +21,13 @@ struct RecordTagButton: View {
                 recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, recordTagRequested: true)
             }
         }){
-            Text(self.mapRecorder.recordTag ? "Stop Recording Tags" : "Start Recording Tags")
+            Text(!self.mapRecorder.recordTag ? "Mark Tag" : "Tag was Marked")
                 .frame(width: 300, height: 60)
-                .foregroundColor(.white)
-                .background(
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(self.mapRecorder.recordTag ? .red : .blue)
-                        .opacity(self.mapRecorder.seesTag ? 1 : 0.5))
+                                .foregroundColor(.white)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .foregroundColor(!self.mapRecorder.recordTag ? .green : .gray)
+                                        .opacity(self.mapRecorder.seesTag ? 1 : 0.5))
         }
         //.disabled(!self.mapRecorder.seesTag)
     }

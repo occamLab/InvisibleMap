@@ -24,10 +24,14 @@ struct AddLocationButton: View {
                 Text("Add Location")
             }
             .frame(width: 200, height: 40)
-            .foregroundColor(.white)
+            .foregroundColor(.blue)
             .background(
-                RoundedRectangle(cornerRadius: 15)
-                    .foregroundColor(.blue))
+                ZStack {
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(Color(UIColor.systemBackground))
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color.blue, lineWidth: 1)
+                })
         }
         // Button styling for the AddLocation button
         .opacity(recordGlobalState.tagFound ? 1 : 0.5)

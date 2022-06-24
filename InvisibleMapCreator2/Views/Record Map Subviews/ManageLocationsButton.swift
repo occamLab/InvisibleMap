@@ -17,7 +17,7 @@ struct ManageLocationsButton: View {
             showLocations = true
             InvisibleMapCreatorController.shared.process(event: .ViewLocationsRequested) // Tells the state machine that the manage locations menu has been opened
         }){
-            Image(systemName: "line.horizontal.3")
+            Image(systemName: "map")
                 .accessibility(label: Text("Manage Locations"))
         }
         .frame(width: 80, height: 40)
