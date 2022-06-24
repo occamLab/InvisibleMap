@@ -23,6 +23,7 @@ struct ContentView: View {
     @ObservedObject var mapDatabase = FirebaseManager.createMapDatabase()
     @State var showMenu = false
     @State var searchText = ""
+    @Environment(\.isPresented) private var isPresented
     
     var body: some View {
         if Auth.auth().currentUser == nil {
@@ -46,7 +47,6 @@ struct ContentView: View {
                         VStack {
                             SearchBar(text: $searchText)
                                 .padding()
-                            
                             // filtered maps array for search bar feature
                             let filteredMaps = self.mapDatabase.mapData.filter({ (map: MapData) -> Bool in
                                 return map.name.localizedCaseInsensitiveContains(searchText) || searchText == "" })
@@ -131,10 +131,19 @@ struct ContentView: View {
                         }
                         .accessibilityLabel(Text("Menu Bar"))
                     )
+                }.onChange(of: isPresented) { isPresented in
+                    print("isPresented \(isPresented)")
+                    if isPresented {
+                        // Do something when first presented.
+                    }
                 }
         
             //    .listStyle(PlainListStyle())
-                .navigationTitle("My Invisible Maps")
+            #if IS_MAP_CREATOR
+                .navigationTitle("My Created Invisible Maps")
+            #else
+                .navigationTitle("Invisible Maps")
+            #endif
 //            .navigationBarItems(trailing:
 //                Button(action: {
 //                    // TODO: Build settings menu

@@ -26,7 +26,7 @@ struct TagDetectionButton: View {
                 .foregroundColor(.white)
                 .background(
                     RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(self.mapNavigator.detectTags ? .red : .blue))
+                        .foregroundColor(self.mapNavigator.detectTags ? .red : .green))
         }
     }
 }

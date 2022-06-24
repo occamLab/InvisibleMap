@@ -13,12 +13,13 @@ import SwiftGraph
 class MapNavigator: ObservableObject {
     var map: Map! {
         didSet {
+            print(map.waypointDictionary)
             objectWillChange.send()
         }
     }
     var endpointTagId: Int = 0
     let tagFinder = imageToData()
-    @Published var detectTags = true
+    @Published var detectTags = false //changed true -> false - don't start detecting tags until user presses start detect tag button on navigate map view
     var processingFrame = false
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.invisiblemap", qos: DispatchQoS.userInitiated)
     var pathPlanningTimer = Timer()

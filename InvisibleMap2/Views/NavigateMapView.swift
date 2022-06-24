@@ -9,21 +9,6 @@
 import SwiftUI
 import FirebaseAuth
 
-struct ExitButton: View {
-    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
-
-    var body: some View {
-        Button(action: {
-            self.mode.wrappedValue.dismiss()
-            InvisibleMapController.shared.process(event: .LeaveMapRequested)
-        }){
-            Image(systemName: "xmark")
-                .accessibility(label: Text("Exit Navigation"))
-        }
-        .buttonStyle(RectangleButtonStyle())
-    }
-}
-
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
 class NavigateGlobalState: ObservableObject {
     init() {

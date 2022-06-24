@@ -5,6 +5,7 @@
 //  Created by Marion Madanguit on 4/13/21.
 //  Copyright © 2021 Occam Lab. All rights reserved.
 //
+//  Exit Button for Invisible Map Creator (could possible merge with Exit button for IM and put if else statements)
 
 import SwiftUI
 

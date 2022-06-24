@@ -88,6 +88,7 @@
 		86F39549210FA42600F209EC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39547210FA42600F209EC /* LaunchScreen.storyboard */; };
 		98082AB42864FECB009E808C /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB32864FECB009E808C /* MenuView.swift */; };
 		98082AB52864FECB009E808C /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB32864FECB009E808C /* MenuView.swift */; };
+		98082AB7286633B1009E808C /* ExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB6286633B1009E808C /* ExitButton.swift */; };
 		984C21CB26B445C9006EEF4F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */; };
 		984C21CD26B447C6006EEF4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86F39545210FA42600F209EC /* Assets.xcassets */; };
 		984C21D026B44F4D006EEF4F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 984C21CF26B44F4D006EEF4F /* FirebaseAnalytics */; };
@@ -175,6 +176,7 @@
 		86F39553210FA42600F209EC /* InvisibleMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapTests.swift; sourceTree = "<group>"; };
 		86F39555210FA42600F209EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98082AB32864FECB009E808C /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		98082AB6286633B1009E808C /* ExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitButton.swift; sourceTree = "<group>"; };
 		984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		98BF269526AF01F60076427E /* AppleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInController.swift; sourceTree = "<group>"; };
 		98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
@@ -380,6 +382,7 @@
 			isa = PBXGroup;
 			children = (
 				1FE46D7F27644F93001A3812 /* TagDetectionButton.swift */,
+				98082AB6286633B1009E808C /* ExitButton.swift */,
 			);
 			path = "NavigateMap Subviews";
 			sourceTree = "<group>";
@@ -683,6 +686,7 @@
 				1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */,
 				1F83DB70273EFC0C00D0148F /* ContentView.swift in Sources */,
 				98E9BE992756BAE9001B5A2B /* ViewStructs.swift in Sources */,
+				98082AB7286633B1009E808C /* ExitButton.swift in Sources */,
 				1F83DB73273F02C100D0148F /* BaseNavigationView.swift in Sources */,
 				98D494882757D34900BF0279 /* AuthenticationHelper.swift in Sources */,
 				1FE9717D26FB8B2D00DEB00A /* InvisibleMapController.swift in Sources */,
@@ -751,7 +755,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = InvisibleMapCreator2/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -784,7 +788,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = InvisibleMapCreator2/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -813,7 +817,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = InvisibleMap2/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -842,7 +846,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = InvisibleMap2/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -993,7 +997,7 @@
 					$SDKROOT/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = InvisibleMap/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1026,7 +1030,7 @@
 					$SDKROOT/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = InvisibleMap/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
