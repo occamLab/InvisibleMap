@@ -9,16 +9,16 @@ import SwiftUI
 
 struct EditMapView: View {
     @State private var showingDeleteConfirmation = false
-    var map: String
+    var mapName: String
     
     var body: some View {
-        Text("Map Name: \(map)")
+        Text("Map Name: \(mapName)")
             .font(.title)
             .bold()
          
         // location in this map button
         Button(action: {
-            // TODO: put in list of locations in selected map
+            // TODO: put in list of POI/savedlocations in selected map
         }) {
             Text("View Locations in this Map")
                 .frame(minWidth: 0, maxWidth: 300)
@@ -72,7 +72,7 @@ struct EditMapView: View {
                     title: Text("Are you sure?"),
                     primaryButton: .destructive(Text("Delete")) {
                         print("deleting map..")
-                        InvisibleMapCreatorController.shared.deleteMap(mapName: map)
+                        InvisibleMapCreatorController.shared.deleteMap(mapName: mapName)
                     },
                     secondaryButton: .cancel()
                 )

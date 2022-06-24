@@ -56,7 +56,7 @@ struct ContentView: View {
                                 ForEach(filteredMaps, id: \.image) { map in
                                     #if IS_MAP_CREATOR
                                     NavigationLink(
-                                        destination: EditMapView(map: map.name)
+                                        destination: EditMapView(mapName: map.name)
                                     ) {
                                         HStack {
                                             Image(uiImage: map.image)
@@ -69,7 +69,7 @@ struct ContentView: View {
                                         }
                                     }
                                     #else
-                                    NavigationLink(destination: SelectPathView().onAppear() {
+                                    NavigationLink(destination: SelectPathView(mapName: map.name).onAppear() {
                                         InvisibleMapController.shared.process(event: .MapSelected(mapFileName: map.file))
                                     })
                                     {
@@ -113,7 +113,11 @@ struct ContentView: View {
                         .gesture(drag)
                     }
                     .listStyle(PlainListStyle())
-                    .navigationBarTitle("My Invisible Maps", displayMode: .inline)
+                #if IS_MAP_CREATOR
+                    .navigationBarTitle("My Created Invisible Maps", displayMode: .inline)
+                #else
+                    .navigationBarTitle("Invisible Maps", displayMode: .inline)
+                #endif
                     .navigationBarItems(leading:
                         //burger menu bar button to drag in/out menu from top, left corner
                         Button(action: {

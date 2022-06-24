@@ -66,3 +66,7 @@ class InvisibleMapController: AppController {
         process(commands: state.handle(event: event))
     }
 }
+
+protocol MapsController {
+    func deleteMap(mapID: String)
+}
