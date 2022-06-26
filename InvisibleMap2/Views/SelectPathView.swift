@@ -41,7 +41,6 @@ struct SelectPathView: View {
                             // location list where each location navigates to navigation camera screen to start navigating to that selected location
                             NavigationLink(destination: NavigateMapView().onAppear() {
                                 // TODO: Navigate to saved location of interest
-                                //InvisibleMapController.shared.process(event: .PathSelected(tagId: location))
                             }) {
                                 Text("\(mapNavigator.map.waypointDictionary[location]!.id)")
                             }
