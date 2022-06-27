@@ -10,34 +10,40 @@ import SwiftUI
 struct EditMapView: View {
     @State private var showingDeleteConfirmation = false
     var mapName: String
-   // @State private var selection: String? = nil
+    @State private var isShowingLocationListView = false
+    @StateObject static var recordGlobalState = RecordGlobalState()
     
     var body: some View {
+   //     NavigationView {
+    
             Text("Map Name: \(mapName)")
                 .font(.title)
                 .bold()
-        
-            VStack {
-              //  NavigationLink(destination: SelectPathView(), tag: "locations", selection: $selection) { }
                 
             // location in this map button
-            Button(action: {
-                // TODO: put in list of POI/savedlocations in selected map
-                //  selection = "locations"
-            }) {
-                Text("View Locations in this Map")
-                    .frame(minWidth: 0, maxWidth: 300)
-                    .padding()
-                    .foregroundColor(.black)
-                    .background(Color.green)
-                    .cornerRadius(10)
-                    .font(.system(size: 18, weight: .bold))
-                    .padding(10)
-                    .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.green, lineWidth: 4))
-            }.padding()
+            NavigationLink(destination: LocationList(mapName: mapName, showLocations: $isShowingLocationListView)) { }
             
+                    Button(action: {
+                        print("view locations list")
+                        isShowingLocationListView = true
+                        InvisibleMapCreatorController.shared.process(event: .ViewLocationsRequested)
+                    })
+                     {
+                        Text("View Locations in this Map")
+                            .frame(minWidth: 0, maxWidth: 300)
+                            .padding()
+                            .foregroundColor(.black)
+                            .background(Color.green)
+                            .cornerRadius(10)
+                            .font(.system(size: 18, weight: .bold))
+                            .padding(10)
+                            .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.green, lineWidth: 4))
+                    }.padding()
+            
+            
+        
             // upload map button
             Button(action: {
                 // TODO: upload map to IM app
@@ -100,7 +106,8 @@ struct EditMapView: View {
                                 .stroke(Color.blue, lineWidth: 4))
             }.padding()
         }
-    }
+    //}
+    
 }
 
 /*

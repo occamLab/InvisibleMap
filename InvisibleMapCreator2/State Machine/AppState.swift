@@ -67,9 +67,11 @@ enum AppState: StateType {
             let commands = newState.handle(event: RecordMapState.Event(event)!)
             self = .RecordMap(newState)
             return commands
-        case (.EditMapScreen, .MapDeleted(let mapID)):
+        case (.EditMapScreen, .MapDeleted(_)):
             self = .MainScreen
               return []
+        case(.EditMapScreen, .SaveLocationRequested(let locationName)):
+            return [.PinLocation(locationName: locationName)]
             
         default: break
         }
