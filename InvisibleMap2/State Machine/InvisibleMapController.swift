@@ -42,9 +42,13 @@ class InvisibleMapController: AppController {
                 case .FinishedNavigation:
                     self.arViewer?.playSound(type: "arrived")
                     self.mapNavigator.stopPathPlanning()
+                    self.arViewer?.endSound()
+                    print("navigation finished")
                 case .LeaveMap:
                     self.mapNavigator.resetMap()
-                    self.arViewer?.reset()
+                    self.arViewer?.reset()  // stops the ping timer
+                //    self.arViewer?.endSound()
+                    print("leave map")
                 case .PlanPath:
                     if let cameraNode = self.arViewer!.cameraNode {
                         let stops = self.mapNavigator.planPath(from: cameraNode.simdTransform.getTrans())

@@ -12,6 +12,8 @@ import FirebaseDatabase
 import FirebaseStorage
 
 class MapRecorder: MapRecorderController, ObservableObject {
+    // for tag detection visualization for creator 
+    var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
     var currentFrameTransform: simd_float4x4 = simd_float4x4.init()
     /// Tracks last recorded frame to set map image to
     var lastRecordedFrame: ARFrame?

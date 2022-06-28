@@ -13,7 +13,7 @@ import SwiftGraph
 class MapNavigator: ObservableObject {
     var map: Map! {
         didSet {
-            print(map.waypointDictionary)
+           // print(map.waypointDictionary)
             objectWillChange.send()
         }
     }
@@ -122,7 +122,7 @@ class MapNavigator: ObservableObject {
     
     func resetMap() {
         self.stopPathPlanning()
-        self.map = nil
-        self.detectTags = true
+        self.map = nil // 
+       // self.detectTags = true
     }
 }

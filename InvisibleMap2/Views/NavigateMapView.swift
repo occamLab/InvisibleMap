@@ -17,7 +17,7 @@ enum InstructionType: Equatable {
     case findTagReminder(startTime: Double)
     case none
 }
-
+/*
 var text: String? {
     get {
         switch self {
@@ -25,7 +25,7 @@ var text: String? {
         }
     }
 }
-
+*/
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
 class NavigateGlobalState: ObservableObject {
     init() {
@@ -34,9 +34,11 @@ class NavigateGlobalState: ObservableObject {
 
 struct NavigateMapView: View {
     @StateObject var navigateGlobalState = NavigateGlobalState()
+    var mapName: String
     
     init() {
         print("currentUser is \(Auth.auth().currentUser!.uid)")
+        mapName = ""
     }
     
     var body : some View {
@@ -45,7 +47,7 @@ struct NavigateMapView: View {
                 // Toolbar buttons
                 .toolbar(content: {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        ExitButton()
+                        ExitButton(mapName: mapName)
                     }
                 })
             .ignoresSafeArea(.keyboard)

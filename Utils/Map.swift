@@ -10,6 +10,7 @@ import Foundation
 import ARKit
 import SwiftGraph
 
+// represents a fully created a Map
 class Map {
     var rawData: RawMap
     var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()

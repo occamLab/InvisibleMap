@@ -210,6 +210,11 @@ extension ARView: ARViewController {
             let aprilTagTracker = InvisibleMapController.shared.mapNavigator.map.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
             InvisibleMapController.shared.mapNavigator.map.aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
             
+            #else
+            let aprilTagTracker = InvisibleMapCreatorController.shared.mapRecorder.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
+            InvisibleMapCreatorController.shared.mapRecorder.aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
+            #endif
+            
             // TODO: need some sort of logic to discard old detections.  One method that seems good would be to add some process noise (Q_k non-zero)
             aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar, doKalman: doKalman)
 
@@ -227,7 +232,6 @@ extension ARView: ARViewController {
                 tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
                 self.detectionNode.addChildNode(tagNode)
             }
-       //     #endif
             
             /// Adds axes to the tag to aid in the visualization
             let xAxis = SCNNode(geometry: SCNBox(width: 1.0, height: 0.05, length: 0.05, chamferRadius: 0))
@@ -242,7 +246,7 @@ extension ARView: ARViewController {
             tagNode.addChildNode(xAxis)
             tagNode.addChildNode(yAxis)
             tagNode.addChildNode(zAxis)
-            #endif
+        //    #endif
         }
     }
 
@@ -555,7 +559,11 @@ extension ARView: ARViewController {
              print(error.localizedDescription)
          }
      }
-    
+    @objc func endSound() {
+        print("ending sound/timer?")
+        pingTimer.invalidate()
+    }
+   
     func updateMapPose(to mapToGlobal: simd_float4x4) {
         self.mapNode.simdTransform = mapToGlobal
     }

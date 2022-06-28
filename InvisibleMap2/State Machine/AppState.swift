@@ -34,7 +34,7 @@ indirect enum AppState: StateType {
         case SaveEditRequested
         case ViewPathRequested
         case DismissPathRequested
-        case LeaveMapRequested
+        case LeaveMapRequested(mapFileName: String)
         case PlanPath
     }
     
@@ -47,7 +47,7 @@ indirect enum AppState: StateType {
         case GetNewWaypoint
         case EditMap
         case FinishedNavigation
-        case LeaveMap
+        case LeaveMap(mapFileName: String)
         case PlanPath
     }
     
@@ -58,11 +58,11 @@ indirect enum AppState: StateType {
             case (.MainScreen, .MapSelected(let mapFileName)):
                 self = .SelectPath(lastState: AppState.MainScreen)
                 return [.LoadMap(mapFileName: mapFileName)]
-            case (.NavigateMap, .LeaveMapRequested):
+            case (.NavigateMap, .LeaveMapRequested(let mapFileName)):
                // self = .MainScreen
                 self = .SelectPath(lastState: AppState.NavigateMap)  // go back to saved location list [SelectPathView] when cancel button is pressed
-               // return [.LeaveMap]  -> cancel button takes you out of the app???
-                return[]
+                return [.LeaveMap(mapFileName: mapFileName)]  //-> cancel button takes you out of the app???
+                //return[]
             case (.NavigateMap, .NewARFrame(let cameraFrame)):
                 return [.UpdatePoseVIO(cameraFrame: cameraFrame)]
             case (.NavigateMap, .TagFound(let tag, let cameraTransform)):
@@ -78,7 +78,7 @@ indirect enum AppState: StateType {
             case (.SelectPath, .PathSelected(let tagId)):
                 self = .NavigateMap
                 return [.StartPath(tagId: tagId)]
-            case (.SelectPath(let lastState), .DismissPathRequested):
+            case (.SelectPath(let lastState), .DismissPathRequested):  //dismiss select path view back to main screen
                 self = lastState
                 return []
             case (.NavigateMap, .PlanPath):
@@ -89,6 +89,10 @@ indirect enum AppState: StateType {
             case (.EditMap, .SaveEditRequested):
                 self = .NavigateMap
                 return [.EditMap]
+      //  case(.NavigateMap, .LeaveMapRequested(let mapFileName)):
+      //      self = .SelectPath(lastState: .NavigateMap)
+      //      return [.LoadMap(mapFileName: mapFileName)]
+
             default: break
         }
         return []

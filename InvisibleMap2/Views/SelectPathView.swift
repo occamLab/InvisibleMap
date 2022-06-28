@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SelectPathView: View {
     @ObservedObject var mapNavigator = InvisibleMapController.shared.mapNavigator
+    public var arViewer: ARView?
     var mapName: String
     
     var body: some View {
@@ -50,6 +51,9 @@ struct SelectPathView: View {
             }
         }.onDisappear() {
             InvisibleMapController.shared.process(event: .DismissPathRequested)  // when select path view is dismissed this event is called that sets the app back to the state it was before the select path view state
+        }
+        .onAppear() {
+            self.arViewer?.endSound()
         }
     }
 }
