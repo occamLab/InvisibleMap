@@ -21,7 +21,7 @@ struct EditMapView: View {
                 .bold()
                 
             // location in this map button
-            NavigationLink(destination: LocationList(mapName: mapName, showLocations: $isShowingLocationListView)) { }
+        //    NavigationLink(destination: LocationList(mapName: mapName, showLocations: $isShowingLocationListView)) { }
             
                     Button(action: {
                         print("view locations list")
@@ -41,6 +41,11 @@ struct EditMapView: View {
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.green, lineWidth: 4))
                     }.padding()
+            .sheet(isPresented: $isShowingLocationListView, onDismiss: {
+                InvisibleMapCreatorController.shared.process(event: .DismissLocationsRequested) // Tells the state machine that the locationlist view has been closed
+            }) {
+                LocationList(mapName: mapName, showLocations: $isShowingLocationListView)
+            }
             
             
         

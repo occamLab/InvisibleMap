@@ -12,7 +12,7 @@ enum AppState: StateType {
     // Higher level app states
     case MainScreen
     case RecordMap(RecordMapState)
-    case EditMapScreen
+    case EditMapScreen(EditMapState)
     
     // Initial state upon opening the app
     static let initialState = AppState.MainScreen
@@ -22,7 +22,7 @@ enum AppState: StateType {
         // MainScreen events
         case StartRecordingRequested
         // EditMapScreen events
-        case MapDeleted(mapID: String)
+        case MapDeleteRequested(mapID: String)
         // RecordMap events
         case NewARFrame(cameraFrame: ARFrame)
         case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
@@ -67,15 +67,67 @@ enum AppState: StateType {
             let commands = newState.handle(event: RecordMapState.Event(event)!)
             self = .RecordMap(newState)
             return commands
-        case (.EditMapScreen, .MapDeleted(_)):
+        case (.EditMapScreen, .MapDeleteRequested(_)):
             self = .MainScreen
               return []
-        case(.EditMapScreen, .SaveLocationRequested(let locationName)):
-            return [.PinLocation(locationName: locationName)]
+        case (.EditMapScreen(let state), _) where EditMapState.Event(event) != nil:
+            var newState = state
+            let commands = newState.handle(event: EditMapState.Event(event)!)
+            self = .EditMapScreen(newState)
+            return commands
             
         default: break
         }
         return []
+    }
+}
+
+enum EditMapState: StateType {
+    
+    // Lower level app stated nested within EditMapState
+    case EditMapScreen
+    case ViewLocations
+    
+    // Initial state upon transitioning into the EditMapState
+    static let initialState: EditMapState.EditMapScreen
+    
+    // All the effectual inputs from the app which EditMapState can react to
+    enum Event {
+        case MapDeleteRequested(mapID: String)
+        case ViewLocationsRequested
+        case DismissLocationsRequested
+    }
+    
+    // Refers to commands defined in AppState
+    typealias Command = AppState.Command
+    
+    // In response to an event, EditMapState may emit a command
+    mutating func handle(event: Event) -> [Command] {
+        switch (self, event) {
+        case(.EditMapScreen, .ViewLocationsRequested):
+            self = .ViewLocations
+            return []
+        case(.ViewLocations, .DismissLocationsRequested):
+            self = .EditMapScreen
+            return []
+            
+        default: break
+        }
+        return []
+    }
+}
+
+extension EditMapState.Event {
+    init?(_ event: AppState.Event) {
+        // Translate between events in AppState and events in EditMapState
+        switch event {
+            case .ViewLocationsRequested:
+                self = .ViewLocationsRequested
+            case .DismissLocationsRequested:
+                self = .DismissLocationsRequested
+                
+            default: return nil
+        }
     }
 }
 
@@ -157,3 +209,5 @@ extension RecordMapState.Event {
         }
     }
 }
+
+
