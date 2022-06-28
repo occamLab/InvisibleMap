@@ -9,6 +9,23 @@
 import SwiftUI
 import FirebaseAuth
 
+// Describes all the instructions that will exist on-screen for the user
+enum InstructionType: Equatable {
+    case findTag(startTime: Double)
+    case tagFound(startTime: Double)
+    case destinationReached(startTime: Double)
+    case findTagReminder(startTime: Double)
+    case none
+}
+
+var text: String? {
+    get {
+        switch self {
+            
+        }
+    }
+}
+
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
 class NavigateGlobalState: ObservableObject {
     init() {

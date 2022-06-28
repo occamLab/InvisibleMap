@@ -12,7 +12,7 @@ enum AppState: StateType {
     // Higher level app states
     case MainScreen
     case RecordMap(RecordMapState)
-    case EditMapScreen(EditMapState)
+    case EditMapScreen//(EditMapState)
     
     // Initial state upon opening the app
     static let initialState = AppState.MainScreen
@@ -70,18 +70,18 @@ enum AppState: StateType {
         case (.EditMapScreen, .MapDeleteRequested(_)):
             self = .MainScreen
               return []
-        case (.EditMapScreen(let state), _) where EditMapState.Event(event) != nil:
+      /*  case (.EditMapScreen(let state), _) where EditMapState.Event(event) != nil:
             var newState = state
             let commands = newState.handle(event: EditMapState.Event(event)!)
             self = .EditMapScreen(newState)
-            return commands
+            return commands */
             
         default: break
         }
         return []
     }
 }
-
+/*
 enum EditMapState: StateType {
     
     // Lower level app stated nested within EditMapState
@@ -130,7 +130,7 @@ extension EditMapState.Event {
         }
     }
 }
-
+*/
 enum RecordMapState: StateType {
     // Lower level app states nested within RecordMapState
     case RecordMap

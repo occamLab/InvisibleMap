@@ -9,19 +9,21 @@ import SwiftUI
 
 struct EditMapView: View {
     @State private var showingDeleteConfirmation = false
-    var mapName: String
+    var map: MapData
     @State private var isShowingLocationListView = false
-    @StateObject static var recordGlobalState = RecordGlobalState()
+    @State static var recordGlobalState = RecordGlobalState()
     
     var body: some View {
    //     NavigationView {
     
-            Text("Map Name: \(mapName)")
+        Text("Map Name: \(map.name)")
                 .font(.title)
                 .bold()
                 
             // location in this map button
-        //    NavigationLink(destination: LocationList(mapName: mapName, showLocations: $isShowingLocationListView)) { }
+        NavigationLink(destination: LocationListView(mapName: map.name, showLocations: $isShowingLocationListView)) {} //.onAppear() {
+         //   InvisibleMapCreatorController.shared.process(event: .MapSelected(mapFileName: map.file))
+      //  }
             
                     Button(action: {
                         print("view locations list")
@@ -44,13 +46,13 @@ struct EditMapView: View {
             .sheet(isPresented: $isShowingLocationListView, onDismiss: {
                 InvisibleMapCreatorController.shared.process(event: .DismissLocationsRequested) // Tells the state machine that the locationlist view has been closed
             }) {
-                LocationList(mapName: mapName, showLocations: $isShowingLocationListView)
+                LocationListView(mapName: map.name, showLocations: $isShowingLocationListView)
             }
             
             
-        
             // upload map button
-            Button(action: {
+        // TODO: allow map creators to upload map to Invisible Maps app instead of letting the Creator app upload it automatically
+         /*   Button(action: {
                 // TODO: upload map to IM app
             }) {
                 Text("Upload Map to Invisible Maps")
@@ -64,8 +66,9 @@ struct EditMapView: View {
                     .overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.orange, lineWidth: 4))
-            }.padding()
+            }.padding() */
             
+        
             // delete map button
             Button(action: {
                 showingDeleteConfirmation = true
@@ -88,12 +91,13 @@ struct EditMapView: View {
                         title: Text("Are you sure?"),
                         primaryButton: .destructive(Text("Delete")) {
                             print("deleting map..")
-                            InvisibleMapCreatorController.shared.deleteMap(mapName: mapName)
+                            InvisibleMapCreatorController.shared.deleteMap(mapName: map.name)
                         },
                         secondaryButton: .cancel()
                     )
                 }
             
+        /*
             // Share map button
             Button(action: {
                 // TODO: share map
@@ -110,9 +114,8 @@ struct EditMapView: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.blue, lineWidth: 4))
             }.padding()
-        }
-    //}
-    
+        } */
+    }
 }
 
 /*

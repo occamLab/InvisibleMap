@@ -89,7 +89,8 @@
 		98082AB42864FECB009E808C /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB32864FECB009E808C /* MenuView.swift */; };
 		98082AB52864FECB009E808C /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB32864FECB009E808C /* MenuView.swift */; };
 		98082AB7286633B1009E808C /* ExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB6286633B1009E808C /* ExitButton.swift */; };
-		98082AB9286A3DDB009E808C /* LocationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB8286A3DDB009E808C /* LocationList.swift */; };
+		98082ABF286B6F25009E808C /* LocationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082ABE286B6F25009E808C /* LocationListView.swift */; };
+		98082AC1286B6FEC009E808C /* InstructionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141497E52645A41700BF0ABC /* InstructionOverlay.swift */; };
 		984C21CB26B445C9006EEF4F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */; };
 		984C21CD26B447C6006EEF4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86F39545210FA42600F209EC /* Assets.xcassets */; };
 		984C21D026B44F4D006EEF4F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 984C21CF26B44F4D006EEF4F /* FirebaseAnalytics */; };
@@ -178,7 +179,7 @@
 		86F39555210FA42600F209EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98082AB32864FECB009E808C /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		98082AB6286633B1009E808C /* ExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitButton.swift; sourceTree = "<group>"; };
-		98082AB8286A3DDB009E808C /* LocationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationList.swift; sourceTree = "<group>"; };
+		98082ABE286B6F25009E808C /* LocationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationListView.swift; sourceTree = "<group>"; };
 		984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		98BF269526AF01F60076427E /* AppleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInController.swift; sourceTree = "<group>"; };
 		98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
@@ -268,7 +269,6 @@
 		1447B71F2624227600230A58 /* Record Map Subviews */ = {
 			isa = PBXGroup;
 			children = (
-				141497E52645A41700BF0ABC /* InstructionOverlay.swift */,
 				14995FD126269AB400A7C78B /* ExitButton.swift */,
 				14995FD626269B0900A7C78B /* SaveButton.swift */,
 				143011F82629D8AF0042FDFC /* AddLocationButton.swift */,
@@ -283,8 +283,8 @@
 			isa = PBXGroup;
 			children = (
 				14E164722633523B0087A426 /* EditMapView.swift */,
-				98082AB8286A3DDB009E808C /* LocationList.swift */,
 				14995FE9262713EC00A7C78B /* RecordMapView.swift */,
+				98082AC0286B6F5B009E808C /* Edit Map Subviews */,
 				1447B71F2624227600230A58 /* Record Map Subviews */,
 			);
 			path = Views;
@@ -377,6 +377,7 @@
 				1F83DB71273F02C100D0148F /* BaseNavigationView.swift */,
 				98E9BE972756BAE9001B5A2B /* ViewStructs.swift */,
 				98082AB32864FECB009E808C /* MenuView.swift */,
+				141497E52645A41700BF0ABC /* InstructionOverlay.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -460,6 +461,14 @@
 				86F39555210FA42600F209EC /* Info.plist */,
 			);
 			path = InvisibleMapTests;
+			sourceTree = "<group>";
+		};
+		98082AC0286B6F5B009E808C /* Edit Map Subviews */ = {
+			isa = PBXGroup;
+			children = (
+				98082ABE286B6F25009E808C /* LocationListView.swift */,
+			);
+			path = "Edit Map Subviews";
 			sourceTree = "<group>";
 		};
 		98BF269A26AF2E4F0076427E /* Authentication */ = {
@@ -644,12 +653,12 @@
 				1F131D72271F5FCC00568FEC /* FirebaseManager.swift in Sources */,
 				1F83DB72273F02C100D0148F /* BaseNavigationView.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
+				98082ABF286B6F25009E808C /* LocationListView.swift in Sources */,
 				14995FD726269B0900A7C78B /* SaveButton.swift in Sources */,
 				141497E62645A41700BF0ABC /* InstructionOverlay.swift in Sources */,
 				98BF26A126AF4F9E0076427E /* AuthenticationHelper.swift in Sources */,
 				14995FB6262639E400A7C78B /* TagFinder.mm in Sources */,
 				98E9BE982756BAE9001B5A2B /* ViewStructs.swift in Sources */,
-				98082AB9286A3DDB009E808C /* LocationList.swift in Sources */,
 				1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */,
 				1FE9717A26FB8AFB00DEB00A /* AppController.swift in Sources */,
 				1FE97193271619F200DEB00A /* Map.swift in Sources */,
@@ -678,6 +687,7 @@
 				1FE9718B26FE635D00DEB00A /* MemoryChecker.m in Sources */,
 				1F131D73271F5FCC00568FEC /* FirebaseManager.swift in Sources */,
 				1FE9718626FE615600DEB00A /* AprilTagTracker.swift in Sources */,
+				98082AC1286B6FEC009E808C /* InstructionOverlay.swift in Sources */,
 				98D494872757D34700BF0279 /* AppleSignInController.swift in Sources */,
 				1FE9718526FE614F00DEB00A /* ImageConversion.mm in Sources */,
 				1FE9718426FE614B00DEB00A /* ImageDisplay.mm in Sources */,

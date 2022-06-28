@@ -56,7 +56,7 @@ struct ContentView: View {
                                 ForEach(filteredMaps, id: \.image) { map in
                                     #if IS_MAP_CREATOR
                                     NavigationLink(
-                                        destination: EditMapView(mapName: map.name)
+                                        destination: EditMapView(map: map)
                                     ) {
                                         HStack {
                                             Image(uiImage: map.image)

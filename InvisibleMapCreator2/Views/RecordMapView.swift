@@ -101,6 +101,7 @@ enum InstructionType: Equatable {
             }
         } else {
             let currentTime = NSDate().timeIntervalSince1970
+            // time that instructions stay on screen
             if currentTime - self.getStartTime() > 8 {
                 self = .none
             }
