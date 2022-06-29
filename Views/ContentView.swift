@@ -69,7 +69,7 @@ struct ContentView: View {
                                         }
                                     }
                                     #else
-                                    NavigationLink(destination: SelectPathView(mapName: map.name).onAppear() {
+                                    NavigationLink(destination: SelectPathView(mapName: map.name, mapFileName: map.file).onAppear() {
                                         InvisibleMapController.shared.process(event: .MapSelected(mapFileName: map.file))
                                     })
                                     {

@@ -1,5 +1,5 @@
 //
-//  AppState.swift
+//  InvisibleMapAppState.swift
 //  InvisibleMap2
 //
 //  Created by Allison Li and Ben Morris on 9/15/21.
@@ -9,22 +9,22 @@
 import Foundation
 import ARKit
 
-indirect enum AppState: StateType {
+indirect enum InvisibleMapAppState: StateType {
     // Higher level app states
     case MainScreen
     case NavigateMap
     case EditMap
-    case SelectPath(lastState: AppState)
+    case SelectPath(lastState: InvisibleMapAppState)
     
     // Initial state upon opening the app
-    static let initialState = AppState.MainScreen
+    static let initialState = InvisibleMapAppState.MainScreen
     
     // All the effectual inputs from the app which the state can react to
     enum Event {
         // MainScreen events
         case MapSelected(mapFileName: String)
         // SelectPath events
-        case PathSelected(tagId: Int)
+        case PathSelected(locationType: String, Id: Int)
         // NavigateMap events
         case NewARFrame(cameraFrame: ARFrame)
         case TagFound(tag: AprilTags, cameraTransform: simd_float4x4)
@@ -41,7 +41,7 @@ indirect enum AppState: StateType {
     // All the effectful outputs which the state desires to have performed on the app
     enum Command {
         case LoadMap(mapFileName: String)
-        case StartPath(tagId: Int)
+        case StartPath(locationType: String, Id: Int)
         case UpdatePoseVIO(cameraFrame: ARFrame)
         case UpdatePoseTag(tag: AprilTags, cameraTransform: simd_float4x4)
         case GetNewWaypoint
@@ -55,43 +55,55 @@ indirect enum AppState: StateType {
     mutating func handle(event: Event) -> [Command] {
         print("Current State: \(self), \(event)")
         switch (self, event) {
+            // Note: loads the selected map each time state changes from mainscreen to selectpath (location list view) state; when users go from selectpath to mainscreen state is reset to mainscreen (laststate before selectpath) -> dismisspathrequested (event)
             case (.MainScreen, .MapSelected(let mapFileName)):
-                self = .SelectPath(lastState: AppState.MainScreen)
+                self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
                 return [.LoadMap(mapFileName: mapFileName)]
+            
+            // Note: go back to saved location list [SelectPathView] when cancel button is pressed; lastState of SelectPath must be MainScreen in order to reload maps' location lists in SelectPath view
             case (.NavigateMap, .LeaveMapRequested(let mapFileName)):
-               // self = .MainScreen
-                self = .SelectPath(lastState: AppState.NavigateMap)  // go back to saved location list [SelectPathView] when cancel button is pressed
-                return [.LeaveMap(mapFileName: mapFileName)]  //-> cancel button takes you out of the app???
-                //return[]
+                self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
+                return [.LeaveMap(mapFileName: mapFileName)]
+               // return[]
+            
             case (.NavigateMap, .NewARFrame(let cameraFrame)):
                 return [.UpdatePoseVIO(cameraFrame: cameraFrame)]
+            
             case (.NavigateMap, .TagFound(let tag, let cameraTransform)):
                 return [.UpdatePoseTag(tag: tag, cameraTransform: cameraTransform)]
+            
             case (.NavigateMap, .WaypointReached(let finalWaypoint)):
                 return finalWaypoint ? [.GetNewWaypoint] : [.FinishedNavigation]
+            
             case (.NavigateMap, .EditMapRequested):
                 self = .EditMap
                 return []
-            case (.NavigateMap, .ViewPathRequested):
-                self = .SelectPath(lastState: .NavigateMap)
-                return []
-            case (.SelectPath, .PathSelected(let tagId)):
-                self = .NavigateMap
-                return [.StartPath(tagId: tagId)]
-            case (.SelectPath(let lastState), .DismissPathRequested):  //dismiss select path view back to main screen
-                self = lastState
-                return []
+            
             case (.NavigateMap, .PlanPath):
                 return [.PlanPath]
-            case (.EditMap, .CancelEditRequested):
+            
+         /*   case (.NavigateMap, .ViewPathRequested):
+                self = .SelectPath(lastState: InvisibleMapAppState.NavigateMap)
+                return [] */
+            
+            case (.SelectPath, .PathSelected(let locationType, let Id)):
+                self = .NavigateMap
+            return [.StartPath(locationType: locationType, Id: Id)]
+            
+            // Note: dismiss select path view back and set app state back to main screen
+            case (.SelectPath(let lastState), .DismissPathRequested):
+                self = lastState
+                return []
+            
+            
+            
+        /*    case (.EditMap, .CancelEditRequested):
                 self = .NavigateMap
                 return []
+         
             case (.EditMap, .SaveEditRequested):
                 self = .NavigateMap
-                return [.EditMap]
-      //  case(.NavigateMap, .LeaveMapRequested(let mapFileName)):
-      //      self = .SelectPath(lastState: .NavigateMap)
-      //      return [.LoadMap(mapFileName: mapFileName)]
+                return [.EditMap] */
 
             default: break
         }

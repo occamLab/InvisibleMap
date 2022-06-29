@@ -10,7 +10,7 @@ import ARKit
 
 class InvisibleMapCreatorController: AppController {
     public static var shared = InvisibleMapCreatorController()
-    private var state = AppState.initialState
+    private var state = CreatorAppState.initialState
     
     // Various controllers for handling commands
     var mapRecorder = MapRecorder()
@@ -25,7 +25,7 @@ class InvisibleMapCreatorController: AppController {
         self.arViewer?.initialize()
     }
 
-    func process(commands: [AppState.Command]) {
+    func process(commands: [CreatorAppState.Command]) {
         for command in commands {
             switch command {
             // MapRecorder commands
@@ -38,7 +38,7 @@ class InvisibleMapCreatorController: AppController {
             case .ClearData:
                 mapRecorder.clearData()
                 arViewer?.resetArSession()
-                arView?.endSound()
+                //arView?.endSound()
             case .SendToFirebase(let mapName):
                 mapRecorder.sendToFirebase(mapName: mapName)
             // ARViewer commands
@@ -58,18 +58,18 @@ class InvisibleMapCreatorController: AppController {
         }
     }
     
-    func process(event: AppState.Event) {
+    func process(event: CreatorAppState.Event) {
         process(commands: state.handle(event: event))
     }
 }
 
 extension InvisibleMapCreatorController {
     func cacheLocationRequested(node: SCNNode, picture: UIImage, textNode: SCNNode) {
-        process(commands: [AppState.Command.CacheLocation(node: node, picture: picture, textNode: textNode)])
+        process(commands: [CreatorAppState.Command.CacheLocation(node: node, picture: picture, textNode: textNode)])
     }
     
     func updateLocationListRequested(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
-        process(commands: [AppState.Command.UpdateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)])
+        process(commands: [CreatorAppState.Command.UpdateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)])
     }
     
     func deleteMap(mapName: String) {

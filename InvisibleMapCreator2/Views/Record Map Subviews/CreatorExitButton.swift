@@ -1,5 +1,5 @@
 //
-//  ExitButton.swift
+//  CreatorExitButton.swift
 //  InvisbleMapCreator2
 //
 //  Created by Marion Madanguit on 4/13/21.
@@ -9,7 +9,7 @@
 
 import SwiftUI
 
-struct ExitButton: View {
+struct CreatorExitButton: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode> // Tracks whether the RecordMap screen is being presented
     @State private var showCancelConfirmation = false
 
@@ -35,8 +35,8 @@ struct ExitButton: View {
     }
 }
 
-struct ExitButton_Previews: PreviewProvider {
+struct CreatorExitButton_Previews: PreviewProvider {
     static var previews: some View {
-        ExitButton()
+        CreatorExitButton()
     }
 }

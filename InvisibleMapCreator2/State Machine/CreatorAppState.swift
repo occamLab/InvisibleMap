@@ -1,5 +1,5 @@
 //
-//  AppState.swift
+//  CreatorAppState.swift
 //  InvisibleMapCreator
 //
 //  Created by Marion Madanguit on 3/5/21.
@@ -8,14 +8,14 @@
 import Foundation
 import ARKit
 
-enum AppState: StateType {
+enum CreatorAppState: StateType {
     // Higher level app states
     case MainScreen
     case RecordMap(RecordMapState)
     case EditMapScreen//(EditMapState)
     
     // Initial state upon opening the app
-    static let initialState = AppState.MainScreen
+    static let initialState = CreatorAppState.MainScreen
     
     // All the effectual inputs from the app which the state can react to
     enum Event {
@@ -98,8 +98,8 @@ enum EditMapState: StateType {
         case DismissLocationsRequested
     }
     
-    // Refers to commands defined in AppState
-    typealias Command = AppState.Command
+    // Refers to commands defined in CreatorAppState
+    typealias Command = CreatorAppState.Command
     
     // In response to an event, EditMapState may emit a command
     mutating func handle(event: Event) -> [Command] {
@@ -118,8 +118,8 @@ enum EditMapState: StateType {
 }
 
 extension EditMapState.Event {
-    init?(_ event: AppState.Event) {
-        // Translate between events in AppState and events in EditMapState
+    init?(_ event: CreatorAppState.Event) {
+        // Translate between events in CreatorAppState and events in EditMapState
         switch event {
             case .ViewLocationsRequested:
                 self = .ViewLocationsRequested
@@ -153,8 +153,8 @@ enum RecordMapState: StateType {
         case SaveMapRequested
     }
     
-    // Refers to commands defined in AppState
-    typealias Command = AppState.Command
+    // Refers to commands defined in CreatorAppState
+    typealias Command = CreatorAppState.Command
     
     // In response to an event, RecordMapState may emit a command
     mutating func handle(event: Event) -> [Command] {
@@ -189,8 +189,8 @@ enum RecordMapState: StateType {
 }
 
 extension RecordMapState.Event {
-    init?(_ event: AppState.Event) {
-        // Translate between events in AppState and events in RecordMapState
+    init?(_ event: CreatorAppState.Event) {
+        // Translate between events in CreatorAppState and events in RecordMapState
         switch event {
         case .NewARFrame(let cameraFrame):
             self = .NewARFrame(cameraFrame: cameraFrame)
@@ -209,5 +209,6 @@ extension RecordMapState.Event {
         }
     }
 }
+
 
 

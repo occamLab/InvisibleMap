@@ -17,7 +17,10 @@ class MapNavigator: ObservableObject {
             objectWillChange.send()
         }
     }
+    var locationType: String = "tag"
+    // updates every time .StartPath command is called, depending on type of endpoint user selects (i.e. if tag is clicked endpointTagId updates, if POI is clicked endpointLocation Id updates)
     var endpointTagId: Int = 0
+    var endpointLocationId: Int = 0
     let tagFinder = imageToData()
     @Published var detectTags = false //changed true -> false - don't start detecting tags until user presses start detect tag button on navigate map view
     var processingFrame = false
@@ -45,9 +48,18 @@ class MapNavigator: ObservableObject {
             return nil
         }
 
+        // end point for navigating to tag locations
+        // searching for first instance of match between id and given endpointTagId
         let tagLocation = self.map.rawData.tagVertices.first(where: {$0.id == self.endpointTagId})!.translation
         
-        let endpoint = self.map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
+        var endpoint = self.map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
+        
+        // end point for navigating to waypoints/POIs
+        if locationType == "waypoint" {
+            let waypointLocation = self.map.rawData.waypointsVertices.first(where: {$0.id == self.map.waypointDictionary[endpointLocationId]!.id})!.translation
+            
+            endpoint = self.map.getClosestGraphNode(to: simd_float3(waypointLocation.x, waypointLocation.y, waypointLocation.z))!
+        }
         let startpoint = self.map.getClosestGraphNode(to: currentLocation, ignoring: endpoint)
 
         let (_, pathDict) = self.map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
@@ -122,7 +134,7 @@ class MapNavigator: ObservableObject {
     
     func resetMap() {
         self.stopPathPlanning()
-        self.map = nil // 
-       // self.detectTags = true
+        self.map = nil    // fix later: creates an empty select path view page when exiting from navigate map state??
+        self.detectTags = false //true
     }
 }

@@ -19,7 +19,6 @@
 		1447B75B2624230200230A58 /* InvisibleMapCreatorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7552624230200230A58 /* InvisibleMapCreatorController.swift */; };
 		1447B75C2624230200230A58 /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7562624230200230A58 /* StateType.swift */; };
 		1447B75E2624230200230A58 /* MapRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7592624230200230A58 /* MapRecorder.swift */; };
-		1447B75F2624230200230A58 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B75A2624230200230A58 /* AppState.swift */; };
 		14995FB2262639DA00A7C78B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4A2113394B007343B4 /* main.m */; };
 		14995FB6262639E400A7C78B /* TagFinder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4C2113394B007343B4 /* TagFinder.mm */; };
 		14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */ = {isa = PBXBuildFile; fileRef = 868CBA4721133939007343B4 /* ImageDisplay.mm */; };
@@ -28,7 +27,6 @@
 		14995FC026263B3100A7C78B /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
 		14995FC426263BA800A7C78B /* visp3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86616BC42113369200DD565C /* visp3.framework */; };
 		14995FC826263BB700A7C78B /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8630963B21125E89003D4434 /* opencv2.framework */; };
-		14995FD226269AB400A7C78B /* ExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD126269AB400A7C78B /* ExitButton.swift */; };
 		14995FD726269B0900A7C78B /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FD626269B0900A7C78B /* SaveButton.swift */; };
 		14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14995FE9262713EC00A7C78B /* RecordMapView.swift */; };
 		14E164732633523B0087A426 /* EditMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E164722633523B0087A426 /* EditMapView.swift */; };
@@ -45,7 +43,6 @@
 		1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A36126F2493A0044BE18 /* InvisibleMap2App.swift */; };
 		1F77A36626F249480044BE18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F77A36526F249480044BE18 /* Assets.xcassets */; };
 		1F77A36926F249480044BE18 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F77A36826F249480044BE18 /* Preview Assets.xcassets */; };
-		1F77A37326F2522E0044BE18 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F77A37226F2522E0044BE18 /* AppState.swift */; };
 		1F83DB6A272C7AE800D0148F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB69272C7AE800D0148F /* Utils.swift */; };
 		1F83DB6B272C7AE800D0148F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83DB69272C7AE800D0148F /* Utils.swift */; };
 		1F83DB70273EFC0C00D0148F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447B7412624229600230A58 /* ContentView.swift */; };
@@ -88,9 +85,12 @@
 		86F39549210FA42600F209EC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86F39547210FA42600F209EC /* LaunchScreen.storyboard */; };
 		98082AB42864FECB009E808C /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB32864FECB009E808C /* MenuView.swift */; };
 		98082AB52864FECB009E808C /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB32864FECB009E808C /* MenuView.swift */; };
-		98082AB7286633B1009E808C /* ExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AB6286633B1009E808C /* ExitButton.swift */; };
 		98082ABF286B6F25009E808C /* LocationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082ABE286B6F25009E808C /* LocationListView.swift */; };
 		98082AC1286B6FEC009E808C /* InstructionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141497E52645A41700BF0ABC /* InstructionOverlay.swift */; };
+		98082AC3286CB6AD009E808C /* MapNavigateExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AC2286CB6AC009E808C /* MapNavigateExitButton.swift */; };
+		98082AC5286CBDE4009E808C /* InvisibleMapAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AC4286CBDE4009E808C /* InvisibleMapAppState.swift */; };
+		98082AC7286CBEE1009E808C /* CreatorExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AC6286CBEE1009E808C /* CreatorExitButton.swift */; };
+		98082AC9286CBF6B009E808C /* CreatorAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AC8286CBF6B009E808C /* CreatorAppState.swift */; };
 		984C21CB26B445C9006EEF4F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */; };
 		984C21CD26B447C6006EEF4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86F39545210FA42600F209EC /* Assets.xcassets */; };
 		984C21D026B44F4D006EEF4F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 984C21CF26B44F4D006EEF4F /* FirebaseAnalytics */; };
@@ -128,8 +128,6 @@
 		1447B7552624230200230A58 /* InvisibleMapCreatorController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InvisibleMapCreatorController.swift; sourceTree = "<group>"; };
 		1447B7562624230200230A58 /* StateType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
 		1447B7592624230200230A58 /* MapRecorder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapRecorder.swift; sourceTree = "<group>"; };
-		1447B75A2624230200230A58 /* AppState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
-		14995FD126269AB400A7C78B /* ExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitButton.swift; sourceTree = "<group>"; };
 		14995FD626269B0900A7C78B /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		14995FE9262713EC00A7C78B /* RecordMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMapView.swift; sourceTree = "<group>"; };
 		14E164722633523B0087A426 /* EditMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMapView.swift; sourceTree = "<group>"; };
@@ -143,7 +141,6 @@
 		1F77A36526F249480044BE18 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1F77A36826F249480044BE18 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1F77A36A26F249480044BE18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F77A37226F2522E0044BE18 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		1F83DB69272C7AE800D0148F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		1F83DB71273F02C100D0148F /* BaseNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseNavigationView.swift; sourceTree = "<group>"; };
 		1F83DB74273F081300D0148F /* NavigateMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigateMapView.swift; sourceTree = "<group>"; };
@@ -178,8 +175,11 @@
 		86F39553210FA42600F209EC /* InvisibleMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapTests.swift; sourceTree = "<group>"; };
 		86F39555210FA42600F209EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98082AB32864FECB009E808C /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
-		98082AB6286633B1009E808C /* ExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitButton.swift; sourceTree = "<group>"; };
 		98082ABE286B6F25009E808C /* LocationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationListView.swift; sourceTree = "<group>"; };
+		98082AC2286CB6AC009E808C /* MapNavigateExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapNavigateExitButton.swift; sourceTree = "<group>"; };
+		98082AC4286CBDE4009E808C /* InvisibleMapAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapAppState.swift; sourceTree = "<group>"; };
+		98082AC6286CBEE1009E808C /* CreatorExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorExitButton.swift; sourceTree = "<group>"; };
+		98082AC8286CBF6B009E808C /* CreatorAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorAppState.swift; sourceTree = "<group>"; };
 		984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		98BF269526AF01F60076427E /* AppleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInController.swift; sourceTree = "<group>"; };
 		98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
@@ -269,7 +269,7 @@
 		1447B71F2624227600230A58 /* Record Map Subviews */ = {
 			isa = PBXGroup;
 			children = (
-				14995FD126269AB400A7C78B /* ExitButton.swift */,
+				98082AC6286CBEE1009E808C /* CreatorExitButton.swift */,
 				14995FD626269B0900A7C78B /* SaveButton.swift */,
 				143011F82629D8AF0042FDFC /* AddLocationButton.swift */,
 				143011FD2629D8CD0042FDFC /* ManageLocationsButton.swift */,
@@ -293,7 +293,7 @@
 		1447B749262422AB00230A58 /* State Machine */ = {
 			isa = PBXGroup;
 			children = (
-				1447B75A2624230200230A58 /* AppState.swift */,
+				98082AC8286CBF6B009E808C /* CreatorAppState.swift */,
 				1447B7552624230200230A58 /* InvisibleMapCreatorController.swift */,
 				1447B7582624230200230A58 /* Controllers */,
 			);
@@ -352,7 +352,7 @@
 		1F77A36F26F251A90044BE18 /* State Machine */ = {
 			isa = PBXGroup;
 			children = (
-				1F77A37226F2522E0044BE18 /* AppState.swift */,
+				98082AC4286CBDE4009E808C /* InvisibleMapAppState.swift */,
 				1FE9717C26FB8B2D00DEB00A /* InvisibleMapController.swift */,
 				1FE9718026FE50C800DEB00A /* Controllers */,
 			);
@@ -386,7 +386,7 @@
 			isa = PBXGroup;
 			children = (
 				1FE46D7F27644F93001A3812 /* TagDetectionButton.swift */,
-				98082AB6286633B1009E808C /* ExitButton.swift */,
+				98082AC2286CB6AC009E808C /* MapNavigateExitButton.swift */,
 			);
 			path = "NavigateMap Subviews";
 			sourceTree = "<group>";
@@ -646,10 +646,11 @@
 				1447B72F2624227600230A58 /* ARView.swift in Sources */,
 				1447B75B2624230200230A58 /* InvisibleMapCreatorController.swift in Sources */,
 				14995FC026263B3100A7C78B /* simd+ext.swift in Sources */,
+				98082AC7286CBEE1009E808C /* CreatorExitButton.swift in Sources */,
 				98BF26A026AF4F9E0076427E /* AppleSignInController.swift in Sources */,
 				1447B706262421CC00230A58 /* InvisibleMapCreator2App.swift in Sources */,
 				1F83DB6A272C7AE800D0148F /* Utils.swift in Sources */,
-				14995FD226269AB400A7C78B /* ExitButton.swift in Sources */,
+				98082AC9286CBF6B009E808C /* CreatorAppState.swift in Sources */,
 				1F131D72271F5FCC00568FEC /* FirebaseManager.swift in Sources */,
 				1F83DB72273F02C100D0148F /* BaseNavigationView.swift in Sources */,
 				14995FB7262639E900A7C78B /* ImageDisplay.mm in Sources */,
@@ -669,7 +670,6 @@
 				98082AB42864FECB009E808C /* MenuView.swift in Sources */,
 				1447B7422624229600230A58 /* ContentView.swift in Sources */,
 				1447B75C2624230200230A58 /* StateType.swift in Sources */,
-				1447B75F2624230200230A58 /* AppState.swift in Sources */,
 				14E164732633523B0087A426 /* EditMapView.swift in Sources */,
 				1447B75E2624230200230A58 /* MapRecorder.swift in Sources */,
 				14995FB2262639DA00A7C78B /* main.m in Sources */,
@@ -682,6 +682,7 @@
 			files = (
 				1FE9718326FE614700DEB00A /* TagFinder.mm in Sources */,
 				1FE9717B26FB8AFC00DEB00A /* AppController.swift in Sources */,
+				98082AC5286CBDE4009E808C /* InvisibleMapAppState.swift in Sources */,
 				1FE46D8027644F93001A3812 /* TagDetectionButton.swift in Sources */,
 				1FE9717F26FBA29E00DEB00A /* ARView.swift in Sources */,
 				1FE9718B26FE635D00DEB00A /* MemoryChecker.m in Sources */,
@@ -697,15 +698,14 @@
 				1FE9717626FB88BE00DEB00A /* StateType.swift in Sources */,
 				1F83DB75273F081300D0148F /* NavigateMapView.swift in Sources */,
 				1FE971902703AC9600DEB00A /* Map.swift in Sources */,
+				98082AC3286CB6AD009E808C /* MapNavigateExitButton.swift in Sources */,
 				1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */,
 				1F83DB70273EFC0C00D0148F /* ContentView.swift in Sources */,
 				98E9BE992756BAE9001B5A2B /* ViewStructs.swift in Sources */,
-				98082AB7286633B1009E808C /* ExitButton.swift in Sources */,
 				1F83DB73273F02C100D0148F /* BaseNavigationView.swift in Sources */,
 				98D494882757D34900BF0279 /* AuthenticationHelper.swift in Sources */,
 				1FE9717D26FB8B2D00DEB00A /* InvisibleMapController.swift in Sources */,
 				1FE9718226FE50E400DEB00A /* MapNavigator.swift in Sources */,
-				1F77A37326F2522E0044BE18 /* AppState.swift in Sources */,
 				98E9BE9B2756C104001B5A2B /* SelectPathView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

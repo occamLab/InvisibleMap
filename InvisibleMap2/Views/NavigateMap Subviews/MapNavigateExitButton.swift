@@ -1,18 +1,18 @@
 //
-//  ExitButton.swift
+//  MapNavigateExitButton.swift
 //  InvisibleMap2
 //
 //  Created by occamlab on 6/24/22.
 //  Copyright © 2022 Occam Lab. All rights reserved.
 //
-//  Exit Button for Invisible Map 
+//  Exit Button for Invisible Map
 
 import SwiftUI
 
-struct ExitButton: View {
+struct MapNavigateExitButton: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     @State private var showCancelConfirmation = false
-    var mapName: String
+    var mapFileName: String
 
     var body: some View {
         Button(action: {
@@ -29,10 +29,11 @@ struct ExitButton: View {
                 print("exiting map navigation view...")
                 self.mode.wrappedValue.dismiss()
              //   NavigationLink(destination: SelectPathView())
-                InvisibleMapController.shared.process(event: .LeaveMapRequested(mapFileName: mapName)) // Tells the state machine to cancel the map navigating
+                    InvisibleMapController.shared.process(event: .LeaveMapRequested(mapFileName: mapFileName)) // Tells the state machine to cancel the map navigating
                 },
                 secondaryButton: .cancel()
             )
         }
     }
 }
+

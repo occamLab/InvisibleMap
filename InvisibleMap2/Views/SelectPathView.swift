@@ -12,6 +12,7 @@ struct SelectPathView: View {
     @ObservedObject var mapNavigator = InvisibleMapController.shared.mapNavigator
     public var arViewer: ARView?
     var mapName: String
+    var mapFileName: String
     
     var body: some View {
         NavigationView {
@@ -27,8 +28,8 @@ struct SelectPathView: View {
                     List {
                         Text("Tag Locations: ")
                         ForEach(Array(mapNavigator.map.tagDictionary.keys), id: \.self) { location in
-                            NavigationLink(destination: NavigateMapView().onAppear() {
-                                InvisibleMapController.shared.process(event: .PathSelected(tagId: location))
+                            NavigationLink(destination: NavigateMapView(mapFileName: mapFileName).onAppear() {
+                                InvisibleMapController.shared.process(event: .PathSelected(locationType: "tag", Id: location))
                             }) {
                                 Text("\(location)")
                             }
@@ -40,8 +41,8 @@ struct SelectPathView: View {
                         Text("Saved Locations of Interests: ")
                         ForEach(Array(mapNavigator.map.waypointDictionary.keys), id: \.self) { location in
                             // location list where each location navigates to navigation camera screen to start navigating to that selected location
-                            NavigationLink(destination: NavigateMapView().onAppear() {
-                                // TODO: Navigate to saved location of interest
+                            NavigationLink(destination: NavigateMapView(mapFileName: mapFileName).onAppear() {
+                                InvisibleMapController.shared.process(event: .PathSelected(locationType: "waypoint", Id: location))
                             }) {
                                 Text("\(mapNavigator.map.waypointDictionary[location]!.id)")
                             }
@@ -52,9 +53,9 @@ struct SelectPathView: View {
         }.onDisappear() {
             InvisibleMapController.shared.process(event: .DismissPathRequested)  // when select path view is dismissed this event is called that sets the app back to the state it was before the select path view state
         }
-        .onAppear() {
+      /*  .onAppear() {
             self.arViewer?.endSound()
-        }
+        } */
     }
 }
 

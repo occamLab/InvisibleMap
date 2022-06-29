@@ -160,7 +160,7 @@ struct RecordMapView: View {
                 // Toolbar buttons
                 .toolbar(content: {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        ExitButton()
+                        CreatorExitButton()
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         SaveButton()
