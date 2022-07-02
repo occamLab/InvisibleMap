@@ -53,9 +53,6 @@ struct SelectPathView: View {
         }.onDisappear() {
             InvisibleMapController.shared.process(event: .DismissPathRequested)  // when select path view is dismissed this event is called that sets the app back to the state it was before the select path view state
         }
-      /*  .onAppear() {
-            self.arViewer?.endSound()
-        } */
     }
 }
 

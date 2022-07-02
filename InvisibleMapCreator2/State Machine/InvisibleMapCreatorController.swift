@@ -17,7 +17,7 @@ class InvisibleMapCreatorController: AppController {
     var arViewer: ARViewController? // Initialized in ARView.swift
     var recordViewer: RecordViewController? // Initialized in RecordMapView.swift
     var mapDatabase = FirebaseManager.createMapDatabase()
-    public var arView: ARView?
+   // public var arView: ARView?
     
     private init() {
     }
@@ -38,7 +38,6 @@ class InvisibleMapCreatorController: AppController {
             case .ClearData:
                 mapRecorder.clearData()
                 arViewer?.resetArSession()
-                //arView?.endSound()
             case .SendToFirebase(let mapName):
                 mapRecorder.sendToFirebase(mapName: mapName)
             // ARViewer commands

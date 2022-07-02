@@ -19,12 +19,13 @@ enum InstructionType: Equatable {
     var text: String? {
         get {
             switch self {
-            case .findTag: return ""
-            case .tagFound: return ""
-            case .destinationReached: return ""
+            case .findTag: return "Point your camera at a tag \nnearby and START TAG DETECTION to start navigation."
+            case .tagFound: return "Tag detected. STOP TAG DETECTION until you reach the next tag. When you reach the next tag along the route, START TAG DETECTION for it."
+            case .destinationReached: return "You have arrived at your destination!"
             case .none: return nil
             }
         }
+        // Set start times for each instruction text so that it shows on the screen for a set amount of time (set in transition func).
         set {
             switch self {
             case .findTag: self = .findTag(startTime: NSDate().timeIntervalSince1970)
@@ -46,12 +47,11 @@ enum InstructionType: Equatable {
     }
     
     // when to display instructions/feedback text and to control how long it stays on screen
-  /*  mutating func transition(tagFound: Bool, locationRequested: Bool = false, recordTagRequested: Bool = false) {
+ /*   mutating func transition(tagFound: Bool) {
         let previousInstruction = self
         switch self {
-            
         case .findTag:
-            
+            if InvisibleMapController.shared.mapNavigator
         case .tagFound:
             
         case .destinationReached:
@@ -62,7 +62,7 @@ enum InstructionType: Equatable {
         
         if self != previousInstruction {
             let instructions = self.text
-            if locationRequested || recordTagRequested {
+            if locationRequested || markTagRequested {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     UIAccessibility.post(notification: .announcement, argument: instructions)
                 }
@@ -83,7 +83,17 @@ enum InstructionType: Equatable {
 
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
 class NavigateGlobalState: ObservableObject {
+    @Published var tagFound: Bool
+    @Published var instructionWrapper: InstructionType
+    
     init() {
+        tagFound = false
+        instructionWrapper = .findTag(startTime: NSDate().timeIntervalSince1970)
+    }
+    
+    // Navigate view controller commands
+    func updateInstructionText() {
+    // TODO: if first tag is detected, let tagFound get true, otherwise false and transition the instructionWrapper based on that boolean
     }
 }
 
@@ -106,11 +116,19 @@ struct NavigateMapView: View {
                         MapNavigateExitButton(mapFileName: mapFileName)
                     }
                 })
-            .ignoresSafeArea(.keyboard)
-            TagDetectionButton(navigateGlobalState: navigateGlobalState)
-                .environmentObject(InvisibleMapController.shared.mapNavigator)
-                .frame(maxHeight: .infinity, alignment: .bottom)
+            VStack{
+                // Show instrcutions if there are any
+                if navigateGlobalState.instructionWrapper.text != nil {
+                    InstructionOverlay(instruction: $navigateGlobalState.instructionWrapper.text)
+                        .animation(.easeInOut)
+                }
+                TagDetectionButton(navigateGlobalState: navigateGlobalState)
+                    .environmentObject(InvisibleMapController.shared.mapNavigator)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+            }
+            .padding()
         }
+        .ignoresSafeArea(.keyboard)
     }
 }
 

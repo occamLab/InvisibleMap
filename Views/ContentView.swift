@@ -93,11 +93,16 @@ struct ContentView: View {
                                     destination: RecordMapView()
                                 ) {
                                     Text("Create New Map")
-                                        .frame(width: 200, height: 40)
+                                        .fontWeight(.heavy)
+                                        .frame(width: 250, height: 50)
                                         .foregroundColor(.blue)
                                         .background(
-                                            RoundedRectangle(cornerRadius: 15)
-                                                .stroke(Color.blue, lineWidth: 1))
+                                            ZStack {
+                                                RoundedRectangle(cornerRadius: 15)
+                                                    .foregroundColor(Color(UIColor.systemBackground))
+                                                RoundedRectangle(cornerRadius: 15)
+                                                    .stroke(Color.blue, lineWidth: 5)
+                                            })
                                    
                                 }
                             #endif

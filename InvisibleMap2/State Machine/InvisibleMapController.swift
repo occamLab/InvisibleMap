@@ -13,8 +13,11 @@ class InvisibleMapController: AppController {
     public static var shared = InvisibleMapController()
     private var state = InvisibleMapAppState.initialState
     
-    public var arViewer: ARView?
+    // Various controllers for handling commands
     public var mapNavigator = MapNavigator()
+    public var arViewer: ARView?
+    var navigateViewer: NavigateViewController?
+    
     
     func initialize() {
         InvisibleMapController.shared.arViewer?.initialize()
@@ -58,15 +61,12 @@ class InvisibleMapController: AppController {
                     self.arViewer?.playSound(type: "arrived")
                     self.mapNavigator.stopPathPlanning()
                     self.arViewer?.reset()  // stops the ping timer? check if it's needed
-                  //  self.arViewer?.endSound()
                     print("navigation finished")
                 
-                case .LeaveMap(let mapFileName):  //need to fix after setting map to nil: somehow let the app know what map's location list to go back to from navigate screen after leaving map navigation
-                  //  self.mapNavigator.resetMap()  //Question: what does setting map to nil do?
-                    self.mapNavigator.stopPathPlanning() //in place of resetMap()?
+                case .LeaveMap(let mapFileName):
+                    self.mapNavigator.resetMap() // destroys the map
                     self.arViewer?.reset()  // stops the ping timer
-                    self.mapNavigator.detectTags = false  //in place of resetMap()?
-                //    self.arViewer?.endSound()
+                process(commands: [.LoadMap(mapFileName: mapFileName)])
                     print("leave map")
                 
                 case .PlanPath:
@@ -76,6 +76,10 @@ class InvisibleMapController: AppController {
                             self.arViewer!.renderGraph(fromStops: stops)
                         }
                     }
+                
+                // NavigateViewer commands
+                case .UpdateInstructionText:
+                    navigateViewer?.updateInstructionText()
                 
                 // TODO: Add functionality for these
                 case .GetNewWaypoint:
@@ -91,6 +95,8 @@ class InvisibleMapController: AppController {
     }
 }
 
-protocol MapsController {
-    func deleteMap(mapID: String)
+protocol NavigateViewController {
+    // Commands that impact the navigate map view UI
+    func updateInstructionText()
 }
+

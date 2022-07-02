@@ -246,7 +246,6 @@ extension ARView: ARViewController {
             tagNode.addChildNode(xAxis)
             tagNode.addChildNode(yAxis)
             tagNode.addChildNode(zAxis)
-        //    #endif
         }
     }
 
@@ -559,10 +558,6 @@ extension ARView: ARViewController {
              print(error.localizedDescription)
          }
      }
- /*   @objc func endSound() {
-        print("ending sound/timer?")
-        pingTimer.invalidate()
-    } */
    
     func updateMapPose(to mapToGlobal: simd_float4x4) {
         self.mapNode.simdTransform = mapToGlobal

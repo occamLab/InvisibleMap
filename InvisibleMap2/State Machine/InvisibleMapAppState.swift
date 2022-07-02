@@ -49,6 +49,7 @@ indirect enum InvisibleMapAppState: StateType {
         case FinishedNavigation
         case LeaveMap(mapFileName: String)
         case PlanPath
+        case UpdateInstructionText
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
@@ -64,7 +65,6 @@ indirect enum InvisibleMapAppState: StateType {
             case (.NavigateMap, .LeaveMapRequested(let mapFileName)):
                 self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
                 return [.LeaveMap(mapFileName: mapFileName)]
-               // return[]
             
             case (.NavigateMap, .NewARFrame(let cameraFrame)):
                 return [.UpdatePoseVIO(cameraFrame: cameraFrame)]

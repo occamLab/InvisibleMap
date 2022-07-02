@@ -20,6 +20,9 @@ enum InstructionType: Equatable {
     case findTagReminder(startTime: Double)
     case recordTagReminder(startTime: Double)
     case none
+    //TODO: add feedback for when a location was marked (tell user to take a step back to see the white marked location & that they successfully marked a location of interest.)
+    //TODO: tell user either in record map view or in Help that if they re-walk a path backwards to mark the same tags, they get a more accurate map
+    //TODO: Help settings - tell users that after creating a map, it may take some time to load depending on their phone and connection to the server -> if after 5 minutes you do not see your map contact us
     
     var text: String? {
         get {
@@ -52,8 +55,8 @@ enum InstructionType: Equatable {
             return -1
         }
     }
-    
-    mutating func transition(tagFound: Bool, locationRequested: Bool = false, recordTagRequested: Bool = false) {
+    // Note: locationRequested -> when user tries to add a location of interest
+    mutating func transition(tagFound: Bool, locationRequested: Bool = false, markTagRequested: Bool = false) {
         let previousInstruction = self
         switch self {
         case .findTag:
@@ -61,7 +64,7 @@ enum InstructionType: Equatable {
                 self = .saveLocation(startTime: NSDate().timeIntervalSince1970)
             } else if locationRequested {
                 self = .findTagReminder(startTime: NSDate().timeIntervalSince1970)
-            } else if recordTagRequested {
+            } else if markTagRequested {
                 self = .recordTagReminder(startTime: NSDate().timeIntervalSince1970)
             }
         case .saveLocation, .tagFound:
@@ -71,7 +74,7 @@ enum InstructionType: Equatable {
         case .findTagReminder:
             if tagFound {
                 self = .saveLocation(startTime: NSDate().timeIntervalSince1970)
-            } else if recordTagRequested {
+            } else if markTagRequested {
                 self = .recordTagReminder(startTime: NSDate().timeIntervalSince1970)
             }
         case .recordTagReminder:
@@ -84,7 +87,7 @@ enum InstructionType: Equatable {
         case .none:
             if InvisibleMapCreatorController.shared.mapRecorder.seesTag {
                 self = .tagFound(startTime: NSDate().timeIntervalSince1970)
-            } else if recordTagRequested {
+            } else if markTagRequested {
                 self = .recordTagReminder(startTime: NSDate().timeIntervalSince1970)
             } else if locationRequested && !tagFound {
                 self = .findTagReminder(startTime: NSDate().timeIntervalSince1970)
@@ -92,7 +95,7 @@ enum InstructionType: Equatable {
         }
         if self != previousInstruction {
             let instructions = self.text
-            if locationRequested || recordTagRequested {
+            if locationRequested || markTagRequested {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     UIAccessibility.post(notification: .announcement, argument: instructions)
                 }

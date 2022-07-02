@@ -22,7 +22,13 @@ class MapNavigator: ObservableObject {
     var endpointTagId: Int = 0
     var endpointLocationId: Int = 0
     let tagFinder = imageToData()
+    
+    /// Tracks whether the user has asked for a tag to be detected
     @Published var detectTags = false //changed true -> false - don't start detecting tags until user presses start detect tag button on navigate map view
+    
+    /// Tracks whether the tag was found after the user asked a tag to be detected
+    @Published var seesTag = false
+    
     var processingFrame = false
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.invisiblemap", qos: DispatchQoS.userInitiated)
     var pathPlanningTimer = Timer()
@@ -83,7 +89,7 @@ class MapNavigator: ObservableObject {
         let numTags = tagFinder.getNumberOfTags()
         if numTags > 0 {
             print("Tags found!")
-            
+            seesTag = true
             if let map = self.map {
                 if !map.firstTagFound {
                     print("Starting path planning")
@@ -134,7 +140,7 @@ class MapNavigator: ObservableObject {
     
     func resetMap() {
         self.stopPathPlanning()
-        self.map = nil    // fix later: creates an empty select path view page when exiting from navigate map state??
-        self.detectTags = false //true
+        self.map = nil
+        self.detectTags = false 
     }
 }

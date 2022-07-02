@@ -18,7 +18,7 @@ struct RecordTagButton: View {
             if self.mapRecorder.seesTag {
                 self.mapRecorder.recordTag.toggle()
             } else {
-                recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, recordTagRequested: true)
+                recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, markTagRequested: true)
             }
         }){
             Text(!self.mapRecorder.recordTag ? "Mark Tag" : "Tag was Marked")

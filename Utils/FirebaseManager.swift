@@ -94,6 +94,7 @@ class MapDatabase: ObservableObject {
     }
 }
 
+#if IS_MAP_CREATOR
 extension MapDatabase: MapsController {
     func deleteMap(mapID: String) {
         // get index of map in maps array (same index in images and files array)
@@ -107,6 +108,7 @@ extension MapDatabase: MapsController {
         }
     }
 }
+#endif
 
 
 // a map object
