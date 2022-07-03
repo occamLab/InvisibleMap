@@ -8,22 +8,21 @@
 import SwiftUI
 
 struct EditMapView: View {
-    @State private var showingDeleteConfirmation = false
     var map: MapData
+    @State private var showingDeleteConfirmation = false
     @State private var isShowingLocationListView = false
     @State static var recordGlobalState = RecordGlobalState()
     
     var body: some View {
-   //     NavigationView {
     
         Text("Map Name: \(map.name)")
                 .font(.title)
                 .bold()
                 
             // location in this map button
-        NavigationLink(destination: LocationListView(mapName: map.name, showLocations: $isShowingLocationListView)) {} //.onAppear() {
-         //   InvisibleMapCreatorController.shared.process(event: .MapSelected(mapFileName: map.file))
-      //  }
+        NavigationLink(destination: LocationListView(mapName: map.name, mapFileName: map.file, showLocations: $isShowingLocationListView)) {} .onAppear() {
+                    InvisibleMapCreatorController.shared.process(event: .MapSelected(mapFileName: map.file))  // Tells the state machine that a map was selected and should be processed when the location list view is opened
+                }
             
                     Button(action: {
                         print("view locations list")
@@ -43,10 +42,11 @@ struct EditMapView: View {
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.green, lineWidth: 4))
                     }.padding()
-            .sheet(isPresented: $isShowingLocationListView, onDismiss: {
-                InvisibleMapCreatorController.shared.process(event: .DismissLocationsRequested) // Tells the state machine that the locationlist view has been closed
+                    .accessibilityLabel(Text("View Locations List in this Map Button"))
+                    .sheet(isPresented: $isShowingLocationListView, onDismiss: {
+                            InvisibleMapCreatorController.shared.process(event: .DismissLocationsRequested) // Tells the state machine that the locationlist view has been closed
             }) {
-                LocationListView(mapName: map.name, showLocations: $isShowingLocationListView)
+                LocationListView(mapName: map.name, mapFileName: map.file, showLocations: $isShowingLocationListView)
             }
             
             
@@ -85,6 +85,7 @@ struct EditMapView: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.red, lineWidth: 4))
             }.padding()
+            .accessibilityLabel(Text("Delete Map Button"))
             // delete confirmation alert popup message when delete route button is pressed
                 .alert(isPresented: $showingDeleteConfirmation) {
                     Alert(

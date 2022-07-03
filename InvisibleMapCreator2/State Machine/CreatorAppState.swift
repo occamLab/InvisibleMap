@@ -21,6 +21,7 @@ enum CreatorAppState: StateType {
     enum Event {
         // MainScreen events
         case StartRecordingRequested
+        case MapSelected(mapFileName: String)
         // EditMapScreen events
         case MapDeleteRequested(mapID: String)
         // RecordMap events
@@ -47,7 +48,9 @@ enum CreatorAppState: StateType {
         case UpdateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int)
         case SendToFirebase(mapName: String)
         case ClearData
+        // EditMapScreen commands
         case DeleteMap(mapID: String)
+        case LoadMap(mapFileName: String)
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
@@ -69,7 +72,13 @@ enum CreatorAppState: StateType {
             return commands
         case (.EditMapScreen, .MapDeleteRequested(_)):
             self = .MainScreen
-              return []
+            return []
+        case (.MainScreen, .MapSelected(let mapFileName)):
+            self = .EditMapScreen
+            return [.LoadMap(mapFileName: mapFileName)]
+        case(.EditMapScreen, .DismissLocationsRequested):
+            self = .MainScreen
+            return []
       /*  case (.EditMapScreen(let state), _) where EditMapState.Event(event) != nil:
             var newState = state
             let commands = newState.handle(event: EditMapState.Event(event)!)

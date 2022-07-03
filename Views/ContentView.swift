@@ -101,7 +101,7 @@ struct ContentView: View {
                                                 RoundedRectangle(cornerRadius: 15)
                                                     .foregroundColor(Color(UIColor.systemBackground))
                                                 RoundedRectangle(cornerRadius: 15)
-                                                    .stroke(Color.blue, lineWidth: 5)
+                                                    .stroke(Color.blue, lineWidth: 2)
                                             })
                                    
                                 }

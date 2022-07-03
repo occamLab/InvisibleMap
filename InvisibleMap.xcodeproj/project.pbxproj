@@ -91,6 +91,12 @@
 		98082AC5286CBDE4009E808C /* InvisibleMapAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AC4286CBDE4009E808C /* InvisibleMapAppState.swift */; };
 		98082AC7286CBEE1009E808C /* CreatorExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AC6286CBEE1009E808C /* CreatorExitButton.swift */; };
 		98082AC9286CBF6B009E808C /* CreatorAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98082AC8286CBF6B009E808C /* CreatorAppState.swift */; };
+		98211C9E28724C5B0027860B /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98211C9D28724C5A0027860B /* HelpView.swift */; };
+		98211C9F28724C5B0027860B /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98211C9D28724C5A0027860B /* HelpView.swift */; };
+		98211CA2287258E60027860B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98211CA1287258E60027860B /* SettingsView.swift */; };
+		98211CA3287258E60027860B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98211CA1287258E60027860B /* SettingsView.swift */; };
+		98211CA528725A620027860B /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98211CA428725A620027860B /* FeedbackView.swift */; };
+		98211CA628725A620027860B /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98211CA428725A620027860B /* FeedbackView.swift */; };
 		984C21CB26B445C9006EEF4F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */; };
 		984C21CD26B447C6006EEF4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86F39545210FA42600F209EC /* Assets.xcassets */; };
 		984C21D026B44F4D006EEF4F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 984C21CF26B44F4D006EEF4F /* FirebaseAnalytics */; };
@@ -180,6 +186,9 @@
 		98082AC4286CBDE4009E808C /* InvisibleMapAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapAppState.swift; sourceTree = "<group>"; };
 		98082AC6286CBEE1009E808C /* CreatorExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorExitButton.swift; sourceTree = "<group>"; };
 		98082AC8286CBF6B009E808C /* CreatorAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorAppState.swift; sourceTree = "<group>"; };
+		98211C9D28724C5A0027860B /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
+		98211CA1287258E60027860B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		98211CA428725A620027860B /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
 		984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		98BF269526AF01F60076427E /* AppleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInController.swift; sourceTree = "<group>"; };
 		98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
@@ -377,6 +386,7 @@
 				1F83DB71273F02C100D0148F /* BaseNavigationView.swift */,
 				98E9BE972756BAE9001B5A2B /* ViewStructs.swift */,
 				98082AB32864FECB009E808C /* MenuView.swift */,
+				98211CA028724C6B0027860B /* Menu Subviews */,
 				141497E52645A41700BF0ABC /* InstructionOverlay.swift */,
 			);
 			path = Views;
@@ -469,6 +479,16 @@
 				98082ABE286B6F25009E808C /* LocationListView.swift */,
 			);
 			path = "Edit Map Subviews";
+			sourceTree = "<group>";
+		};
+		98211CA028724C6B0027860B /* Menu Subviews */ = {
+			isa = PBXGroup;
+			children = (
+				98211C9D28724C5A0027860B /* HelpView.swift */,
+				98211CA1287258E60027860B /* SettingsView.swift */,
+				98211CA428725A620027860B /* FeedbackView.swift */,
+			);
+			path = "Menu Subviews";
 			sourceTree = "<group>";
 		};
 		98BF269A26AF2E4F0076427E /* Authentication */ = {
@@ -640,6 +660,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98211CA2287258E60027860B /* SettingsView.swift in Sources */,
 				14995FBC26263A0900A7C78B /* AprilTagTracker.swift in Sources */,
 				143011FE2629D8CD0042FDFC /* ManageLocationsButton.swift in Sources */,
 				14995FB8262639ED00A7C78B /* ImageConversion.mm in Sources */,
@@ -663,10 +684,12 @@
 				1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */,
 				1FE9717A26FB8AFB00DEB00A /* AppController.swift in Sources */,
 				1FE97193271619F200DEB00A /* Map.swift in Sources */,
+				98211C9E28724C5B0027860B /* HelpView.swift in Sources */,
 				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
 				143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */,
 				141FF9C226499FCE00845059 /* ManageLocationsView.swift in Sources */,
 				1F4C30C626A1D70C008CBE3C /* RecordTagButton.swift in Sources */,
+				98211CA528725A620027860B /* FeedbackView.swift in Sources */,
 				98082AB42864FECB009E808C /* MenuView.swift in Sources */,
 				1447B7422624229600230A58 /* ContentView.swift in Sources */,
 				1447B75C2624230200230A58 /* StateType.swift in Sources */,
@@ -691,12 +714,15 @@
 				98082AC1286B6FEC009E808C /* InstructionOverlay.swift in Sources */,
 				98D494872757D34700BF0279 /* AppleSignInController.swift in Sources */,
 				1FE9718526FE614F00DEB00A /* ImageConversion.mm in Sources */,
+				98211CA628725A620027860B /* FeedbackView.swift in Sources */,
 				1FE9718426FE614B00DEB00A /* ImageDisplay.mm in Sources */,
 				98082AB52864FECB009E808C /* MenuView.swift in Sources */,
 				1F83DB6B272C7AE800D0148F /* Utils.swift in Sources */,
 				1FE9718726FE616000DEB00A /* simd+ext.swift in Sources */,
 				1FE9717626FB88BE00DEB00A /* StateType.swift in Sources */,
 				1F83DB75273F081300D0148F /* NavigateMapView.swift in Sources */,
+				98211C9F28724C5B0027860B /* HelpView.swift in Sources */,
+				98211CA3287258E60027860B /* SettingsView.swift in Sources */,
 				1FE971902703AC9600DEB00A /* Map.swift in Sources */,
 				98082AC3286CB6AD009E808C /* MapNavigateExitButton.swift in Sources */,
 				1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */,

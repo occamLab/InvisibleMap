@@ -17,6 +17,7 @@ class InvisibleMapCreatorController: AppController {
     var arViewer: ARViewController? // Initialized in ARView.swift
     var recordViewer: RecordViewController? // Initialized in RecordMapView.swift
     var mapDatabase = FirebaseManager.createMapDatabase()
+    
    // public var arView: ARView?
     
     private init() {
@@ -53,6 +54,11 @@ class InvisibleMapCreatorController: AppController {
             // MapDatabase commands
             case .DeleteMap(let mapID):
                 mapDatabase.deleteMap(mapID: mapID)
+                // double check? doesnt really make sense that it's using the mapRecorder controller
+            case .LoadMap(let mapFileName):
+                FirebaseManager.createMap(from: mapFileName) { newMap in
+                     self.mapRecorder.map = newMap
+                }
             }
         }
     }

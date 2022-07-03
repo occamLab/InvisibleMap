@@ -13,7 +13,7 @@ import SwiftGraph
 class MapNavigator: ObservableObject {
     var map: Map! {
         didSet {
-           // print(map.waypointDictionary)
+            print(map.waypointDictionary)
             objectWillChange.send()
         }
     }

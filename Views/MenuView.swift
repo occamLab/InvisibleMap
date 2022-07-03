@@ -9,14 +9,18 @@
 import SwiftUI
 
 struct MenuView: View {
+    @State private var isShowingHelpView = false
+    @State private var isShowingSettingsView = false
+    @State private var isShowingFeedbackView = false
+    
     var body: some View {
         VStack(alignment: .leading) {
             
             /// Tutorials/Help
             HStack {
                 Button(action: {
-                    // TODO: make help/tutorials
-                    Text("pressed help button")
+                    // TODO: add tutorials
+                    isShowingHelpView = true
                 }) {
                     Image(systemName: "questionmark")
                         .imageScale(.large)
@@ -26,15 +30,18 @@ struct MenuView: View {
                         .font(.headline)
                 }
                 .accessibilityLabel(Text("Help button"))
-                
             }
             .padding(.top, 100)
+            .sheet(isPresented: $isShowingHelpView) {
+                HelpView(showHelp: $isShowingHelpView)
+            }
+            
             
             /// Settings
             HStack {
                 Button(action: {
                     // TODO: make settings
-                    Text("pressed settings button")
+                    isShowingSettingsView = true
                 }) {
                     Image(systemName: "gearshape")
                         .imageScale(.large)
@@ -46,12 +53,16 @@ struct MenuView: View {
                 .accessibilityLabel(Text("Settings button"))
             }
             .padding(.top, 30)
+            .sheet(isPresented: $isShowingSettingsView) {
+                SettingsView(showSettings: $isShowingSettingsView)
+            }
+            
             
             /// Feedback
             HStack {
                 Button(action: {
                     // TODO: make feedback page
-                    Text("pressed give feedback button")
+                    isShowingFeedbackView = true
                 }) {
                     Image(systemName: "envelope")
                         .imageScale(.large)
@@ -63,6 +74,9 @@ struct MenuView: View {
                 .accessibilityLabel(Text("Give feedback button"))
             }
             .padding(.top, 30)
+            .sheet(isPresented: $isShowingFeedbackView) {
+                FeedbackView(showFeedbackView: $isShowingFeedbackView)
+            }
             Spacer()
         }
         .padding()

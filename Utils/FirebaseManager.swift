@@ -12,7 +12,6 @@ import FirebaseDatabase
 import FirebaseStorage
 
 class FirebaseManager {
-    
     static var storageRef: StorageReference = Storage.storage().reference()
     
     /// Downloads the selected map from firebase

@@ -2,7 +2,7 @@
 //  LocationListView.swift
 //  InvisibleMapCreator2
 //
-//  Created by occamlab on 6/27/22.
+//  Created by Joyce Chung on 6/27/22.
 //  Copyright © 2022 Occam Lab. All rights reserved.
 //
 
@@ -10,36 +10,27 @@ import SwiftUI
 
 struct LocationListView: View {
     var mapName: String
+    var mapFileName: String
     @Binding var showLocations: Bool
- //   var map: Map!
- //   @ObservedObject var recordGlobalState: RecordGlobalState
+    @ObservedObject var mapRecorder = InvisibleMapCreatorController.shared.mapRecorder
     
     var body: some View {
         NavigationView {
-            List{
-             //   ForEach(Array(map.waypointDictionary.keys), id: \.self) {
-             //       location in Text("\(map.waypointDictionary[location]!.id)")
-                //is there a way to access a map's waypointDictionary with it's name?
-                Text("In progress: This view does not work yet. \nYou can go to the Invisible Maps app to see the locations of interests")
-              //  }
-            }
-          /*  List (recordGlobalState.nodeList) { node in
-                HStack {
-                    Image(uiImage: node.picture)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 50, height: 50)
-                        .clipped()
-                        .cornerRadius(8)
-                    Text(node.node.name!)
+            if mapRecorder.map != nil {
+                List{
+                    ForEach(Array(mapRecorder.map.waypointDictionary.keys), id: \.self) {
+                        location in Text("\(mapRecorder.map.waypointDictionary[location]!.id)")
+                    }
                 }
-            }*/
-            .navigationBarTitle(Text("Saved Locations for \(mapName)"), displayMode: .inline)
-            .navigationBarItems(trailing: Button(action: {
-                self.showLocations = false
-            }) {
-                Text("Done").bold()
-            })
+             
+                .navigationBarTitle(Text("Saved Locations for \(mapName)"), displayMode: .inline)
+                .navigationBarItems(trailing: Button(action: {
+                    self.showLocations = false
+                }) {
+                    Text("Done").bold()
+                })
+            }
         }
     }
 }
+    
