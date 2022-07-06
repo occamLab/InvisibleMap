@@ -25,7 +25,6 @@ class MapNavigator: ObservableObject {
     
     /// Tracks whether the user has asked for a tag to be detected
     @Published var detectTags = false //changed true -> false - don't start detecting tags until user presses start detect tag button on navigate map view
-    
     /// Tracks whether the tag was found after the user asked a tag to be detected
     @Published var seesTag = false
     
@@ -141,6 +140,7 @@ class MapNavigator: ObservableObject {
     func resetMap() {
         self.stopPathPlanning()
         self.map = nil
-        self.detectTags = false 
+        self.detectTags = false
+        self.seesTag = false
     }
 }

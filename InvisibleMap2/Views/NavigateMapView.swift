@@ -46,23 +46,31 @@ enum InstructionType: Equatable {
         }
     }
     
-    // when to display instructions/feedback text and to control how long it stays on screen
- /*   mutating func transition(tagFound: Bool) {
+    // Function to transition from one instruction text field to another; when to display instructions/feedback text and to control how long it stays on screen
+    mutating func transition(tagFound: Bool, endPointReached: Bool = false) {
         let previousInstruction = self
         switch self {
         case .findTag:
-            if InvisibleMapController.shared.mapNavigator
+            if InvisibleMapController.shared.mapNavigator.seesTag {
+                self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+            }
         case .tagFound:
-            
-        case .destinationReached:
-            
+            if !InvisibleMapController.shared.mapNavigator.seesTag {
+                self = .none
+            }
         case .none:
-            
+            if InvisibleMapController.shared.mapNavigator.seesTag {
+                self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+            } else if endPointReached {
+                self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
+            }
+        case .destinationReached:
+            self = .none
         }
         
         if self != previousInstruction {
             let instructions = self.text
-            if locationRequested || markTagRequested {
+            if endPointReached {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     UIAccessibility.post(notification: .announcement, argument: instructions)
                 }
@@ -76,24 +84,33 @@ enum InstructionType: Equatable {
                 self = .none
             }
         }
-    } */
+    }
 }
 
 
 
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
-class NavigateGlobalState: ObservableObject {
+class NavigateGlobalState: ObservableObject, NavigateViewController {
     @Published var tagFound: Bool
     @Published var instructionWrapper: InstructionType
     
     init() {
         tagFound = false
         instructionWrapper = .findTag(startTime: NSDate().timeIntervalSince1970)
+        InvisibleMapController.shared.navigateViewer = self
     }
     
     // Navigate view controller commands
     func updateInstructionText() {
     // TODO: if first tag is detected, let tagFound get true, otherwise false and transition the instructionWrapper based on that boolean
+        DispatchQueue.main.async {
+            if !InvisibleMapController.shared.mapNavigator.map.firstTagFound {
+                self.tagFound = false
+            } else {
+                self.tagFound = true
+            }
+            self.instructionWrapper.transition(tagFound: self.tagFound)
+        }
     }
 }
 
@@ -101,11 +118,10 @@ struct NavigateMapView: View {
     @StateObject var navigateGlobalState = NavigateGlobalState()
     var mapFileName: String
     
- /*   init() {
+    init() {
         print("currentUser is \(Auth.auth().currentUser!.uid)")
-        //mapName = ""
-        //mapFileName = ""
-    } */
+        mapFileName = ""
+    }
     
     var body : some View {
         ZStack {
