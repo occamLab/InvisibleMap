@@ -104,7 +104,7 @@ class MapNavigator: ObservableObject {
                 }
             }
             
-            for child in InvisibleMapController.shared.arViewer!.detectionNode.childNodes {
+            for child in InvisibleMapController.shared.arViewer!.detectionNode?.childNodes {
                 child.removeFromParentNode()
             }
             for i in 0...tagFinder.getNumberOfTags()-1 {
