@@ -76,8 +76,8 @@ class MapNavigator: ObservableObject {
         print("startpoint:", startpoint!)
         print("endpoint:", endpoint)
         print("current location:", currentLocation)
-        print("tag dictionary:", Array(self.map.tagDictionary.values))
-        print("waypoint dictionary:", Array(self.map.waypointDictionary.values))
+      //  print("tag dictionary:", Array(self.map.tagDictionary.values))
+     //   print("waypoint dictionary:", Array(self.map.waypointDictionary.values))
         // find path from startpoint to endpoint
         let path: [WeightedEdge<Float>] = pathDictToPath(from: self.map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: self.map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
         let stops = self.map.pathPlanningGraph!.edgesToVertices(edges: path)

@@ -72,8 +72,11 @@ indirect enum InvisibleMapAppState: StateType {
             case (.NavigateMap, .TagFound(let tag, let cameraTransform)):
                 return [.UpdatePoseTag(tag: tag, cameraTransform: cameraTransform)]
             
+            // do tomorrow
             case (.NavigateMap, .WaypointReached(let finalWaypoint)):
-                return finalWaypoint ? [.GetNewWaypoint] : [.FinishedNavigation]
+                print("finished navigation!")
+                return [.FinishedNavigation]
+               // return finalWaypoint ? [.GetNewWaypoint] : [.FinishedNavigation]
             
             case (.NavigateMap, .EditMapRequested):
                 self = .EditMap

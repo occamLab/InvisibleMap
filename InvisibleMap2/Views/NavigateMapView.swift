@@ -71,7 +71,8 @@ enum InstructionType: Equatable {
                 self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
             }
         case .destinationReached:
-            self = .none
+            break
+            //self = .none
         }
         
         if self != previousInstruction {
@@ -121,6 +122,7 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
             // April tag Id of April tag destination; endpointTagId is the key of the endpoint April tag in the tagDictionary
             let endpointId = InvisibleMapController.shared.mapNavigator.map.tagDictionary[InvisibleMapController.shared.mapNavigator.endpointTagId]!.id
             // when user reaches destination for a tag location
+            // do tomorrow
             // TODO: same should go for waypoint destination 
             if endpointId == InvisibleMapController.shared.mapNavigator.currentTagId {
                 self.endPointReached = true
