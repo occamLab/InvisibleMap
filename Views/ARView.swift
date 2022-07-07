@@ -37,6 +37,8 @@ protocol ARViewController {
 //}
 
 class ARView: UIViewController {
+    // TODO: make less gross
+    var pathNodes: [String: (SCNNode, Bool)] = [:]
     let memoryChecker : MemoryChecker = MemoryChecker()
     let configuration = ARWorldTrackingConfiguration()
     #if IS_MAP_CREATOR
@@ -48,9 +50,10 @@ class ARView: UIViewController {
     var lastRecordedTimestamp = -0.1
     let distanceToAnnounceWaypoint: Float = 1.5
     
+    // TODO: make the rest of these optional
     var mapNode: SCNNode!
     var detectionNode: SCNNode!
-    var cameraNode: SCNNode!
+    var cameraNode: SCNNode?
     let locationNodeName = "Locations"
     let tagNodeName = "Tags"
     let crumbNodeName = "Crumbs"
@@ -129,11 +132,11 @@ extension ARView: ARSessionDelegate {
             if self.cameraNode == nil {
                 // TODO: remove camera node when we have some waypoints to test with (we can use ARFrame.camera.transform instead
                 cameraNode = SCNNode()
-                cameraNode.transform = scene
-                cameraNode.name = "camera"
-                arView.scene.rootNode.addChildNode(cameraNode)
+                cameraNode?.transform = scene
+                cameraNode?.name = "camera"
+                arView.scene.rootNode.addChildNode(cameraNode!)
             } else {
-                cameraNode.transform = scene
+                cameraNode!.transform = scene
             }
             lastRecordedTimestamp = frame.timestamp
             print("Timestamp: \(frame.timestamp)")
@@ -376,34 +379,41 @@ extension ARView: ARViewController {
     }
 
     /// Creates a node for a path edge between two vertices
-    func renderEdge(from firstVertex: RawMap.OdomVertex.vector3, to secondVertex: RawMap.OdomVertex.vector3, isPath: Bool) {
-        var pathObj: SCNNode?
+    func renderEdge(from firstVertex: RawMap.OdomVertex, to secondVertex: RawMap.OdomVertex, isPath: Bool) {
+        let pathObj: SCNNode
         let verticalOffset: Float = -0.6
         
-        let x = (secondVertex.x + firstVertex.x) / 2
-        let y = (secondVertex.y + firstVertex.y) / 2
-        let z = (secondVertex.z + firstVertex.z) / 2
-        let xDist = secondVertex.x - firstVertex.x
-        let yDist = secondVertex.y - firstVertex.y
-        let zDist = secondVertex.z - firstVertex.z
+        let x = (secondVertex.translation.x + firstVertex.translation.x) / 2
+        let y = (secondVertex.translation.y + firstVertex.translation.y) / 2
+        let z = (secondVertex.translation.z + firstVertex.translation.z) / 2
+        let xDist = secondVertex.translation.x - firstVertex.translation.x
+        let yDist = secondVertex.translation.y - firstVertex.translation.y
+        let zDist = secondVertex.translation.z - firstVertex.translation.z
         let dist = sqrt(pow(xDist, 2) + pow(yDist, 2) + pow(zDist, 2))
 
+        let shouldAddToMapNode: Bool
+        if let (cachedPathObj, _) = pathNodes["\(firstVertex.poseId)_\(secondVertex.poseId)"] {
+            pathObj = cachedPathObj
+            shouldAddToMapNode = false
+        } else {
         /// SCNNode of the bar path
-        pathObj = SCNNode(geometry: SCNBox(width: CGFloat(dist), height: 0.06, length: 0.06, chamferRadius: 1))
-        pathObjs.append(pathObj!)
+            pathObj = SCNNode(geometry: SCNBox(width: CGFloat(dist), height: 0.06, length: 0.06, chamferRadius: 1))
+            shouldAddToMapNode = true
+        }
+        pathNodes["\(firstVertex.poseId)_\(secondVertex.poseId)"] = (pathObj, true)
 
         //configure node attributes
         if !isPath {
             let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
             odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
-            odometryNode.simdPosition = simd_float3(firstVertex.x, firstVertex.y + verticalOffset, firstVertex.z)
+            odometryNode.simdPosition = simd_float3(firstVertex.translation.x, firstVertex.translation.y + verticalOffset, firstVertex.translation.z)
             mapNode.childNode(withName: crumbNodeName, recursively: false)!.addChildNode(odometryNode)
             
-            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
-            pathObj!.opacity = CGFloat(1)
+            pathObj.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
+            pathObj.opacity = CGFloat(1)
         } else {
-            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.red
-            pathObj!.opacity = CGFloat(1)
+            pathObj.geometry?.firstMaterial!.diffuse.contents = UIColor.red
+            pathObj.opacity = CGFloat(1)
         }
         
         let xAxis = simd_normalize(simd_float3(xDist, yDist, zDist))
@@ -426,18 +436,30 @@ extension ARView: ARViewController {
         let zAxis = simd_cross(xAxis, yAxis)
         let pathTransform = simd_float4x4(columns: (simd_float4(xAxis, 0), simd_float4(yAxis, 0), simd_float4(zAxis, 0), simd_float4(x, y + verticalOffset, z, 1)))
 
-        pathObj!.simdTransform = pathTransform
+        pathObj.simdTransform = pathTransform
         
-        if isPath {
-            mapNode.childNode(withName: edgeNodeName, recursively: false)!.addChildNode(pathObj!)
+        if isPath, shouldAddToMapNode {
+            mapNode.childNode(withName: edgeNodeName, recursively: false)!.addChildNode(pathObj)
         }
     }
     
-    func renderEdges(fromList vertices: [RawMap.OdomVertex.vector3], isPath: Bool) {
-        pathObjs.map({$0.removeFromParentNode()})
-        pathObjs = []
+    func renderEdges(fromList vertices: [RawMap.OdomVertex], isPath: Bool) {
+//        if true {
+//            print("WARNING: disabling edge rendering")
+//            return
+//        }
+        //pathObjs.map({$0.removeFromParentNode()})
+        //pathObjs = []
+        for key in pathNodes.keys {
+            pathNodes[key] = (pathNodes[key]!.0, false)
+        }
         for i in 0...vertices.count-2 {
             self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
+        }
+        for key in pathNodes.keys {
+            let pathObj = pathNodes[key]!.0
+            let shouldRender = pathNodes[key]!.1
+            pathObj.isHidden = !shouldRender
         }
         
         if isPath {
@@ -446,10 +468,11 @@ extension ARView: ARViewController {
                 #if !IS_MAP_CREATOR
                 InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
                 #endif
-            } else {
+            } else if let cameraNode = cameraNode {
+                // TODO: fix camera Position to be relative to map (factor this out into ARViewer since it is used in more than one place
                 let audioSource = vertices[2]
-                let directionToSource = vector2(self.cameraNode.position.x, self.cameraNode.position.z) - vector2(audioSource.x, audioSource.z)
-                var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(self.cameraNode.transform.m31, self.cameraNode.transform.m33))
+                let directionToSource = vector2(cameraNode.position.x, cameraNode.position.z) - vector2(audioSource.translation.x, audioSource.translation.z)
+                var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(cameraNode.transform.m31, cameraNode.transform.m33))
                 volumeScale = acos(volumeScale) / Float.pi
                 volumeScale = 1 - volumeScale
                 volumeScale = pow(volumeScale, 3)
@@ -466,13 +489,13 @@ extension ARView: ARViewController {
         }
         #if !IS_MAP_CREATOR
             for vertex in map.rawData.odometryVertices {
-                for neighbor in vertex.neighbors{
+                for neighbor in vertex.neighbors {
                     // Only render path if it hasn't been rendered yet
                     if (neighbor < vertex.poseId){
                         let neighborVertex = map.odometryDict![neighbor]!
                         
                         // Render edge
-                        self.renderEdge(from: vertex.translation, to: neighborVertex, isPath: false)
+                        self.renderEdge(from: vertex, to: neighborVertex, isPath: false)
                     }
                 }
             }
@@ -496,7 +519,7 @@ extension ARView: ARViewController {
         #endif
     }
     
-    func renderGraph(fromStops stops: [RawMap.OdomVertex.vector3]) {
+    func renderGraph(fromStops stops: [RawMap.OdomVertex]) {
         self.renderEdges(fromList: stops, isPath: true)
         self.renderTags()
     }
@@ -505,6 +528,9 @@ extension ARView: ARViewController {
     
     /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
     func announceNearbyWaypoints(){
+        guard let cameraNode = cameraNode else {
+            return
+        }
         let curr_pose = cameraNode.position
         var potentialAnnouncements : [String:(String, Double)] = [:]
         for waypointNode in self.mapNode.childNode(withName: locationNodeName, recursively: false)!.childNodes {

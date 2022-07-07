@@ -70,8 +70,9 @@ class InvisibleMapController: AppController {
                     print("leave map")
                 
                 case .PlanPath:
-                    if let cameraNode = self.arViewer!.cameraNode {
-                        let stops = self.mapNavigator.planPath(from: cameraNode.simdTransform.getTrans())
+                if let mapNode = arViewer?.mapNode, let cameraNode = arViewer?.cameraNode {
+                    let cameraPositionRelativeToMapNode = cameraNode.convertPosition(SCNVector3(), to: mapNode)
+                    let stops = self.mapNavigator.planPath(from: simd_float3(cameraPositionRelativeToMapNode.x, cameraPositionRelativeToMapNode.y, cameraPositionRelativeToMapNode.z))
                         if let stops = stops {
                             self.arViewer!.renderGraph(fromStops: stops)
                         }

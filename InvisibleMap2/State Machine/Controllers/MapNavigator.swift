@@ -32,7 +32,7 @@ class MapNavigator: ObservableObject {
     func scheduledPathPlanningTimer() {
         pathPlanningTimer.invalidate()
         //pathPlanningTimer = Timer()
-        pathPlanningTimer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(self.sendPathPlanEvent), userInfo: nil, repeats: true)
+        pathPlanningTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.sendPathPlanEvent), userInfo: nil, repeats: true)
     }
     
     func stopPathPlanning() {
@@ -44,7 +44,7 @@ class MapNavigator: ObservableObject {
     }
     
     /// Plans a path from the current location to the end and visualizes it in red
-    func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex.vector3]? {
+    func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex]? {
         let start = Date()
         guard let map = map else {
             return nil
@@ -67,6 +67,7 @@ class MapNavigator: ObservableObject {
             
             endpoint = map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
         }
+        print("currentLocation \(currentLocation)")
         let startpoint = map.getClosestGraphNode(to: currentLocation, ignoring: endpoint)
 
         let (_, pathDict) = map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
