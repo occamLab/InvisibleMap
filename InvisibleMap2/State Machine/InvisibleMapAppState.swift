@@ -67,7 +67,7 @@ indirect enum InvisibleMapAppState: StateType {
                 return [.LeaveMap(mapFileName: mapFileName)]
             
             case (.NavigateMap, .NewARFrame(let cameraFrame)):
-                return [.UpdatePoseVIO(cameraFrame: cameraFrame)]
+            return [.UpdatePoseVIO(cameraFrame: cameraFrame), .UpdateInstructionText]
             
             case (.NavigateMap, .TagFound(let tag, let cameraTransform)):
                 return [.UpdatePoseTag(tag: tag, cameraTransform: cameraTransform)]

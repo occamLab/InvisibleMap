@@ -11,12 +11,19 @@ import ARKit
 import SwiftGraph
 
 class MapNavigator: ObservableObject {
-    @Published var map: Map?
-
+    var map: Map! {
+        didSet {
+       //     print(map.waypointDictionary)
+            objectWillChange.send()
+        }
+    }
     var locationType: String = "tag"
     // updates every time .StartPath command is called, depending on type of endpoint user selects (i.e. if tag is clicked endpointTagId updates, if POI is clicked endpointLocation Id updates)
     var endpointTagId: Int = 0
     var endpointLocationId: Int = 0
+    
+    var currentTagId: Int32 = 0
+    
     let tagFinder = imageToData()
     
     /// Tracks whether the user has asked for a tag to be detected
@@ -44,41 +51,37 @@ class MapNavigator: ObservableObject {
     }
     
     /// Plans a path from the current location to the end and visualizes it in red
-    func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex]? {
-        let start = Date()
-        guard let map = map else {
+    func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex.vector3]? {
+        if !self.map.firstTagFound {
             return nil
         }
-        if !map.firstTagFound {
-            return nil
-        }
-        
-        let endpoint: Int
-        
-        if locationType == "waypoint" {
-            // end point for navigating to waypoints/POIs
-            let waypointLocation = map.rawData.waypointsVertices.first(where: {$0.id == map.waypointDictionary[self.endpointLocationId]!.id})!.translation
-            
-            endpoint = map.getClosestGraphNode(to: simd_float3(waypointLocation.x, waypointLocation.y, waypointLocation.z))!
-        } else {
-            // end point for navigating to tag locations
-            // searching for first instance of match between id and given endpointTagId
-            let tagLocation = map.rawData.tagVertices.first(where: {$0.id == self.endpointTagId})!.translation
-            
-            endpoint = map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
-        }
-        print("currentLocation \(currentLocation)")
-        let startpoint = map.getClosestGraphNode(to: currentLocation, ignoring: endpoint)
 
-        let (_, pathDict) = map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
-        //print("startpoint:", startpoint!)
-        print("startpoint:", startpoint)
+        // end point for navigating to tag locations
+        // searching for first instance of match between id and given endpointTagId
+        let tagLocation = self.map.rawData.tagVertices.first(where: {$0.id == self.endpointTagId})!.translation
+        
+        // closest graph node from current location to endpoint
+        var endpoint = self.map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
+        
+        // end point for navigating to waypoints/POIs
+        if locationType == "waypoint" {
+            let waypointLocation = self.map.rawData.waypointsVertices.first(where: {$0.id == self.map.waypointDictionary[endpointLocationId]!.id})!.translation
+            
+            endpoint = self.map.getClosestGraphNode(to: simd_float3(waypointLocation.x, waypointLocation.y, waypointLocation.z))!
+        }
+        
+        let startpoint = self.map.getClosestGraphNode(to: currentLocation, ignoring: endpoint)
+
+        let (_, pathDict) = self.map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
+        print("startpoint:", startpoint!)
         print("endpoint:", endpoint)
-        // find path from startpoint to endpointß
-        let path: [WeightedEdge<Float>] = pathDictToPath(from: map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
-        let stops = map.pathPlanningGraph!.edgesToVertices(edges: path)
-        print("Time to path plan \(-start.timeIntervalSinceNow)")
-        return stops.map({map.odometryDict![Int($0)!]!})
+        print("current location:", currentLocation)
+        print("tag dictionary:", Array(self.map.tagDictionary.values))
+        print("waypoint dictionary:", Array(self.map.waypointDictionary.values))
+        // find path from startpoint to endpoint
+        let path: [WeightedEdge<Float>] = pathDictToPath(from: self.map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: self.map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
+        let stops = self.map.pathPlanningGraph!.edgesToVertices(edges: path)
+        return stops.map({self.map.odometryDict![Int($0)!]!})
     }
     
     /// Check if tag is detected and update the tag and map transforms
@@ -92,23 +95,21 @@ class MapNavigator: ObservableObject {
         var tagArray: Array<AprilTags> = Array()
         let numTags = tagFinder.getNumberOfTags()
         if numTags > 0 {
-            print("Tags found!")
-            DispatchQueue.main.async {
-                self.seesTag = true
-            }
+        /*    print("Tags found!")
             if let map = self.map {
                 if !map.firstTagFound {
                     print("Starting path planning")
                     map.renderGraphPath()
                     map.firstTagFound = true
                 }
-            }
+            } */
             
-            for child in InvisibleMapController.shared.arViewer!.detectionNode?.childNodes {
+            for child in InvisibleMapController.shared.arViewer!.detectionNode.childNodes {
                 child.removeFromParentNode()
             }
             for i in 0...tagFinder.getNumberOfTags()-1 {
                 let tag = tagFinder.getTagAt(i)
+                self.currentTagId = tag.number
                 tagArray.append(tag)
                 if let map = self.map {
                     if let _ = map.tagDictionary[Int(tag.number)] {
@@ -123,7 +124,10 @@ class MapNavigator: ObservableObject {
     
     /// Processes the pose, april tags, and nearby waypoints.
     func updateTags(from cameraFrame: ARFrame) {
+        // only continue if user chooses to detect tags
         if !detectTags {
+            // don't allow camera to see tags if user did not start tag detection
+            self.seesTag = false
             return
         }
         print("Update Tags")
@@ -137,16 +141,33 @@ class MapNavigator: ObservableObject {
         if processingFrame {
             return
         }
+        // process the frame in NavigateMap view if it's not doing that yet
         processingFrame = true
+        
         aprilTagQueue.async {
-            let _ = self.checkTagDetection(image: uiImage,cameraIntrinsics: cameraFrame.camera.intrinsics, cameraTransform: cameraFrame.camera.transform)
-            self.processingFrame = false
+            let arTags = self.checkTagDetection(image: uiImage,cameraIntrinsics: cameraFrame.camera.intrinsics, cameraTransform: cameraFrame.camera.transform)
+            print("arTags array of detected tags: \(arTags)")
+            DispatchQueue.main.async {
+                // checks if tags were detected and assigns seesTag depending on that
+                self.seesTag = !arTags.isEmpty
+                print("seesTag: \(self.seesTag)")
+                if let map = self.map {
+                    if !map.firstTagFound && self.seesTag {
+                        print("Starting path planning")
+                        map.renderGraphPath()
+                        map.firstTagFound = true
+                        print("firstTagFound: \(map.firstTagFound)")
+                    }
+                    self.processingFrame = false
+                }
+            }
         }
     }
     
+    // clears data for map
     func resetMap() {
         self.stopPathPlanning()
-        self.map = nil
+        self.map = nil  // this also resets firstTagFound var to false 
         self.detectTags = false
         self.seesTag = false
     }

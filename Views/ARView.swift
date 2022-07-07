@@ -37,10 +37,6 @@ protocol ARViewController {
 //}
 
 class ARView: UIViewController {
-    // TODO: make less gross
-    var pathNodes: [String: (SCNNode, Bool)] = [:]
-    
-    
     let memoryChecker : MemoryChecker = MemoryChecker()
     let configuration = ARWorldTrackingConfiguration()
     #if IS_MAP_CREATOR
@@ -52,10 +48,9 @@ class ARView: UIViewController {
     var lastRecordedTimestamp = -0.1
     let distanceToAnnounceWaypoint: Float = 1.5
     
-    // TODO: make the rest of these optional
-    var mapNode: SCNNode?
-    var detectionNode: SCNNode?
-    var cameraNode: SCNNode?
+    var mapNode: SCNNode!
+    var detectionNode: SCNNode!
+    var cameraNode: SCNNode!
     let locationNodeName = "Locations"
     let tagNodeName = "Tags"
     let crumbNodeName = "Crumbs"
@@ -131,14 +126,14 @@ extension ARView: ARSessionDelegate {
         
         if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame {
             let scene = SCNMatrix4(frame.camera.transform)
-            if let cameraNode = self.cameraNode {
-                cameraNode.transform = scene
-            } else {
+            if self.cameraNode == nil {
                 // TODO: remove camera node when we have some waypoints to test with (we can use ARFrame.camera.transform instead
                 cameraNode = SCNNode()
-                cameraNode!.transform = scene
-                cameraNode!.name = "camera"
-                arView.scene.rootNode.addChildNode(cameraNode!)
+                cameraNode.transform = scene
+                cameraNode.name = "camera"
+                arView.scene.rootNode.addChildNode(cameraNode)
+            } else {
+                cameraNode.transform = scene
             }
             lastRecordedTimestamp = frame.timestamp
             print("Timestamp: \(frame.timestamp)")
@@ -184,9 +179,6 @@ extension ARView: ARViewController {
     /// Adds or updates a tag node when a tag is detected
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         DispatchQueue.main.async {
-            guard let map = InvisibleMapController.shared.mapNavigator.map else {
-                return
-            }
             let pose = tag.poseData
 
             let originalTagPose = simd_float4x4(pose)
@@ -215,8 +207,8 @@ extension ARView: ARViewController {
             let doKalman = false
             
             #if !IS_MAP_CREATOR
-            let aprilTagTracker = map.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
-            map.aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
+            let aprilTagTracker = InvisibleMapController.shared.mapNavigator.map.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
+            InvisibleMapController.shared.mapNavigator.map.aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
             
             #else
             let aprilTagTracker = InvisibleMapCreatorController.shared.mapRecorder.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
@@ -227,7 +219,7 @@ extension ARView: ARViewController {
             aprilTagTracker.updateTagPoseMeans(id: Int(tag.number), detectedPosition: scenePoseTranslation, detectedPositionVar: sceneTransVar, detectedQuat: scenePoseQuat, detectedQuatVar: sceneQuatVar, doKalman: doKalman)
 
             let tagNode: SCNNode
-            if let existingTagNode = self.detectionNode?.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
+            if let existingTagNode = self.detectionNode.childNode(withName: "Tag_\(String(tag.number))", recursively: false)  {
                 tagNode = existingTagNode
                 tagNode.simdPosition = aprilTagTracker.tagPosition
                 tagNode.simdOrientation = aprilTagTracker.tagOrientation
@@ -238,7 +230,7 @@ extension ARView: ARViewController {
                 tagNode.geometry = SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0)
                 tagNode.name = "Tag_\(String(tag.number))"
                 tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.cyan
-                self.detectionNode?.addChildNode(tagNode)
+                self.detectionNode.addChildNode(tagNode)
             }
             
             /// Adds axes to the tag to aid in the visualization
@@ -254,6 +246,8 @@ extension ARView: ARViewController {
             tagNode.addChildNode(xAxis)
             tagNode.addChildNode(yAxis)
             tagNode.addChildNode(zAxis)
+            
+            print("April tag number: ", tag.number)
         }
     }
 
@@ -304,7 +298,7 @@ extension ARView: ARViewController {
             
             textNode.scale = SCNVector3(0.005,0.005,0.005)
             
-            self.mapNode?.childNode(withName: self.locationNodeName, recursively: false)!.addChildNode(boxNode)
+            self.mapNode.childNode(withName: self.locationNodeName, recursively: false)!.addChildNode(boxNode)
             boxNode.addChildNode(textNode)
             
             let snapshot = self.arView.snapshot()
@@ -336,13 +330,13 @@ extension ARView: ARViewController {
     /// Initializes the map node, of which all of the tags and waypoints downloaded from firebase are children
     func createMapNode() {
         mapNode = SCNNode()
-        mapNode?.position = SCNVector3(x: 0, y: 0, z: 0)
-        arView?.scene.rootNode.addChildNode(mapNode!)
+        mapNode.position = SCNVector3(x: 0, y: 0, z: 0)
+        arView.scene.rootNode.addChildNode(mapNode)
         for nodeName in [locationNodeName, tagNodeName, crumbNodeName, edgeNodeName] {
             let node = SCNNode()
             node.name = nodeName
             node.position = SCNVector3(x: 0, y: 0, z: 0)
-            mapNode?.addChildNode(node)
+            mapNode.addChildNode(node)
         }
         
         self.createDetectionNode()
@@ -351,8 +345,8 @@ extension ARView: ARViewController {
     /// Initializes the detection node, which all tag detections are children of
     func createDetectionNode() {
         detectionNode = SCNNode()
-        detectionNode?.position = SCNVector3(x: 0, y: 0, z: 0)
-        arView?.scene.rootNode.addChildNode(detectionNode!)
+        detectionNode.position = SCNVector3(x: 0, y: 0, z: 0)
+        arView.scene.rootNode.addChildNode(detectionNode)
     }
     
     /// Initialize the ARSession
@@ -381,41 +375,34 @@ extension ARView: ARViewController {
     }
 
     /// Creates a node for a path edge between two vertices
-    func renderEdge(from firstVertex: RawMap.OdomVertex, to secondVertex: RawMap.OdomVertex, isPath: Bool) {
-        let pathObj: SCNNode
+    func renderEdge(from firstVertex: RawMap.OdomVertex.vector3, to secondVertex: RawMap.OdomVertex.vector3, isPath: Bool) {
+        var pathObj: SCNNode?
         let verticalOffset: Float = -0.6
         
-        let x = (secondVertex.translation.x + firstVertex.translation.x) / 2
-        let y = (secondVertex.translation.y + firstVertex.translation.y) / 2
-        let z = (secondVertex.translation.z + firstVertex.translation.z) / 2
-        let xDist = secondVertex.translation.x - firstVertex.translation.x
-        let yDist = secondVertex.translation.y - firstVertex.translation.y
-        let zDist = secondVertex.translation.z - firstVertex.translation.z
+        let x = (secondVertex.x + firstVertex.x) / 2
+        let y = (secondVertex.y + firstVertex.y) / 2
+        let z = (secondVertex.z + firstVertex.z) / 2
+        let xDist = secondVertex.x - firstVertex.x
+        let yDist = secondVertex.y - firstVertex.y
+        let zDist = secondVertex.z - firstVertex.z
         let dist = sqrt(pow(xDist, 2) + pow(yDist, 2) + pow(zDist, 2))
 
-        let shouldAddToMapNode: Bool
-        if let (cachedPathObj, _) = pathNodes["\(firstVertex.poseId)_\(secondVertex.poseId)"] {
-            pathObj = cachedPathObj
-            shouldAddToMapNode = false
-        } else {
         /// SCNNode of the bar path
-            pathObj = SCNNode(geometry: SCNBox(width: CGFloat(dist), height: 0.06, length: 0.06, chamferRadius: 1))
-            shouldAddToMapNode = true
-        }
-        pathNodes["\(firstVertex.poseId)_\(secondVertex.poseId)"] = (pathObj, true)
+        pathObj = SCNNode(geometry: SCNBox(width: CGFloat(dist), height: 0.06, length: 0.06, chamferRadius: 1))
+        pathObjs.append(pathObj!)
 
         //configure node attributes
         if !isPath {
             let odometryNode = SCNNode(geometry: SCNBox(width: 0.05, height: 0.05, length: 0.05, chamferRadius: 0))
             odometryNode.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
-            odometryNode.simdPosition = simd_float3(firstVertex.translation.x, firstVertex.translation.y + verticalOffset, firstVertex.translation.z)
-            mapNode?.childNode(withName: crumbNodeName, recursively: false)!.addChildNode(odometryNode)
+            odometryNode.simdPosition = simd_float3(firstVertex.x, firstVertex.y + verticalOffset, firstVertex.z)
+            mapNode.childNode(withName: crumbNodeName, recursively: false)!.addChildNode(odometryNode)
             
-            pathObj.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
-            pathObj.opacity = CGFloat(1)
+            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.yellow
+            pathObj!.opacity = CGFloat(1)
         } else {
-            pathObj.geometry?.firstMaterial!.diffuse.contents = UIColor.red
-            pathObj.opacity = CGFloat(1)
+            pathObj!.geometry?.firstMaterial!.diffuse.contents = UIColor.red
+            pathObj!.opacity = CGFloat(1)
         }
         
         let xAxis = simd_normalize(simd_float3(xDist, yDist, zDist))
@@ -438,30 +425,18 @@ extension ARView: ARViewController {
         let zAxis = simd_cross(xAxis, yAxis)
         let pathTransform = simd_float4x4(columns: (simd_float4(xAxis, 0), simd_float4(yAxis, 0), simd_float4(zAxis, 0), simd_float4(x, y + verticalOffset, z, 1)))
 
-        pathObj.simdTransform = pathTransform
+        pathObj!.simdTransform = pathTransform
         
-        if isPath, shouldAddToMapNode {
-            mapNode?.childNode(withName: edgeNodeName, recursively: false)!.addChildNode(pathObj)
+        if isPath {
+            mapNode.childNode(withName: edgeNodeName, recursively: false)!.addChildNode(pathObj!)
         }
     }
     
-    func renderEdges(fromList vertices: [RawMap.OdomVertex], isPath: Bool) {
-//        if true {
-//            print("WARNING: disabling edge rendering")
-//            return
-//        }
-        //pathObjs.map({$0.removeFromParentNode()})
-        //pathObjs = []
-        for key in pathNodes.keys {
-            pathNodes[key] = (pathNodes[key]!.0, false)
-        }
+    func renderEdges(fromList vertices: [RawMap.OdomVertex.vector3], isPath: Bool) {
+        pathObjs.map({$0.removeFromParentNode()})
+        pathObjs = []
         for i in 0...vertices.count-2 {
             self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
-        }
-        for key in pathNodes.keys {
-            let pathObj = pathNodes[key]!.0
-            let shouldRender = pathNodes[key]!.1
-            pathObj.isHidden = !shouldRender
         }
         
         if isPath {
@@ -470,11 +445,10 @@ extension ARView: ARViewController {
                 #if !IS_MAP_CREATOR
                 InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
                 #endif
-            } else if let cameraNode = cameraNode {
-                // TODO: fix camera Position to be relative to map (factor this out into ARViewer since it is used in more than one place
+            } else {
                 let audioSource = vertices[2]
-                let directionToSource = vector2(cameraNode.position.x, cameraNode.position.z) - vector2(audioSource.translation.x, audioSource.translation.z)
-                var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(cameraNode.transform.m31, cameraNode.transform.m33))
+                let directionToSource = vector2(self.cameraNode.position.x, self.cameraNode.position.z) - vector2(audioSource.x, audioSource.z)
+                var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(self.cameraNode.transform.m31, self.cameraNode.transform.m33))
                 volumeScale = acos(volumeScale) / Float.pi
                 volumeScale = 1 - volumeScale
                 volumeScale = pow(volumeScale, 3)
@@ -486,18 +460,15 @@ extension ARView: ARViewController {
     
     /// Renders entire path for debugging
     func renderDebugGraph(){
-        guard let map = self.sharedController.mapNavigator.map else {
-            return
-        }
         #if !IS_MAP_CREATOR
-            for vertex in map.rawData.odometryVertices {
-                for neighbor in vertex.neighbors {
+            for vertex in self.sharedController.mapNavigator.map.rawData.odometryVertices {
+                for neighbor in vertex.neighbors{
                     // Only render path if it hasn't been rendered yet
                     if (neighbor < vertex.poseId){
-                        let neighborVertex = map.odometryDict![neighbor]!
+                        let neighborVertex = self.sharedController.mapNavigator.map.odometryDict![neighbor]!
                         
                         // Render edge
-                        self.renderEdge(from: vertex, to: neighborVertex, isPath: false)
+                        self.renderEdge(from: vertex.translation, to: neighborVertex, isPath: false)
                     }
                 }
             }
@@ -505,23 +476,20 @@ extension ARView: ARViewController {
     }
     
     func renderTags() {
-        guard let map = sharedController.mapNavigator.map else {
-            return
-        }
         #if !IS_MAP_CREATOR
-        for tagId in map.tagDictionary.keys {
-            let tag = map.tagDictionary[tagId]!
+        for tagId in self.sharedController.mapNavigator.map.tagDictionary.keys {
+            let tag = self.sharedController.mapNavigator.map.tagDictionary[tagId]!
             let tagNode = SCNNode()
             tagNode.geometry = SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0)
             tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
             tagNode.name = "Tag_\(tagId)"
             tagNode.transform = SCNMatrix4(simd_float4x4(tag))
-            self.mapNode?.childNode(withName: self.tagNodeName, recursively: false)?.addChildNode(tagNode)
+            self.mapNode.childNode(withName: self.tagNodeName, recursively: false)?.addChildNode(tagNode)
         }
         #endif
     }
     
-    func renderGraph(fromStops stops: [RawMap.OdomVertex]) {
+    func renderGraph(fromStops stops: [RawMap.OdomVertex.vector3]) {
         self.renderEdges(fromList: stops, isPath: true)
         self.renderTags()
     }
@@ -530,12 +498,9 @@ extension ARView: ARViewController {
     
     /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
     func announceNearbyWaypoints(){
-        guard let cameraNode = cameraNode else {
-            return
-        }
         let curr_pose = cameraNode.position
         var potentialAnnouncements : [String:(String, Double)] = [:]
-        for waypointNode in self.mapNode?.childNode(withName: locationNodeName, recursively: false)!.childNodes {
+        for waypointNode in self.mapNode.childNode(withName: locationNodeName, recursively: false)!.childNodes {
             let nodeName = waypointNode.name!
             let waypointName = String(nodeName[nodeName.index(nodeName.firstIndex(of: "_")!, offsetBy: 1)...])
             let waypoint_pose = arView.scene.rootNode.convertPosition(waypointNode.position, from: mapNode)
@@ -564,11 +529,15 @@ extension ARView: ARViewController {
      
      @objc func ping() {
          #if IS_MAP_CREATOR
+         //don't play ping sound
             return
          #else
-             if self.sharedController.mapNavigator.map?.firstTagFound != true {
+         if self.sharedController.mapNavigator.map !== nil {
+             if !self.sharedController.mapNavigator.map.firstTagFound {
+                 //don't play ping sound if first tag isn't detected
                  return
              }
+         }
         #endif
          self.playSound(type: "ping")
          let volume = self.audioPlayers["ping"]!!.volume
@@ -597,11 +566,6 @@ extension ARView: ARViewController {
      }
    
     func updateMapPose(to mapToGlobal: simd_float4x4) {
-        self.mapNode?.simdTransform = mapToGlobal
-    }
-    func converttoMapFrame(mapNode: SCNNode?,cameraNode: SCNNode?) -> (SCNVector3) {
-        let cameraPos = cameraNode?.convertPosition(SCNVector3(), to: mapNode)
-        return cameraPos!
-        
+        self.mapNode.simdTransform = mapToGlobal
     }
 }
