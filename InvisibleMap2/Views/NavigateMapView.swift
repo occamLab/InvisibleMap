@@ -104,10 +104,10 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
     func updateInstructionText() {
     // TODO: if first tag is detected, let tagFound get true, otherwise false and transition the instructionWrapper based on that boolean
         DispatchQueue.main.async {
-            if !InvisibleMapController.shared.mapNavigator.map.firstTagFound {
-                self.tagFound = false
-            } else {
+            if InvisibleMapController.shared.mapNavigator.map?.firstTagFound == true {
                 self.tagFound = true
+            } else {
+                self.tagFound = false
             }
             self.instructionWrapper.transition(tagFound: self.tagFound)
         }
@@ -118,9 +118,9 @@ struct NavigateMapView: View {
     @StateObject var navigateGlobalState = NavigateGlobalState()
     var mapFileName: String
     
-    init() {
+    init(mapFileName: String = "") {
         print("currentUser is \(Auth.auth().currentUser!.uid)")
-        mapFileName = ""
+        self.mapFileName = mapFileName
     }
     
     var body : some View {

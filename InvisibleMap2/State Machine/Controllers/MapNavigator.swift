@@ -11,12 +11,8 @@ import ARKit
 import SwiftGraph
 
 class MapNavigator: ObservableObject {
-    var map: Map! {
-        didSet {
-            print(map.waypointDictionary)
-            objectWillChange.send()
-        }
-    }
+    @Published var map: Map?
+
     var locationType: String = "tag"
     // updates every time .StartPath command is called, depending on type of endpoint user selects (i.e. if tag is clicked endpointTagId updates, if POI is clicked endpointLocation Id updates)
     var endpointTagId: Int = 0
@@ -36,7 +32,7 @@ class MapNavigator: ObservableObject {
     func scheduledPathPlanningTimer() {
         pathPlanningTimer.invalidate()
         //pathPlanningTimer = Timer()
-        pathPlanningTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.sendPathPlanEvent), userInfo: nil, repeats: true)
+        pathPlanningTimer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(self.sendPathPlanEvent), userInfo: nil, repeats: true)
     }
     
     func stopPathPlanning() {
@@ -49,31 +45,39 @@ class MapNavigator: ObservableObject {
     
     /// Plans a path from the current location to the end and visualizes it in red
     func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex.vector3]? {
-        if !self.map.firstTagFound {
+        let start = Date()
+        guard let map = map else {
             return nil
         }
-
-        // end point for navigating to tag locations
-        // searching for first instance of match between id and given endpointTagId
-        let tagLocation = self.map.rawData.tagVertices.first(where: {$0.id == self.endpointTagId})!.translation
-        
-        var endpoint = self.map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
-        
-        // end point for navigating to waypoints/POIs
-        if locationType == "waypoint" {
-            let waypointLocation = self.map.rawData.waypointsVertices.first(where: {$0.id == self.map.waypointDictionary[endpointLocationId]!.id})!.translation
-            
-            endpoint = self.map.getClosestGraphNode(to: simd_float3(waypointLocation.x, waypointLocation.y, waypointLocation.z))!
+        if !map.firstTagFound {
+            return nil
         }
-        let startpoint = self.map.getClosestGraphNode(to: currentLocation, ignoring: endpoint)
+        
+        let endpoint: Int
+        
+        if locationType == "waypoint" {
+            // end point for navigating to waypoints/POIs
+            let waypointLocation = map.rawData.waypointsVertices.first(where: {$0.id == map.waypointDictionary[self.endpointLocationId]!.id})!.translation
+            
+            endpoint = map.getClosestGraphNode(to: simd_float3(waypointLocation.x, waypointLocation.y, waypointLocation.z))!
+        } else {
+            // end point for navigating to tag locations
+            // searching for first instance of match between id and given endpointTagId
+            let tagLocation = map.rawData.tagVertices.first(where: {$0.id == self.endpointTagId})!.translation
+            
+            endpoint = map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
+        }
+        let startpoint = map.getClosestGraphNode(to: currentLocation, ignoring: endpoint)
 
-        let (_, pathDict) = self.map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
-        print("startpoint:", startpoint!)
+        let (_, pathDict) = map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
+        //print("startpoint:", startpoint!)
+        print("startpoint:", startpoint)
         print("endpoint:", endpoint)
         // find path from startpoint to endpointß
-        let path: [WeightedEdge<Float>] = pathDictToPath(from: self.map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: self.map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
-        let stops = self.map.pathPlanningGraph!.edgesToVertices(edges: path)
-        return stops.map({self.map.odometryDict![Int($0)!]!})
+        let path: [WeightedEdge<Float>] = pathDictToPath(from: map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
+        let stops = map.pathPlanningGraph!.edgesToVertices(edges: path)
+        print("Time to path plan \(-start.timeIntervalSinceNow)")
+        return stops.map({map.odometryDict![Int($0)!]!})
     }
     
     /// Check if tag is detected and update the tag and map transforms
@@ -88,7 +92,9 @@ class MapNavigator: ObservableObject {
         let numTags = tagFinder.getNumberOfTags()
         if numTags > 0 {
             print("Tags found!")
-            seesTag = true
+            DispatchQueue.main.async {
+                self.seesTag = true
+            }
             if let map = self.map {
                 if !map.firstTagFound {
                     print("Starting path planning")

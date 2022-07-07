@@ -52,7 +52,7 @@ class InvisibleMapController: AppController {
                     self.mapNavigator.updateTags(from: cameraFrame)
                 
                 case .UpdatePoseTag(let tag, let cameraTransform):
-                    let mapToGlobal = self.mapNavigator.map.computeMapPose(fromTag: Int(tag.number), withPosition: simd_float4x4(tag.poseData), relativeTo: cameraTransform)
+                    let mapToGlobal = self.mapNavigator.map?.computeMapPose(fromTag: Int(tag.number), withPosition: simd_float4x4(tag.poseData), relativeTo: cameraTransform)
                     if let mapToGlobal = mapToGlobal {
                         self.arViewer?.updateMapPose(to: mapToGlobal)
                     }

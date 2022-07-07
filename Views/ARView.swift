@@ -179,6 +179,9 @@ extension ARView: ARViewController {
     /// Adds or updates a tag node when a tag is detected
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         DispatchQueue.main.async {
+            guard let map = InvisibleMapController.shared.mapNavigator.map else {
+                return
+            }
             let pose = tag.poseData
 
             let originalTagPose = simd_float4x4(pose)
@@ -207,8 +210,8 @@ extension ARView: ARViewController {
             let doKalman = false
             
             #if !IS_MAP_CREATOR
-            let aprilTagTracker = InvisibleMapController.shared.mapNavigator.map.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
-            InvisibleMapController.shared.mapNavigator.map.aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
+            let aprilTagTracker = map.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
+            map.aprilTagDetectionDictionary[Int(tag.number)] = aprilTagTracker
             
             #else
             let aprilTagTracker = InvisibleMapCreatorController.shared.mapRecorder.aprilTagDetectionDictionary[Int(tag.number), default: AprilTagTracker(self.arView, tagId: Int(tag.number))]
@@ -458,12 +461,15 @@ extension ARView: ARViewController {
     
     /// Renders entire path for debugging
     func renderDebugGraph(){
+        guard let map = self.sharedController.mapNavigator.map else {
+            return
+        }
         #if !IS_MAP_CREATOR
-            for vertex in self.sharedController.mapNavigator.map.rawData.odometryVertices {
+            for vertex in map.rawData.odometryVertices {
                 for neighbor in vertex.neighbors{
                     // Only render path if it hasn't been rendered yet
                     if (neighbor < vertex.poseId){
-                        let neighborVertex = self.sharedController.mapNavigator.map.odometryDict![neighbor]!
+                        let neighborVertex = map.odometryDict![neighbor]!
                         
                         // Render edge
                         self.renderEdge(from: vertex.translation, to: neighborVertex, isPath: false)
@@ -474,9 +480,12 @@ extension ARView: ARViewController {
     }
     
     func renderTags() {
+        guard let map = sharedController.mapNavigator.map else {
+            return
+        }
         #if !IS_MAP_CREATOR
-        for tagId in self.sharedController.mapNavigator.map.tagDictionary.keys {
-            let tag = self.sharedController.mapNavigator.map.tagDictionary[tagId]!
+        for tagId in map.tagDictionary.keys {
+            let tag = map.tagDictionary[tagId]!
             let tagNode = SCNNode()
             tagNode.geometry = SCNBox(width: 0.19, height: 0.19, length: 0.05, chamferRadius: 0)
             tagNode.geometry?.firstMaterial?.diffuse.contents = UIColor.black
@@ -529,7 +538,7 @@ extension ARView: ARViewController {
          #if IS_MAP_CREATOR
             return
          #else
-             if !self.sharedController.mapNavigator.map.firstTagFound {
+             if self.sharedController.mapNavigator.map?.firstTagFound != true {
                  return
              }
         #endif

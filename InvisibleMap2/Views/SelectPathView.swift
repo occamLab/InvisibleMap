@@ -16,7 +16,7 @@ struct SelectPathView: View {
     
     var body: some View {
         NavigationView {
-            if mapNavigator.map != nil {
+            if let map = mapNavigator.map {
                 VStack {
                     Text("Map Name: \(mapName)")
                         .font(.title)
@@ -27,7 +27,7 @@ struct SelectPathView: View {
                     // populate list of tag locations of selected map
                     List {
                         Text("Tag Locations: ")
-                        ForEach(Array(mapNavigator.map.tagDictionary.keys), id: \.self) { location in
+                        ForEach(Array(map.tagDictionary.keys), id: \.self) { location in
                             NavigationLink(destination: NavigateMapView(mapFileName: mapFileName).onAppear() {
                                 InvisibleMapController.shared.process(event: .PathSelected(locationType: "tag", Id: location))
                             }) {
@@ -39,12 +39,12 @@ struct SelectPathView: View {
                     
                     List {
                         Text("Saved Locations of Interests: ")
-                        ForEach(Array(mapNavigator.map.waypointDictionary.keys), id: \.self) { location in
+                        ForEach(Array(map.waypointDictionary.keys), id: \.self) { location in
                             // location list where each location navigates to navigation camera screen to start navigating to that selected location
                             NavigationLink(destination: NavigateMapView(mapFileName: mapFileName).onAppear() {
                                 InvisibleMapController.shared.process(event: .PathSelected(locationType: "waypoint", Id: location))
                             }) {
-                                Text("\(mapNavigator.map.waypointDictionary[location]!.id)")
+                                Text("\(map.waypointDictionary[location]!.id)")
                             }
                         }
                     }
