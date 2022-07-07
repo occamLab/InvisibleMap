@@ -66,7 +66,7 @@ class InvisibleMapController: AppController {
                 case .LeaveMap(let mapFileName):
                     self.mapNavigator.resetMap() // destroys the map
                     self.arViewer?.reset()  // stops the ping timer
-                process(commands: [.LoadMap(mapFileName: mapFileName)])
+                process(commands: [.LoadMap(mapFileName: mapFileName)])  // loads the map (with its tag locations and POIs) that the user just left
                     print("leave map")
                 
                 case .PlanPath:

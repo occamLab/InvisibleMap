@@ -246,6 +246,8 @@ extension ARView: ARViewController {
             tagNode.addChildNode(xAxis)
             tagNode.addChildNode(yAxis)
             tagNode.addChildNode(zAxis)
+            
+            print("April tag number: ", tag.number)
         }
     }
 
@@ -527,11 +529,15 @@ extension ARView: ARViewController {
      
      @objc func ping() {
          #if IS_MAP_CREATOR
+         //don't play ping sound
             return
          #else
+         if self.sharedController.mapNavigator.map !== nil {
              if !self.sharedController.mapNavigator.map.firstTagFound {
+                 //don't play ping sound if first tag isn't detected
                  return
              }
+         }
         #endif
          self.playSound(type: "ping")
          let volume = self.audioPlayers["ping"]!!.volume

@@ -20,7 +20,7 @@ enum InstructionType: Equatable {
         get {
             switch self {
             case .findTag: return "Point your camera at a tag \nnearby and START TAG DETECTION to start navigation."
-            case .tagFound: return "Tag detected. STOP TAG DETECTION until you reach the next tag. When you reach the next tag along the route, START TAG DETECTION for it."
+            case .tagFound: return "Tag detected! STOP TAG DETECTION until you reach the next tag. When you reach the next tag along the route, START TAG DETECTION again."
             case .destinationReached: return "You have arrived at your destination!"
             case .none: return nil
             }
@@ -47,18 +47,24 @@ enum InstructionType: Equatable {
     }
     
     // Function to transition from one instruction text field to another; when to display instructions/feedback text and to control how long it stays on screen
+    //TODO: end point reached feedback - for both location and tag location
     mutating func transition(tagFound: Bool, endPointReached: Bool = false) {
         let previousInstruction = self
         switch self {
         case .findTag:
-            if InvisibleMapController.shared.mapNavigator.seesTag {
+            // when first tag is found -> tagFound
+            if tagFound {
+                print("switch instructions from findTag to tagFound after camera finds the first tag")
                 self = .tagFound(startTime: NSDate().timeIntervalSince1970)
             }
         case .tagFound:
+            // case stays as .tagFound until frame is processed again when 'Start Tag Detection' is pressed again -> resets seesTag variable depending on reprocessed camera AR frame.
             if !InvisibleMapController.shared.mapNavigator.seesTag {
+                print("tag found and camera doesn't see tag so get rid of instruction text field")
                 self = .none
             }
         case .none:
+            // seesTag is not reset until tag detection starts again
             if InvisibleMapController.shared.mapNavigator.seesTag {
                 self = .tagFound(startTime: NSDate().timeIntervalSince1970)
             } else if endPointReached {
@@ -92,24 +98,36 @@ enum InstructionType: Equatable {
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
 class NavigateGlobalState: ObservableObject, NavigateViewController {
     @Published var tagFound: Bool
+    @Published var endPointReached: Bool
     @Published var instructionWrapper: InstructionType
     
     init() {
         tagFound = false
+        endPointReached = false 
         instructionWrapper = .findTag(startTime: NSDate().timeIntervalSince1970)
         InvisibleMapController.shared.navigateViewer = self
     }
     
     // Navigate view controller commands
     func updateInstructionText() {
-    // TODO: if first tag is detected, let tagFound get true, otherwise false and transition the instructionWrapper based on that boolean
         DispatchQueue.main.async {
             if !InvisibleMapController.shared.mapNavigator.map.firstTagFound {
                 self.tagFound = false
             } else {
+                print("first tag was found!")
                 self.tagFound = true
             }
-            self.instructionWrapper.transition(tagFound: self.tagFound)
+            
+            // April tag Id of April tag destination; endpointTagId is the key of the endpoint April tag in the tagDictionary
+            let endpointId = InvisibleMapController.shared.mapNavigator.map.tagDictionary[InvisibleMapController.shared.mapNavigator.endpointTagId]!.id
+            // when user reaches destination for a tag location
+            // TODO: same should go for waypoint destination 
+            if endpointId == InvisibleMapController.shared.mapNavigator.currentTagId {
+                self.endPointReached = true
+                InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
+            }
+            
+            self.instructionWrapper.transition(tagFound: self.tagFound, endPointReached: self.endPointReached)
         }
     }
 }
@@ -118,10 +136,10 @@ struct NavigateMapView: View {
     @StateObject var navigateGlobalState = NavigateGlobalState()
     var mapFileName: String
     
-    init() {
+ /*   init() {
         print("currentUser is \(Auth.auth().currentUser!.uid)")
-        mapFileName = ""
-    }
+        //mapFileName = ""
+    } */
     
     var body : some View {
         ZStack {
@@ -133,7 +151,7 @@ struct NavigateMapView: View {
                     }
                 })
             VStack{
-                // Show instrcutions if there are any
+                // Show instructions if there are any
                 if navigateGlobalState.instructionWrapper.text != nil {
                     InstructionOverlay(instruction: $navigateGlobalState.instructionWrapper.text)
                         .animation(.easeInOut)
