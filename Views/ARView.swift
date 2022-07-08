@@ -473,7 +473,8 @@ extension ARView: ARViewController {
             } else if let cameraNode = cameraNode {
                 // TODO: fix camera Position to be relative to map (factor this out into ARViewer since it is used in more than one place
                 let audioSource = vertices[2]
-                let directionToSource = vector2(cameraNode.position.x, cameraNode.position.z) - vector2(audioSource.translation.x, audioSource.translation.z)
+                cameraPos = converttoMapFrame(mapNode: mapNode?, cameraNode: cameraNode?)
+                let directionToSource = vector2(cameraPos.x, cameraPos.z) - vector2(audioSource.translation.x, audioSource.translation.z)
                 var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(cameraNode.transform.m31, cameraNode.transform.m33))
                 volumeScale = acos(volumeScale) / Float.pi
                 volumeScale = 1 - volumeScale
@@ -533,7 +534,7 @@ extension ARView: ARViewController {
         guard let cameraNode = cameraNode else {
             return
         }
-        let curr_pose = cameraNode.position
+        let curr_pose = converttoMapFrame(mapNode: mapNode?, cameraNode: cameraNode?)
         var potentialAnnouncements : [String:(String, Double)] = [:]
         for waypointNode in self.mapNode?.childNode(withName: locationNodeName, recursively: false)!.childNodes {
             let nodeName = waypointNode.name!
@@ -600,7 +601,7 @@ extension ARView: ARViewController {
         self.mapNode?.simdTransform = mapToGlobal
     }
     func converttoMapFrame(mapNode: SCNNode?,cameraNode: SCNNode?) -> (SCNVector3) {
-        let cameraPos = cameraNode?.convertPosition(SCNVector3(), to: mapNode)
+        let cameraPos = cameraNode?.convertPosition(SCNVector3(), to: mapNode?)
         return cameraPos!
         
     }
