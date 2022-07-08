@@ -7,3 +7,4 @@
 Pods/
 /InvisibleMap.xcodeproj/xcuserdata/
 /InvisibleMap.xcworkspace/xcuserdata/
+*.xcuserstate
