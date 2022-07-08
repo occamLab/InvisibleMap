@@ -63,7 +63,7 @@ indirect enum InvisibleMapAppState: StateType {
             
             // Note: go back to saved location list [SelectPathView] when cancel button is pressed; lastState of SelectPath must be MainScreen in order to reload maps' location lists in SelectPath view
             case (.NavigateMap, .LeaveMapRequested(let mapFileName)):
-                self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
+                self = .SelectPath(lastState: InvisibleMapAppState.NavigateMap)
                 return [.LeaveMap(mapFileName: mapFileName)]
             
             case (.NavigateMap, .NewARFrame(let cameraFrame)):
@@ -81,6 +81,8 @@ indirect enum InvisibleMapAppState: StateType {
             
             case (.NavigateMap, .PlanPath):
                 return [.PlanPath]
+            case (.SelectPath, .NewARFrame(let cameraFrame)):
+                return []
             
          /*   case (.NavigateMap, .ViewPathRequested):
                 self = .SelectPath(lastState: InvisibleMapAppState.NavigateMap)

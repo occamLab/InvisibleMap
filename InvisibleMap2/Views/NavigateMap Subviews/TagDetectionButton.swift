@@ -16,9 +16,7 @@ struct TagDetectionButton: View {
         Button(action: {
             self.mapNavigator.detectTags.toggle()
             if self.mapNavigator.detectTags {
-                for child in InvisibleMapController.shared.arViewer!.detectionNode.childNodes {
-                    child.removeFromParentNode()
-                }
+                let _ = InvisibleMapController.shared.arViewer?.detectionNode?.childNodes.map({ child in child.removeFromParentNode() })
             }
         }){
             Text(self.mapNavigator.detectTags ? "Stop Tag Detection" : "Start Tag Detection")

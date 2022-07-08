@@ -10,7 +10,6 @@ import SwiftUI
 
 struct SelectPathView: View {
     @ObservedObject var mapNavigator = InvisibleMapController.shared.mapNavigator
-    public var arViewer: ARView?
     var mapName: String
     var mapFileName: String
     

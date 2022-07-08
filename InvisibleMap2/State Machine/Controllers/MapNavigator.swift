@@ -72,7 +72,7 @@ class MapNavigator: ObservableObject {
 
         let (_, pathDict) = map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
         //print("startpoint:", startpoint!)
-        print("startpoint:", startpoint)
+        print("startpoint:", startpoint!)
         print("endpoint:", endpoint)
         // find path from startpoint to endpointß
         let path: [WeightedEdge<Float>] = pathDictToPath(from: map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
@@ -104,9 +104,9 @@ class MapNavigator: ObservableObject {
                 }
             }
             
-            for child in InvisibleMapController.shared.arViewer!.detectionNode?.childNodes {
-                child.removeFromParentNode()
-            }
+            // remove all of the child nodes of the detection node using the map operation (map plays nicer with optionals than writing it as a for loop)
+            let _ = InvisibleMapController.shared.arViewer?.detectionNode?.childNodes.map({ childNode in childNode.removeFromParentNode() })
+ 
             for i in 0...tagFinder.getNumberOfTags()-1 {
                 let tag = tagFinder.getTagAt(i)
                 tagArray.append(tag)
