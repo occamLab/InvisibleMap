@@ -37,7 +37,7 @@ class ViewController: UIViewController {
     let tagTiltMin: Float = 0.09
     let tagTiltMax: Float = 0.91
     var mapFileName: String = ""
-    var endpointTagId: Int = 0
+    var endpointTagKey: Int = 0
     /// We use the knowledge that the z-axis of the tag should be perpendicular to gravity to adjust the tag detection
     var snapTagsToVertical = true
     
@@ -290,7 +290,7 @@ class ViewController: UIViewController {
         
         print("path planning!")
 
-        let tagLocation = myMap.tagVertices.first(where: {$0.id == self.endpointTagId})!.translation
+        let tagLocation = myMap.tagVertices.first(where: {$0.id == self.endpointTagKey})!.translation
         
         let endpoint = getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
         let startpoint = getClosestGraphNode(ignoring: endpoint)

@@ -67,13 +67,17 @@ indirect enum InvisibleMapAppState: StateType {
                 return [.LeaveMap(mapFileName: mapFileName)]
             
             case (.NavigateMap, .NewARFrame(let cameraFrame)):
-                return [.UpdatePoseVIO(cameraFrame: cameraFrame)]
+            return [.UpdatePoseVIO(cameraFrame: cameraFrame), .UpdateInstructionText]
             
             case (.NavigateMap, .TagFound(let tag, let cameraTransform)):
                 return [.UpdatePoseTag(tag: tag, cameraTransform: cameraTransform)]
             
+            // Note: As of now this case is when users reach their selected destination
             case (.NavigateMap, .WaypointReached(let finalWaypoint)):
-                return finalWaypoint ? [.GetNewWaypoint] : [.FinishedNavigation]
+                print("finished navigation!")
+               // self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
+                return [.FinishedNavigation]
+               // return finalWaypoint ? [.GetNewWaypoint] : [.FinishedNavigation]
             
             case (.NavigateMap, .EditMapRequested):
                 self = .EditMap
@@ -84,10 +88,6 @@ indirect enum InvisibleMapAppState: StateType {
             case (.SelectPath, .NewARFrame(let cameraFrame)):
                 return []
             
-         /*   case (.NavigateMap, .ViewPathRequested):
-                self = .SelectPath(lastState: InvisibleMapAppState.NavigateMap)
-                return [] */
-            
             case (.SelectPath, .PathSelected(let locationType, let Id)):
                 self = .NavigateMap
             return [.StartPath(locationType: locationType, Id: Id)]
@@ -96,8 +96,6 @@ indirect enum InvisibleMapAppState: StateType {
             case (.SelectPath(let lastState), .DismissPathRequested):
                 self = lastState
                 return []
-            
-            
             
         /*    case (.EditMap, .CancelEditRequested):
                 self = .NavigateMap

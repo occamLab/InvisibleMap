@@ -35,7 +35,6 @@ struct SelectPathView: View {
                         }
                     }
                     // populate list of saved locations of interest of selected map
-                    
                     List {
                         Text("Saved Locations of Interests: ")
                         ForEach(Array(map.waypointDictionary.keys), id: \.self) { location in

@@ -37,12 +37,12 @@ class InvisibleMapController: AppController {
                 // Question: ping sound from previous navigation to a POI continues for navigation to another POI (navmap -> selectpath -> navmap (ping starts before detecting first tag)
                     self.mapNavigator.locationType = locationType
                     if locationType == "tag" {
-                        self.mapNavigator.endpointTagId = Id
+                        self.mapNavigator.endpointTagKey = Id
                         self.mapNavigator.scheduledPathPlanningTimer()
                         self.arViewer?.scheduledPingTimer()
                     }
                     if locationType == "waypoint" {
-                        self.mapNavigator.endpointLocationId = Id
+                        self.mapNavigator.endpointWaypointKey = Id
                         self.mapNavigator.scheduledPathPlanningTimer()
                         self.arViewer?.scheduledPingTimer()
                     }
@@ -60,14 +60,13 @@ class InvisibleMapController: AppController {
                 case .FinishedNavigation:
                     self.arViewer?.playSound(type: "arrived")
                     self.mapNavigator.stopPathPlanning()
-                    self.arViewer?.reset()  // stops the ping timer? check if it's needed
+                  //  self.arViewer?.reset()  // stops the ping timer? check if it's needed
                     print("navigation finished")
                 
                 case .LeaveMap(let mapFileName):
                     self.arViewer?.reset()  // stops the ping timer
                     self.mapNavigator.resetMap() // destroys the map
-                    process(commands: [.LoadMap(mapFileName: mapFileName)])
-                    //process(commands)
+                    process(commands: [.LoadMap(mapFileName: mapFileName)])  // loads the map (with its tag locations and POIs) that the user just left
                     print("leave map")
                 
                 case .PlanPath:
