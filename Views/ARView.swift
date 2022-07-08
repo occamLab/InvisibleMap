@@ -166,14 +166,17 @@ extension ARView: ARViewController {
         }
     }
     
+    // initialize ArView
     func initialize() {
         self.startSession()
         self.createMapNode()
     }
     
+    // stop ArView and pings
     func reset() {
         self.pingTimer.invalidate()
         self.pingTimer = Timer()
+        arView.session.pause()
     }
     
     /// Adds or updates a tag node when a tag is detected

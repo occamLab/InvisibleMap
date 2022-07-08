@@ -17,12 +17,19 @@ class MapNavigator: ObservableObject {
             objectWillChange.send()
         }
     }
-    var locationType: String = "tag"
-    // updates every time .StartPath command is called, depending on type of endpoint user selects (i.e. if tag is clicked endpointTagId updates, if POI is clicked endpointLocation Id updates)
-    var endpointTagId: Int = 0
-    var endpointLocationId: Int = 0
     
-    var currentTagId: Int32 = 0
+    // endpoints are either tag locations or waypoint locations
+    var locationType: String = "tag"
+    
+    // updates every time .StartPath command is called, depending on type of endpoint user selects (i.e. if tag is clicked endpointTagKey updates, if POI is clicked endpointLocation Id updates)
+    var endpointTagKey: Int = -1
+    var endpointWaypointKey: Int = -1
+    
+    // the April tag id of the most currently scanned/detected tag
+    var currentTagId: Int32 = -1
+    
+    // the name of the waypoint that user is currently at (if they are at a waypoint)
+    var currentWaypointName: String = "waypoint name"
     
     let tagFinder = imageToData()
     
@@ -57,15 +64,15 @@ class MapNavigator: ObservableObject {
         }
 
         // end point for navigating to tag locations
-        // searching for first instance of match between id and given endpointTagId
-        let tagLocation = self.map.rawData.tagVertices.first(where: {$0.id == self.endpointTagId})!.translation
+        // searching for first instance of match between id and given endpointTagKey
+        let tagLocation = self.map.rawData.tagVertices.first(where: {$0.id == self.endpointTagKey})!.translation
         
         // closest graph node from current location to endpoint
         var endpoint = self.map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
         
         // end point for navigating to waypoints/POIs
         if locationType == "waypoint" {
-            let waypointLocation = self.map.rawData.waypointsVertices.first(where: {$0.id == self.map.waypointDictionary[endpointLocationId]!.id})!.translation
+            let waypointLocation = self.map.rawData.waypointsVertices.first(where: {$0.id == self.map.waypointDictionary[endpointWaypointKey]!.id})!.translation
             
             endpoint = self.map.getClosestGraphNode(to: simd_float3(waypointLocation.x, waypointLocation.y, waypointLocation.z))!
         }

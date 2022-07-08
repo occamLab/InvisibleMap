@@ -10,7 +10,6 @@ import SwiftUI
 
 struct SelectPathView: View {
     @ObservedObject var mapNavigator = InvisibleMapController.shared.mapNavigator
-    public var arViewer: ARView?
     var mapName: String
     var mapFileName: String
     
@@ -36,7 +35,6 @@ struct SelectPathView: View {
                         }
                     }
                     // populate list of saved locations of interest of selected map
-                    
                     List {
                         Text("Saved Locations of Interests: ")
                         ForEach(Array(mapNavigator.map.waypointDictionary.keys), id: \.self) { location in

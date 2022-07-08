@@ -119,12 +119,13 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
                 self.tagFound = true
             }
             
-            // April tag Id of April tag destination; endpointTagId is the key of the endpoint April tag in the tagDictionary
-            let endpointId = InvisibleMapController.shared.mapNavigator.map.tagDictionary[InvisibleMapController.shared.mapNavigator.endpointTagId]!.id
-            // when user reaches destination for a tag location
-            // do tomorrow
-            // TODO: same should go for waypoint destination 
-            if endpointId == InvisibleMapController.shared.mapNavigator.currentTagId {
+            // Note: endpointTagId is the id of the April tag that's the destination; endpointTagKey is the key of the endpoint April tag in the tagDictionary
+            let endpointTagId = InvisibleMapController.shared.mapNavigator.map.tagDictionary[InvisibleMapController.shared.mapNavigator.endpointTagKey]!.id
+            // name of the waypoint destination that the user needs to reach
+        /*    let endWaypointName = InvisibleMapController.shared.mapNavigator.map.waypointDictionary[InvisibleMapController.shared.mapNavigator.endpointWaypointKey]!.id */
+            // TODO: update currentWaypointName each time user passes by a waypoint
+            // when user reaches destination for a tag location or a waypoint/saved location
+            if endpointTagId == InvisibleMapController.shared.mapNavigator.currentTagId /*|| endWaypointName == InvisibleMapController.shared.mapNavigator.currentWaypointName */{
                 self.endPointReached = true
                 InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
             }
