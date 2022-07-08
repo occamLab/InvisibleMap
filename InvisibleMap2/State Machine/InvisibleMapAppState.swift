@@ -85,6 +85,8 @@ indirect enum InvisibleMapAppState: StateType {
             
             case (.NavigateMap, .PlanPath):
                 return [.PlanPath]
+            case (.SelectPath, .NewARFrame(let cameraFrame)):
+                return []
             
             case (.SelectPath, .PathSelected(let locationType, let Id)):
                 self = .NavigateMap

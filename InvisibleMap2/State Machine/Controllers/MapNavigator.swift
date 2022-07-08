@@ -79,8 +79,9 @@ class MapNavigator: ObservableObject {
         
         let startpoint = self.map.getClosestGraphNode(to: currentLocation, ignoring: endpoint)
 
-        let (_, pathDict) = self.map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
-        print("startpoint:", startpoint!)
+
+        let (_, pathDict) = map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
+        //print("startpoint:", startpoint!)
         print("endpoint:", endpoint)
         print("current location:", currentLocation)
       //  print("tag dictionary:", Array(self.map.tagDictionary.values))
@@ -111,9 +112,9 @@ class MapNavigator: ObservableObject {
                 }
             } */
             
-            for child in InvisibleMapController.shared.arViewer!.detectionNode.childNodes {
-                child.removeFromParentNode()
-            }
+            // remove all of the child nodes of the detection node using the map operation (map plays nicer with optionals than writing it as a for loop)
+            let _ = InvisibleMapController.shared.arViewer?.detectionNode?.childNodes.map({ childNode in childNode.removeFromParentNode() })
+ 
             for i in 0...tagFinder.getNumberOfTags()-1 {
                 let tag = tagFinder.getTagAt(i)
                 self.currentTagId = tag.number

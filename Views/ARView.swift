@@ -450,13 +450,15 @@ extension ARView: ARViewController {
                 #endif
             } else {
                 let audioSource = vertices[2]
-                let directionToSource = vector2(self.cameraNode.position.x, self.cameraNode.position.z) - vector2(audioSource.x, audioSource.z)
-                var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(self.cameraNode.transform.m31, self.cameraNode.transform.m33))
-                volumeScale = acos(volumeScale) / Float.pi
-                volumeScale = 1 - volumeScale
-                volumeScale = pow(volumeScale, 3)
-                self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
-                print("Volume scale: \(volumeScale)")
+                if let cameraPos = convertNodeOrigintoMapFrame(node: cameraNode) {
+                    let directionToSource = vector2(cameraPos.x, cameraPos.z) - vector2(audioSource.translation.x, audioSource.translation.z)
+                    var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(cameraNode.transform.m31, cameraNode.transform.m33))
+                    volumeScale = acos(volumeScale) / Float.pi
+                    volumeScale = 1 - volumeScale
+                    volumeScale = pow(volumeScale, 3)
+                    self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
+                    print("Volume scale: \(volumeScale)")
+                }
             }
         }
     }
@@ -501,26 +503,30 @@ extension ARView: ARViewController {
     
     /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
     func announceNearbyWaypoints(){
-        let curr_pose = cameraNode.position
-        var potentialAnnouncements : [String:(String, Double)] = [:]
-        for waypointNode in self.mapNode.childNode(withName: locationNodeName, recursively: false)!.childNodes {
-            let nodeName = waypointNode.name!
-            let waypointName = String(nodeName[nodeName.index(nodeName.firstIndex(of: "_")!, offsetBy: 1)...])
-            let waypoint_pose = arView.scene.rootNode.convertPosition(waypointNode.position, from: mapNode)
-            let distanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2) + pow((waypoint_pose.z - curr_pose.z),2))
-            if distanceToCurrPose < self.distanceToAnnounceWaypoint, (lastSpeechTime[waypointName] ?? Date.distantPast).timeIntervalSinceNow < -5.0, !synth.isSpeaking {
-                let twoDimensionalDistanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2))
-                let announcement: String = waypointName + " is " + String(format: "%.1f", twoDimensionalDistanceToCurrPose) + " meters away."
-                potentialAnnouncements[waypointName] = (announcement, (lastSpeechTime[waypointName] ?? Date.distantPast).timeIntervalSinceNow)
-            }
+        guard let cameraNode = cameraNode, let mapNode = mapNode else {
+            return
         }
-        // If multiple announcements are possible, pick the one that was least recently spoken
-        let leastRecentlyAnnounced = potentialAnnouncements.min { a, b in a.value.1 < b.value.1 }
-        if let leastRecentlyAnnounced = leastRecentlyAnnounced {
-            let utterance = AVSpeechUtterance(string: leastRecentlyAnnounced.value.0)
-            utterance.voice = voice
-            lastSpeechTime[leastRecentlyAnnounced.key] = Date()
-            synth.speak(utterance)
+        if let curr_pose = convertNodeOrigintoMapFrame(node: cameraNode) {
+            var potentialAnnouncements : [String:(String, Double)] = [:]
+            for waypointNode in mapNode.childNode(withName: locationNodeName, recursively: false)!.childNodes {
+                let nodeName = waypointNode.name!
+                let waypointName = String(nodeName[nodeName.index(nodeName.firstIndex(of: "_")!, offsetBy: 1)...])
+                let waypoint_pose = arView.scene.rootNode.convertPosition(waypointNode.position, from: mapNode)
+                let distanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2) + pow((waypoint_pose.z - curr_pose.z),2))
+                if distanceToCurrPose < self.distanceToAnnounceWaypoint, (lastSpeechTime[waypointName] ?? Date.distantPast).timeIntervalSinceNow < -5.0, !synth.isSpeaking {
+                    let twoDimensionalDistanceToCurrPose = sqrt(pow((waypoint_pose.x - curr_pose.x),2) + pow((waypoint_pose.y - curr_pose.y),2))
+                    let announcement: String = waypointName + " is " + String(format: "%.1f", twoDimensionalDistanceToCurrPose) + " meters away."
+                    potentialAnnouncements[waypointName] = (announcement, (lastSpeechTime[waypointName] ?? Date.distantPast).timeIntervalSinceNow)
+                }
+                // If multiple announcements are possible, pick the one that was least recently spoken
+                let leastRecentlyAnnounced = potentialAnnouncements.min { a, b in a.value.1 < b.value.1 }
+                if let leastRecentlyAnnounced = leastRecentlyAnnounced {
+                    let utterance = AVSpeechUtterance(string: leastRecentlyAnnounced.value.0)
+                    utterance.voice = voice
+                    lastSpeechTime[leastRecentlyAnnounced.key] = Date()
+                    synth.speak(utterance)
+                }
+            }
         }
     }
     
@@ -569,6 +575,15 @@ extension ARView: ARViewController {
      }
    
     func updateMapPose(to mapToGlobal: simd_float4x4) {
-        self.mapNode.simdTransform = mapToGlobal
+        self.mapNode?.simdTransform = mapToGlobal
+    }
+    
+    func convertNodeOrigintoMapFrame(node: SCNNode) -> SCNVector3? {
+        if let mapNode = mapNode {
+            let cameraPos = node.convertPosition(SCNVector3(), to: mapNode)
+            return cameraPos
+        } else {
+            return nil
+        }
     }
 }
