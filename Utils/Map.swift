@@ -25,7 +25,7 @@ class Map {
     var firstTagFound = false
     var pathPlanningGraph: WeightedGraph<String, Float>?
     // odometryDict stores a list of nodes by poseID to their xyz data
-    var odometryDict: Dictionary<Int, RawMap.OdomVertex.vector3>?
+    var odometryDict: Dictionary<Int, RawMap.OdomVertex>?
     
     init?(from data: Data) {
         do {
@@ -76,7 +76,7 @@ class Map {
         var closestNode: Int = 0
         var minDist = 100000.0
         for node in odometryDict!{
-            let nodeVec = simd_float3(node.value.x, node.value.y, node.value.z)
+            let nodeVec = simd_float3(node.value.translation.x, node.value.translation.y, node.value.translation.z)
             let dist = simd_distance(nodeVec, location)
             
             if (Double)(dist) < minDist && (endpoint == nil || node.key != endpoint) {
@@ -84,13 +84,14 @@ class Map {
                 closestNode = node.key
             }
         }
+        print("closest Node \(closestNode) minDist \(minDist)")
         return closestNode
     }
     
     /// Renders graph used for path planning and initializes dictionary and graph used
     func renderGraphPath(){
         // Initializes dictionary and graph
-        odometryDict = Dictionary<Int, RawMap.OdomVertex.vector3>(uniqueKeysWithValues: zip(rawData.odometryVertices.map({$0.poseId}), rawData.odometryVertices.map({$0.translation})))
+        odometryDict = Dictionary<Int, RawMap.OdomVertex>(uniqueKeysWithValues: zip(rawData.odometryVertices.map({$0.poseId}), rawData.odometryVertices))
         pathPlanningGraph = WeightedGraph<String, Float>(vertices: Array(odometryDict!.keys).sorted().map({String($0)}))
 
         for vertex in rawData.odometryVertices {
@@ -100,7 +101,7 @@ class Map {
                     let neighborVertex = odometryDict![neighbor]!
                     
                     let vertexVec = simd_float3(vertex.translation.x, vertex.translation.y, vertex.translation.z)
-                    let neighborVertexVec = simd_float3(neighborVertex.x, neighborVertex.y, neighborVertex.z)
+                    let neighborVertexVec = simd_float3(neighborVertex.translation.x, neighborVertex.translation.y, neighborVertex.translation.z)
                     let total_dist = simd_distance(vertexVec, neighborVertexVec)
         
                     // Adding edge from vertex to neighbor

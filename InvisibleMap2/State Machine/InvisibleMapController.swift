@@ -52,7 +52,7 @@ class InvisibleMapController: AppController {
                     self.mapNavigator.updateTags(from: cameraFrame)
                 
                 case .UpdatePoseTag(let tag, let cameraTransform):
-                    let mapToGlobal = self.mapNavigator.map.computeMapPose(fromTag: Int(tag.number), withPosition: simd_float4x4(tag.poseData), relativeTo: cameraTransform)
+                    let mapToGlobal = self.mapNavigator.map?.computeMapPose(fromTag: Int(tag.number), withPosition: simd_float4x4(tag.poseData), relativeTo: cameraTransform)
                     if let mapToGlobal = mapToGlobal {
                         self.arViewer?.updateMapPose(to: mapToGlobal)
                     }
@@ -70,8 +70,9 @@ class InvisibleMapController: AppController {
                     print("leave map")
                 
                 case .PlanPath:
-                    if let cameraNode = self.arViewer!.cameraNode {
-                        let stops = self.mapNavigator.planPath(from: cameraNode.simdTransform.getTrans())
+                if let mapNode = arViewer?.mapNode, let cameraNode = arViewer?.cameraNode {
+                    let cameraPositionRelativeToMapNode = cameraNode.convertPosition(SCNVector3(), to: mapNode)
+                    let stops = self.mapNavigator.planPath(from: simd_float3(cameraPositionRelativeToMapNode.x, cameraPositionRelativeToMapNode.y, cameraPositionRelativeToMapNode.z))
                         if let stops = stops {
                             self.arViewer!.renderGraph(fromStops: stops)
                         }
