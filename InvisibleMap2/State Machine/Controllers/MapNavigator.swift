@@ -53,41 +53,48 @@ class MapNavigator: ObservableObject {
     }
     
     /// Plans a path from the current location to the end and visualizes it in red
-    func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex.vector3]? {
-        if let self.map = map {
-            if !map.firstTagFound {
-                return nil
-            }
-
+    func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex]? {
+        let start = Date()
+        guard let map = map else{
+            return nil
+        }
+        
+        if !map.firstTagFound {
+            return nil
+        }
+        let endpoint: Int
+        // end point for navigating to waypoints/POIs
+        if locationType == "waypoint" {
+            let waypointLocation = map.rawData.waypointsVertices.first(where: {$0.id == map.waypointDictionary[endpointWaypointKey]!.id})!.translation
+            
+            endpoint = map.getClosestGraphNode(to: simd_float3(waypointLocation.x, waypointLocation.y, waypointLocation.z))!
+        } else {
             // end point for navigating to tag locations
             // searching for first instance of match between id and given endpointTagKey
             let tagLocation = map.rawData.tagVertices.first(where: {$0.id == self.endpointTagKey})!.translation
             
             // closest graph node from current location to endpoint
-            var endpoint = map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
+            endpoint = map.getClosestGraphNode(to: simd_float3(tagLocation.x, tagLocation.y, tagLocation.z))!
             
-            // end point for navigating to waypoints/POIs
-            if locationType == "waypoint" {
-                let waypointLocation = map.rawData.waypointsVertices.first(where: {$0.id == map.waypointDictionary[endpointWaypointKey]!.id})!.translation
-                
-                endpoint = map.getClosestGraphNode(to: simd_float3(waypointLocation.x, waypointLocation.y, waypointLocation.z))!
-            }
-            
-            let startpoint = map.getClosestGraphNode(to: currentLocation, ignoring: endpoint)
-
-
-            let (_, pathDict) = map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
-            //print("startpoint:", startpoint!)
-            print("endpoint:", endpoint)
-            print("current location:", currentLocation)
-          //  print("tag dictionary:", Array(self.map.tagDictionary.values))
-         //   print("waypoint dictionary:", Array(self.map.waypointDictionary.values))
-            // find path from startpoint to endpoint
-            let path: [WeightedEdge<Float>] = pathDictToPath(from: map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
-            let stops = map.pathPlanningGraph!.edgesToVertices(edges: path)
-            return stops.map({map.odometryDict![Int($0)!]!.translation})
         }
+        print("currentLocation \(currentLocation)")
+        let startpoint = map.getClosestGraphNode(to: currentLocation, ignoring: endpoint)
+
+
+        let (_, pathDict) = map.pathPlanningGraph!.dijkstra(root: String(startpoint!), startDistance: Float(0.0))
+        //print("startpoint:", startpoint!)
+        print("startpoint:", startpoint!)
+        print("endpoint:", endpoint)
+        print("current location:", currentLocation)
+      //  print("tag dictionary:", Array(self.map.tagDictionary.values))
+     //   print("waypoint dictionary:", Array(self.map.waypointDictionary.values))
+        // find path from startpoint to endpoint
+        let path: [WeightedEdge<Float>] = pathDictToPath(from: map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
+        let stops = map.pathPlanningGraph!.edgesToVertices(edges: path)
+        print("Time to path plan \(-start.timeIntervalSinceNow)")
+        return stops.map({map.odometryDict![Int($0)!]!})
     }
+    
     /// Check if tag is detected and update the tag and map transforms
     ///
     /// - Parameters:
@@ -99,14 +106,17 @@ class MapNavigator: ObservableObject {
         var tagArray: Array<AprilTags> = Array()
         let numTags = tagFinder.getNumberOfTags()
         if numTags > 0 {
-        /*    print("Tags found!")
+            print("Tags found!")
+            DispatchQueue.main.async {
+                self.seesTag = true
+            }
             if let map = self.map {
                 if !map.firstTagFound {
                     print("Starting path planning")
                     map.renderGraphPath()
                     map.firstTagFound = true
                 }
-            } */
+            }
             
             // remove all of the child nodes of the detection node using the map operation (map plays nicer with optionals than writing it as a for loop)
             let _ = InvisibleMapController.shared.arViewer?.detectionNode?.childNodes.map({ childNode in childNode.removeFromParentNode() })

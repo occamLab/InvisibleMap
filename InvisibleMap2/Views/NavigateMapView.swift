@@ -112,28 +112,27 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
     // Navigate view controller commands
     func updateInstructionText() {
         DispatchQueue.main.async {
-            if let map = InvisibleMapController.shared.mapNavigator.map {
-                if !map.firstTagFound {
+            if InvisibleMapController.shared.mapNavigator.map?.firstTagFound == true {
                     self.tagFound = false
                 } else {
                     print("first tag was found!")
                     self.tagFound = true
                 }
-            } /*
+                
                 // Note: endpointTagId is the id of the April tag that's the destination; endpointTagKey is the key of the endpoint April tag in the tagDictionary
-                let endpointTagId = map.tagDictionary[InvisibleMapController.shared.mapNavigator.endpointTagKey]!.id
+           /*     let endpointTagId = map.tagDictionary[InvisibleMapController.shared.mapNavigator.endpointTagKey].id
                 // name of the waypoint destination that the user needs to reach
             /*    let endWaypointName = InvisibleMapController.shared.mapNavigator.map.waypointDictionary[InvisibleMapController.shared.mapNavigator.endpointWaypointKey]!.id */
+                // TODO: update currentWaypointName each time user passes by a waypoint
+                // when user reaches destination for a tag location or a waypoint/saved location
             
-            // TODO: update currentWaypointName each time user passes by a waypoint
-            // when user reaches destination for a tag location or a waypoint/saved location
-            if endpointTagId == InvisibleMapController.shared.mapNavigator.currentTagId /*|| endWaypointName == InvisibleMapController.shared.mapNavigator.currentWaypointName */{
-                self.endPointReached = true
-                InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
+                if endpointTagId == InvisibleMapController.shared.mapNavigator.currentTagId /*|| endWaypointName == InvisibleMapController.shared.mapNavigator.currentWaypointName */{
+                    self.endPointReached = true
+                    InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
+                }
             } */
-        
+            
             self.instructionWrapper.transition(tagFound: self.tagFound, endPointReached: self.endPointReached)
-          //  }
         }
     }
 }
@@ -142,10 +141,10 @@ struct NavigateMapView: View {
     @StateObject var navigateGlobalState = NavigateGlobalState()
     var mapFileName: String
     
- /*   init() {
+    init(mapFileName: String = "") {
         print("currentUser is \(Auth.auth().currentUser!.uid)")
-        //mapFileName = ""
-    } */
+        self.mapFileName = mapFileName
+    }
     
     var body : some View {
         ZStack {
