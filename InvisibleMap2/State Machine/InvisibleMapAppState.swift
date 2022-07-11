@@ -54,7 +54,7 @@ indirect enum InvisibleMapAppState: StateType {
     
     // In response to an event, a state may transition to a new state, and it may emit a command
     mutating func handle(event: Event) -> [Command] {
-        print("Current State: \(self), \(event)")
+        print("Last State: \(self), \(event)")
         switch (self, event) {
             // Note: loads the selected map each time state changes from mainscreen to selectpath (location list view) state; when users go from selectpath to mainscreen state is reset to mainscreen (laststate before selectpath) -> dismisspathrequested (event)
             case (.MainScreen, .MapSelected(let mapFileName)):
@@ -74,7 +74,6 @@ indirect enum InvisibleMapAppState: StateType {
             
             // Note: As of now this case is when users reach their selected destination
             case (.NavigateMap, .WaypointReached(let finalWaypoint)):
-                print("finished navigation!")
                // self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
                 return [.FinishedNavigation]
                // return finalWaypoint ? [.GetNewWaypoint] : [.FinishedNavigation]

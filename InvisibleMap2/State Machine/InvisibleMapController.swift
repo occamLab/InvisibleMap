@@ -58,13 +58,15 @@ class InvisibleMapController: AppController {
                     }
                 
                 case .FinishedNavigation:
-                    self.arViewer?.playSound(type: "arrived")
+                   // self.arViewer?.playSound(type: "arrived")
+                    self.arViewer?.scheduledArrivedSoundTimer()
+                    self.arViewer?.stopPing()
                     self.mapNavigator.stopPathPlanning()
-                  //  self.arViewer?.reset()  // stops the ping timer? check if it's needed
+                  //  self.arViewer?.stopArrivedSound()  //is not working
                     print("navigation finished")
                 
                 case .LeaveMap(let mapFileName):
-                    self.arViewer?.reset()  // stops the ping timer
+                    self.arViewer?.reset()  // stops the ping timer and resets ARView
                     self.mapNavigator.resetMap() // destroys the map
                     process(commands: [.LoadMap(mapFileName: mapFileName)])  // loads the map (with its tag locations and POIs) that the user just left
                     print("leave map")
