@@ -164,7 +164,7 @@ struct NavigateMapView: View {
 extension UINavigationController {
     override open func viewDidLoad() {
         super.viewDidLoad()
-      
+      //  self.navigationItem.hidesBackButton = true
         // Creates a translucent toolbar
         let toolbarAppearance = UIToolbarAppearance()
         toolbarAppearance.configureWithTransparentBackground()

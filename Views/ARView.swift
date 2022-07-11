@@ -39,8 +39,9 @@ protocol ARViewController {
 class ARView: UIViewController {
     // TODO: make less gross
     var pathNodes: [String: (SCNNode, Bool)] = [:]
-    
+    #if !IS_MAP_CREATOR
     let navigateGlobalState = NavigateGlobalState()
+    #endif
     let memoryChecker : MemoryChecker = MemoryChecker()
     let configuration = ARWorldTrackingConfiguration()
     #if IS_MAP_CREATOR
@@ -193,9 +194,11 @@ extension ARView: ARViewController {
     /// Adds or updates a tag node when a tag is detected
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         DispatchQueue.main.async {
+            #if !IS_MAP_CREATOR
             guard let map = InvisibleMapController.shared.mapNavigator.map else {
                 return
             }
+            #endif
             let pose = tag.poseData
 
             let originalTagPose = simd_float4x4(pose)
@@ -356,7 +359,6 @@ extension ARView: ARViewController {
             node.position = SCNVector3(x: 0, y: 0, z: 0)
             mapNode?.addChildNode(node)
         }
-        
         self.createDetectionNode()
     }
     
@@ -508,10 +510,10 @@ extension ARView: ARViewController {
     
     /// Renders entire path for debugging
     func renderDebugGraph(){
+        #if !IS_MAP_CREATOR
         guard let map = self.sharedController.mapNavigator.map else {
             return
         }
-        #if !IS_MAP_CREATOR
             for vertex in map.rawData.odometryVertices {
                 for neighbor in vertex.neighbors {
                     // Only render path if it hasn't been rendered yet
@@ -527,10 +529,10 @@ extension ARView: ARViewController {
     }
     
     func renderTags() {
+        #if !IS_MAP_CREATOR
         guard let map = sharedController.mapNavigator.map else {
             return
         }
-        #if !IS_MAP_CREATOR
         for tagId in map.tagDictionary.keys {
             let tag = map.tagDictionary[tagId]!
             let tagNode = SCNNode()
