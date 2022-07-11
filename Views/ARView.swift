@@ -38,7 +38,7 @@ protocol ARViewController {
 
 class ARView: UIViewController {
     // TODO: make less gross
-        var pathNodes: [String: (SCNNode, Bool)] = [:]
+    var pathNodes: [String: (SCNNode, Bool)] = [:]
     
     let navigateGlobalState = NavigateGlobalState()
     let memoryChecker : MemoryChecker = MemoryChecker()
@@ -457,46 +457,45 @@ extension ARView: ARViewController {
     }
     
     func renderEdges(fromList vertices: [RawMap.OdomVertex], isPath: Bool) {
-    //        if true {
-    //            print("WARNING: disabling edge rendering")
-    //            return
-    //        }
-            //pathObjs.map({$0.removeFromParentNode()})
-            //pathObjs = []
-            for key in pathNodes.keys {
-                pathNodes[key] = (pathNodes[key]!.0, false)
-            }
+        for key in pathNodes.keys {
+          // keeps track of seen nodes
+          pathNodes[key] = (pathNodes[key]!.0, false)
+        }
+        // hides or shows nodes
         for i in 0...vertices.count-2 {
-            self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
+          self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
         }
         for key in pathNodes.keys {
-            let pathObj = pathNodes[key]!.0
-            let shouldRender = pathNodes[key]!.1
-            pathObj.isHidden = !shouldRender
+          let pathObj = pathNodes[key]!.0
+          let shouldRender = pathNodes[key]!.1
+          pathObj.isHidden = !shouldRender
         }
-        
         if isPath {
-            /// Ping audio from a few nodes down to ensure direction
-            if vertices.count < 3 {
-                #if !IS_MAP_CREATOR
-                InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
-                self.navigateGlobalState.endPointReached = true
-                #endif
-            } else if let cameraNode = cameraNode {
-                // TODO: fix camera Position to be relative to map (factor this out into ARViewer since it is used in more than one place
-                let audioSource = vertices[2]
-                if let cameraPos = convertNodeOrigintoMapFrame(node: cameraNode) {
-                    let directionToSource = vector2(cameraPos.x, cameraPos.z) - vector2(audioSource.translation.x, audioSource.translation.z)
-                    var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(cameraNode.transform.m31, cameraNode.transform.m33))
-                    volumeScale = acos(volumeScale) / Float.pi
-                    volumeScale = 1 - volumeScale
-                    volumeScale = pow(volumeScale, 3)
-                    self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
-                    print("Volume scale: \(volumeScale)")
-                }
+          /// Ping audio from a few nodes down to ensure direction
+          print("vertices.count \(vertices.count)")
+          // compare the camera’s current position to the destination’s position, and if they are close enough, process event that waypoint or destination was reached
+          if let cameraNode = cameraNode, let cameraPosConverted = convertNodeOrigintoMapFrame(node: cameraNode), let destinationVertex = vertices.last {
+            // TODO: factor 0.3 out as a constant somewhere (maybe MapNavigator)
+            if simd_distance(simd_float3(cameraPosConverted), simd_float3(destinationVertex.translation.x, destinationVertex.translation.y, destinationVertex.translation.z)) < 0.3 {
+              #if !IS_MAP_CREATOR
+              InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
+              self.navigateGlobalState.endPointReached = true
+              print("ARView.swift: Reached endpoint")
+              #endif
+            } else {
+              // TODO: revisit this to see how to better set the source location
+              let audioSource = vertices[min(2, vertices.count-1)]
+              let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
+              var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(cameraPosConverted.x, cameraPosConverted.z))
+              volumeScale = acos(volumeScale) / Float.pi
+              volumeScale = 1 - volumeScale
+              volumeScale = pow(volumeScale, 3)
+              self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
+              print("Volume scale: \(volumeScale)")
             }
+          }
         }
-    }
+      }
     
     /// Renders entire path for debugging
     func renderDebugGraph(){
@@ -619,7 +618,9 @@ extension ARView: ARViewController {
          do {
              try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
              try AVAudioSession.sharedInstance().setActive(true)
-             guard let player = self.audioPlayers[type]! else { return }
+             guard let player = self.audioPlayers[type]! else {
+                 return
+             }
              player.play()
          } catch let error {
              print(error.localizedDescription)

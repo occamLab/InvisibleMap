@@ -37,10 +37,11 @@ class MapNavigator: ObservableObject {
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.invisiblemap", qos: DispatchQoS.userInitiated)
     var pathPlanningTimer = Timer()
     
-    /// Finds and visualizes path to the endpoint on a timer
+    /// Finds and visualizes path repeatedly in intervals to the endpoint based on a timer
     func scheduledPathPlanningTimer() {
         pathPlanningTimer.invalidate()
         //pathPlanningTimer = Timer()
+        //replans the path every "timeInterval" seconds
         pathPlanningTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.sendPathPlanEvent), userInfo: nil, repeats: true)
     }
     
@@ -53,6 +54,7 @@ class MapNavigator: ObservableObject {
     }
     
     /// Plans a path from the current location to the end and visualizes it in red
+    /// retunrs an arry of Vertices between Edges of path
     func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex]? {
         let start = Date()
         guard let map = map else{
@@ -90,6 +92,7 @@ class MapNavigator: ObservableObject {
      //   print("waypoint dictionary:", Array(self.map.waypointDictionary.values))
         // find path from startpoint to endpoint
         let path: [WeightedEdge<Float>] = pathDictToPath(from: map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
+        //stops are the vertices of edges that make up path
         let stops = map.pathPlanningGraph!.edgesToVertices(edges: path)
         print("Time to path plan \(-start.timeIntervalSinceNow)")
         return stops.map({map.odometryDict![Int($0)!]!})
