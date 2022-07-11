@@ -58,9 +58,12 @@ class InvisibleMapController: AppController {
                     }
                 
                 case .FinishedNavigation:
-                    self.arViewer?.playSound(type: "arrived")
+                   // self.arViewer?.playSound(type: "arrived")
+                    self.arViewer?.scheduledArrivedSoundTimer()
+                    self.arViewer?.stopPing()
                     self.mapNavigator.stopPathPlanning()
-                  //  self.arViewer?.reset()  // stops the ping timer? check if it's needed
+                    
+                   // self.arViewer?.reset()  // stops the ping timer? check if it's needed
                     print("navigation finished")
                 
                 case .LeaveMap(let mapFileName):
