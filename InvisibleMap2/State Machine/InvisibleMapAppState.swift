@@ -76,7 +76,6 @@ indirect enum InvisibleMapAppState: StateType {
             
             // Note: As of now this case is when users reach their selected destination
             case (.NavigateMap, .WaypointReached(let finalWaypoint)):
-                print("finished navigation!")
                // self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
                 return [.FinishedNavigation]
                // return finalWaypoint ? [.GetNewWaypoint] : [.FinishedNavigation]
