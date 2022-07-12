@@ -1,5 +1,5 @@
 //
-//  RecordTagButton.swift
+//  tagRecordingStateButton.swift
 //  InvisibleMapCreator2
 //
 //  Created by tad on 7/16/21.
@@ -16,24 +16,28 @@ struct RecordTagButton: View {
     var body: some View {
         Button(action: {
             if self.mapRecorder.seesTag {
-                self.mapRecorder.recordTag.toggle()
+                self.mapRecorder.previousTagRecordedState = self.mapRecorder.tagRecordingState
+                print("previous tag recording state: \(self.mapRecorder.previousTagRecordedState)")
+                print("current tag recording state: \(self.mapRecorder.tagRecordingState)")
+                self.mapRecorder.tagRecordingState.toggle() // toggle between green start and red stop button
+                
             } else {
                 recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, markTagRequested: true)
             }
         }){
-            Text(!self.mapRecorder.recordTag ? "Mark Tag" : "Tag was Marked")
+            Text(!self.mapRecorder.tagRecordingState ? "Start Recording Tag" : "Stop Recording Tag")
                 .frame(width: 300, height: 60)
                                 .foregroundColor(.white)
                                 .background(
                                     RoundedRectangle(cornerRadius: 15)
-                                        .foregroundColor(!self.mapRecorder.recordTag ? .green : .gray)
-                                        .opacity(self.mapRecorder.seesTag ? 1 : 0.5))
+                                        .foregroundColor(!self.mapRecorder.tagRecordingState ? .green : .red) // when at recording state red, stop button shows
+                                        .opacity(self.mapRecorder.seesTag ? 1 : 0.5))  // changes shade of record tag green button if camera is not detecting tags
         }
         //.disabled(!self.mapRecorder.seesTag)
     }
 }
 
-struct RecordTagButton_Previews: PreviewProvider {
+struct tagRecordingStateButton_Previews: PreviewProvider {
     @StateObject static var recordGlobalState = RecordGlobalState()
     
     static var previews: some View {

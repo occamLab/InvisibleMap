@@ -103,7 +103,7 @@ class MapNavigator: ObservableObject {
         var tagArray: Array<AprilTags> = Array()
         let numTags = tagFinder.getNumberOfTags()
         if numTags > 0 {
-           // print("Tags found!")
+           // moved to updateTags function
          /*   DispatchQueue.main.async {
                 self.seesTag = true
             }

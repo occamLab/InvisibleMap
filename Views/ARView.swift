@@ -504,7 +504,6 @@ extension ARView: ARViewController {
                     print("Volume scale: \(volumeScale)")
                 }
             }
-          }
         }
       }
     
@@ -550,10 +549,8 @@ extension ARView: ARViewController {
         self.renderTags()
     }
     
-    
-    
     /// Checks the distance to all of the waypoints and announces those that are closer than a given threshold distance
-    func announceNearbyWaypoints(){
+    func announceNearbyWaypoints() {
         guard let cameraNode = cameraNode, let mapNode = mapNode else {
             return
         }
@@ -578,7 +575,7 @@ extension ARView: ARViewController {
                     synth.speak(utterance)
                 }
             
-        }
+            }
         }
         
     }

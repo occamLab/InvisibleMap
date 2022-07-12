@@ -45,8 +45,10 @@ class MapRecorder: MapRecorderController, ObservableObject {
     /// Tracks whether the first tag has been found
     @Published var firstTagFound = false
     /// Tracks whether the user has asked for a tag to be recorded
-    @Published var recordTag = false
+    @Published var tagRecordingState = false
     @Published var seesTag = false
+    @Published var tagWasRecorded = false
+    @Published var previousTagRecordedState = false
     
     /// Correct the orientation estimate such that the normal vector of the tag is perpendicular to gravity
     let snapTagsToVertical = true
@@ -73,7 +75,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
         lastRecordedFrame = cameraFrame
         
         recordPoseData(cameraFrame: cameraFrame, timestamp: InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp, poseId: poseId)
-        recordTags(cameraFrame: cameraFrame, timestamp: InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp, poseId: poseId)
+        tagRecordingStates(cameraFrame: cameraFrame, timestamp: InvisibleMapCreatorController.shared.arViewer!.lastRecordedTimestamp, poseId: poseId)
         recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
         poseId += 1
         
@@ -162,7 +164,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
         lastRecordedFrame = nil
         firstTagFound = false
         seesTag = false
-        recordTag = false
+        tagRecordingState = false
         poseId = 0
         poseData = []
         locationData = []
@@ -178,8 +180,8 @@ extension MapRecorder {
         poseData.append(getCameraCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId))
     }
     
-    /// Append new april tag data to list
-    @objc func recordTags(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
+    /// Append new april tag data to list - tags are continuously recorded when NewARFrame event is processed but tags are NOT actually "recorded" into the tag data unless certain conditions are met
+    @objc func tagRecordingStates(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         let uiimage = cameraFrame.convertToUIImage()
         aprilTagQueue.async {
             let arTags = self.getArTags(cameraFrame: cameraFrame, image: uiimage, timeStamp: timestamp, poseId: poseId)
@@ -188,12 +190,20 @@ extension MapRecorder {
                 if !self.firstTagFound && self.seesTag {
                     self.firstTagFound = true
                 }
-                if self.recordTag && self.seesTag {
+                if self.tagRecordingState && self.seesTag {
                     self.tagData.append(arTags)
                 }
-                if !self.seesTag {
-                    self.recordTag = false
+                
+                if !self.tagRecordingState && self.previousTagRecordedState {
+                    self.tagWasRecorded = true
                 }
+                    
+                if !self.seesTag {
+                    self.previousTagRecordedState = self.tagRecordingState
+                    self.tagRecordingState = false
+                    self.tagWasRecorded = false
+                }
+                
                 self.processingFrame = false
             }
         }

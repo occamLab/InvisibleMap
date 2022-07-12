@@ -17,6 +17,7 @@ enum InstructionType: Equatable {
     case findTag(startTime: Double)
     case saveLocation(startTime: Double)
     case tagFound(startTime: Double)
+    case tagRecorded(startTime: Double)
     case findTagReminder(startTime: Double)
     case recordTagReminder(startTime: Double)
     case none
@@ -26,11 +27,12 @@ enum InstructionType: Equatable {
     var text: String? {
         get {
             switch self {
-            case .findTag: return "Point your camera at a tag. \nOnce you detect a tag, you can mark \nthe tags to create a map and add locations \nof interest at any point on the map to \nnavigate to in the future."
-            case .saveLocation: return "First tag found! \nMark the tag to start creating a map. \nYou can save a location of interest at any point as you create the map."
-            case .tagFound: return "Tag detected. \nYou can now mark the tag."
-            case .findTagReminder: return "WARNING: You must find a tag before you can save a location"
-            case .recordTagReminder:  return "WARNING: You must first detect a tag to mark the tag position"
+            case .findTag: return "Pan camera to find a tag."  // displayed as initial instructions
+            case .saveLocation: return "First tag detected! \nPress START RECORDING TAG and hold phone still then press STOP RECORDING TAG. /nTo add points of interests, press ADD LOCATIONS at any time."  // displayed when 1st tag is found
+            case .tagFound: return "Tag detected! \nYou can now record the tag. \nRemember to hold phone still."  // displayed when tags other than 1st tag is found
+            case .tagRecorded: return "Tag was recorded."  // after user records the tag
+            case .findTagReminder: return "WARNING: You must find a tag before you can save a location."
+            case .recordTagReminder:  return "WARNING: You must first detect a tag to record the tag position."
             case .none: return nil
             }
         }
@@ -40,6 +42,7 @@ enum InstructionType: Equatable {
             case .saveLocation: self = .saveLocation(startTime: NSDate().timeIntervalSince1970)
             case .tagFound: self = .tagFound(startTime: NSDate().timeIntervalSince1970)
             case .findTagReminder: self = .findTagReminder(startTime: NSDate().timeIntervalSince1970)
+            case .tagRecorded: self = .tagRecorded(startTime: NSDate().timeIntervalSince1970)
             case .recordTagReminder: self = .recordTagReminder(startTime: NSDate().timeIntervalSince1970)
             case .none: self = .none
             }
@@ -48,7 +51,7 @@ enum InstructionType: Equatable {
     
     func getStartTime() -> Double {
         switch self {
-        case .findTag(let startTime), .saveLocation(let startTime), .tagFound(let startTime), .findTagReminder(let startTime), .recordTagReminder(let startTime):
+        case .findTag(let startTime), .saveLocation(let startTime), .tagFound(let startTime), .tagRecorded(startTime: let startTime), .findTagReminder(let startTime), .recordTagReminder(let startTime):
             return startTime
         default:
             return -1
@@ -69,6 +72,14 @@ enum InstructionType: Equatable {
             }
         case .saveLocation, .tagFound:
             if !InvisibleMapCreatorController.shared.mapRecorder.seesTag {
+                self = .none
+            }
+            if InvisibleMapCreatorController.shared.mapRecorder.tagWasRecorded {
+                self = .tagRecorded(startTime: NSDate().timeIntervalSince1970)
+            }
+        case .tagRecorded:
+            // TODO: have a variable that keeps track of when a tag was marked
+            if !InvisibleMapCreatorController.shared.mapRecorder.tagWasRecorded {
                 self = .none
             }
         case .findTagReminder:
