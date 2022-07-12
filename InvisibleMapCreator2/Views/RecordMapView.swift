@@ -59,11 +59,13 @@ enum InstructionType: Equatable {
     }
     // Note: locationRequested -> when user tries to add a location of interest
     //Function to transition from one instruction text field to another
+    // tagFound -> true if first tag was found, false otherwise
     mutating func transition(tagFound: Bool, locationRequested: Bool = false, markTagRequested: Bool = false) {
         let previousInstruction = self
         switch self {
         case .findTag:
-            if InvisibleMapCreatorController.shared.mapRecorder.seesTag {
+          //  if InvisibleMapCreatorController.shared.mapRecorder.seesTag {
+            if tagFound {
                 self = .saveLocation(startTime: NSDate().timeIntervalSince1970)
             } else if locationRequested {
                 self = .findTagReminder(startTime: NSDate().timeIntervalSince1970)
