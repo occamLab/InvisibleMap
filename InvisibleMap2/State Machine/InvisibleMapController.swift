@@ -58,16 +58,13 @@ class InvisibleMapController: AppController {
                     }
                 
                 case .FinishedNavigation:
-                   // self.arViewer?.playSound(type: "arrived")
-                    self.arViewer?.scheduledArrivedSoundTimer()
+                    self.arViewer?.arrivedSound()
                     self.arViewer?.stopPing()
                     self.mapNavigator.stopPathPlanning()
-                    
-                   // self.arViewer?.reset()  // stops the ping timer? check if it's needed
                     print("navigation finished")
                 
                 case .LeaveMap(let mapFileName):
-                    self.arViewer?.reset()  // stops the ping timer
+                    self.arViewer?.reset()
                     self.mapNavigator.resetMap() // destroys the map
                     process(commands: [.LoadMap(mapFileName: mapFileName)])  // loads the map (with its tag locations and POIs) that the user just left
                     print("leave map")
@@ -84,6 +81,7 @@ class InvisibleMapController: AppController {
                 // NavigateViewer commands
                 case .UpdateInstructionText:
                     navigateViewer?.updateInstructionText()
+                    print("updated instruction text")
                 
                 // TODO: Add functionality for these
                 case .GetNewWaypoint:

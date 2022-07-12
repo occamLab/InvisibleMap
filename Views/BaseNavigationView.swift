@@ -23,10 +23,13 @@ struct BaseNavigationView: View {
     var body : some View {
         NavigationIndicator().edgesIgnoringSafeArea(.all)
             // Hides the default navigation bar so that we can replace it with custom exit and save buttons
-            // .navigationBarHidden(true)
+            //.navigationBarHidden(true)
             .navigationBarBackButtonHidden(true)
+           // self.navigationItem.hidesBackButton = true
     }
 }
+
+
 
 struct BaseNavigationView_Previews: PreviewProvider {
     static var previews: some View {

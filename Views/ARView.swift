@@ -39,8 +39,9 @@ protocol ARViewController {
 class ARView: UIViewController {
     // TODO: make less gross
     var pathNodes: [String: (SCNNode, Bool)] = [:]
-    
+    #if !IS_MAP_CREATOR
     let navigateGlobalState = NavigateGlobalState()
+    #endif
     let memoryChecker : MemoryChecker = MemoryChecker()
     let configuration = ARWorldTrackingConfiguration()
     #if IS_MAP_CREATOR
@@ -68,7 +69,6 @@ class ARView: UIViewController {
     // audio and haptic feedback
     var audioPlayers: [String: AVAudioPlayer?] = [:]
     var pingTimer = Timer()
-    var arrivedSoundTimer = Timer()
     var hapticGenerator : UIImpactFeedbackGenerator?
     
     var pathObjs: [SCNNode] = []
@@ -110,6 +110,7 @@ class ARView: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         arView.session.run(configuration)
+        // TODO: have one function to run session (run Session)
     }
     override func viewWillDisappear(_ animated: Bool) {
        super.viewWillDisappear(animated)
@@ -148,8 +149,7 @@ extension ARView: ARSessionDelegate {
         }
         self.memoryChecker.printRemainingMemory()
         if(self.memoryChecker.getRemainingMemory() < 500) {
-            arView.session.pause()
-            arView.session.run(configuration, options: [.resetSceneReconstruction])
+            self.resetArSession()
         }
     }
     
@@ -179,12 +179,13 @@ extension ARView: ARViewController {
         self.createMapNode()
     }
     
-    // stop ArView and pings
+    // resets ArView and pings when user leaves map navigating view
     func reset() {
         self.stopPing()
-        arView.session.pause()
+        self.resetArSession()
     }
     
+    /// Stops ping sound that plays during navigation
     func stopPing() {
         self.pingTimer.invalidate()
         self.pingTimer = Timer()
@@ -193,9 +194,11 @@ extension ARView: ARViewController {
     /// Adds or updates a tag node when a tag is detected
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
         DispatchQueue.main.async {
+            #if !IS_MAP_CREATOR
             guard let map = InvisibleMapController.shared.mapNavigator.map else {
                 return
             }
+            #endif
             let pose = tag.poseData
 
             let originalTagPose = simd_float4x4(pose)
@@ -340,6 +343,7 @@ extension ARView: ARViewController {
     
     /// Reset ARSession after a map recording has been exited
     func resetArSession() {
+        pathNodes = [:]
         arView.session.pause()
         arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction])
     }
@@ -355,7 +359,6 @@ extension ARView: ARViewController {
             node.position = SCNVector3(x: 0, y: 0, z: 0)
             mapNode?.addChildNode(node)
         }
-        
         self.createDetectionNode()
     }
     
@@ -370,6 +373,7 @@ extension ARView: ARViewController {
     func startSession() {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal, .vertical]
+        pathNodes = [:]
         arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -413,7 +417,7 @@ extension ARView: ARViewController {
             pathObj = SCNNode(geometry: SCNBox(width: CGFloat(dist), height: 0.06, length: 0.06, chamferRadius: 1))
                         shouldAddToMapNode = true
         }
-            pathNodes["\(firstVertex.poseId)_\(secondVertex.poseId)"] = (pathObj, true)
+        pathNodes["\(firstVertex.poseId)_\(secondVertex.poseId)"] = (pathObj, true)
 
         //configure node attributes
         if !isPath {
@@ -458,8 +462,8 @@ extension ARView: ARViewController {
     
     func renderEdges(fromList vertices: [RawMap.OdomVertex], isPath: Bool) {
         for key in pathNodes.keys {
-          // keeps track of seen nodes
-          pathNodes[key] = (pathNodes[key]!.0, false)
+            // keeps track of seen nodes
+            pathNodes[key] = (pathNodes[key]!.0, false)
         }
         // hides or shows nodes
         for i in 0...vertices.count-2 {
@@ -471,27 +475,34 @@ extension ARView: ARViewController {
           pathObj.isHidden = !shouldRender
         }
         if isPath {
-          /// Ping audio from a few nodes down to ensure direction
-          print("vertices.count \(vertices.count)")
-          // compare the camera’s current position to the destination’s position, and if they are close enough, process event that waypoint or destination was reached
-          if let cameraNode = cameraNode, let cameraPosConverted = convertNodeOrigintoMapFrame(node: cameraNode), let destinationVertex = vertices.last {
-            // TODO: factor 0.3 out as a constant somewhere (maybe MapNavigator)
-            if simd_distance(simd_float3(cameraPosConverted), simd_float3(destinationVertex.translation.x, destinationVertex.translation.y, destinationVertex.translation.z)) < 0.3 {
-              #if !IS_MAP_CREATOR
-              InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
-              self.navigateGlobalState.endPointReached = true
-              print("ARView.swift: Reached endpoint")
-              #endif
-            } else {
-              // TODO: revisit this to see how to better set the source location
-              let audioSource = vertices[min(2, vertices.count-1)]
-              let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
-              var volumeScale = simd_dot(simd_normalize(directionToSource), vector2(cameraPosConverted.x, cameraPosConverted.z))
-              volumeScale = acos(volumeScale) / Float.pi
-              volumeScale = 1 - volumeScale
-              volumeScale = pow(volumeScale, 3)
-              self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
-              print("Volume scale: \(volumeScale)")
+            /// Ping audio from a few nodes down to ensure direction
+            print("vertices.count \(vertices.count)")
+            // compare the camera's current position to the destination's position, and if they are close enough, process event that waypoint or destination was reached
+            if let cameraNode = cameraNode, let rootNode = arView?.scene.rootNode, let cameraPosConverted = convertNodeOrigintoMapFrame(node: cameraNode), let destinationVertex = vertices.last {
+                // TODO: factor 0.3 out as a constant somewhere (maybe MapNavigator)
+                if simd_distance(simd_float3(cameraPosConverted), simd_float3(destinationVertex.translation.x, destinationVertex.translation.y, destinationVertex.translation.z)) < 0.3 {
+                    #if !IS_MAP_CREATOR
+                    InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
+                    self.navigateGlobalState.endPointReached = true
+                    print("ARView.swift: Reached endpoint")
+                    #endif
+                } else {
+                    // TODO: revisit this to see how to better set the source location
+                    let audioSource = vertices[min(2, vertices.count-1)]  // near the camera's start point
+                    print("audio source: \(audioSource)")
+                    print("audio source vector: \(vector2(audioSource.translation.x, audioSource.translation.z))")
+                    print("camera pos: \(vector2(cameraPosConverted.x, cameraPosConverted.z))")
+                    let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
+                    let phoneZAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
+                    let phoneZAxisInMapFrame = rootNode.convertVector(phoneZAxisInGlobalFrame, to: mapNode)
+                    print("direction to Source = camera pos - audio source: \(directionToSource) \(phoneZAxisInMapFrame)")
+                    var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneZAxisInMapFrame.x, phoneZAxisInMapFrame.z)))
+                    volumeScale = acos(volumeScale) / Float.pi
+                    volumeScale = 1 - volumeScale
+                    volumeScale = pow(volumeScale, 3)
+                    self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
+                    print("Volume scale: \(volumeScale)")
+                }
             }
           }
         }
@@ -499,10 +510,10 @@ extension ARView: ARViewController {
     
     /// Renders entire path for debugging
     func renderDebugGraph(){
+        #if !IS_MAP_CREATOR
         guard let map = self.sharedController.mapNavigator.map else {
             return
         }
-        #if !IS_MAP_CREATOR
             for vertex in map.rawData.odometryVertices {
                 for neighbor in vertex.neighbors {
                     // Only render path if it hasn't been rendered yet
@@ -518,10 +529,10 @@ extension ARView: ARViewController {
     }
     
     func renderTags() {
+        #if !IS_MAP_CREATOR
         guard let map = sharedController.mapNavigator.map else {
             return
         }
-        #if !IS_MAP_CREATOR
         for tagId in map.tagDictionary.keys {
             let tag = map.tagDictionary[tagId]!
             let tagNode = SCNNode()
@@ -578,14 +589,8 @@ extension ARView: ARViewController {
          self.pingTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.ping), userInfo: nil, repeats: true)
      }
     
-    func scheduledArrivedSoundTimer() {
-        self.arrivedSoundTimer.invalidate()
-        self.arrivedSoundTimer = Timer()
-        self.arrivedSoundTimer = Timer.scheduledTimer(timeInterval: 0.0, target: self, selector: #selector(self.arrivedSound), userInfo: nil, repeats: false)
-    }
-    
     @objc func arrivedSound() {
-        self.playSound(type: "arived")
+        self.playSound(type: "arrived")
     }
      
      @objc func ping() {
@@ -614,6 +619,7 @@ extension ARView: ARViewController {
          }
          self.hapticGenerator?.impactOccurred()
      }
+    
      @objc func playSound(type: String) {
          do {
              try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)

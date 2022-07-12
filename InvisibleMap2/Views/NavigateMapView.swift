@@ -19,19 +19,19 @@ enum InstructionType: Equatable {
     var text: String? {
         get {
             switch self {
-            case .findTag: return "Point your camera at a tag \nnearby and START TAG DETECTION to start navigation."
-            case .tagFound: return "Tag detected!"
-            case .destinationReached: return "You have arrived at your destination!"
-            case .none: return nil
+                case .findTag: return "Point your camera at a tag \nnearby and START TAG DETECTION to start navigation."
+                case .tagFound: return "Tag detected!"
+                case .destinationReached: return "You have arrived at your destination!"
+                case .none: return nil
             }
         }
         // Set start times for each instruction text so that it shows on the screen for a set amount of time (set in transition func).
         set {
             switch self {
-            case .findTag: self = .findTag(startTime: NSDate().timeIntervalSince1970)
-            case .tagFound: self = .tagFound(startTime: NSDate().timeIntervalSince1970)
-            case .destinationReached: self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
-            case .none: self = .none
+                case .findTag: self = .findTag(startTime: NSDate().timeIntervalSince1970)
+                case .tagFound: self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+                case .destinationReached: self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
+                case .none: self = .none
             }
         }
     }
@@ -112,27 +112,17 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
     // Navigate view controller commands
     func updateInstructionText() {
         DispatchQueue.main.async {
-            if InvisibleMapController.shared.mapNavigator.map?.firstTagFound == true {
+            if let map = InvisibleMapController.shared.mapNavigator.map {
+                if !map.firstTagFound == true {
                     self.tagFound = false
                 } else {
                     print("first tag was found!")
                     self.tagFound = true
                 }
-                
-                // Note: endpointTagId is the id of the April tag that's the destination; endpointTagKey is the key of the endpoint April tag in the tagDictionary
-           /*     let endpointTagId = map.tagDictionary[InvisibleMapController.shared.mapNavigator.endpointTagKey].id
-                // name of the waypoint destination that the user needs to reach
-            /*    let endWaypointName = InvisibleMapController.shared.mapNavigator.map.waypointDictionary[InvisibleMapController.shared.mapNavigator.endpointWaypointKey]!.id */
-                // TODO: update currentWaypointName each time user passes by a waypoint
-                // when user reaches destination for a tag location or a waypoint/saved location
-            
-                if endpointTagId == InvisibleMapController.shared.mapNavigator.currentTagId /*|| endWaypointName == InvisibleMapController.shared.mapNavigator.currentWaypointName */{
-                    self.endPointReached = true
-                    InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
-                }
-            } */
-            
-            self.instructionWrapper.transition(tagFound: self.tagFound, endPointReached: self.endPointReached)
+                print("Instruction wrapper: \(self.instructionWrapper)")
+                self.instructionWrapper.transition(tagFound: self.tagFound, endPointReached: self.endPointReached)
+                print("Instruction wrapper: \(self.instructionWrapper)")
+            }
         }
     }
 }
@@ -174,7 +164,7 @@ struct NavigateMapView: View {
 extension UINavigationController {
     override open func viewDidLoad() {
         super.viewDidLoad()
-      
+      //  self.navigationItem.hidesBackButton = true
         // Creates a translucent toolbar
         let toolbarAppearance = UIToolbarAppearance()
         toolbarAppearance.configureWithTransparentBackground()

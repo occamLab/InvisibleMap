@@ -119,9 +119,9 @@ struct ContentView: View {
                     }
                     .listStyle(PlainListStyle())
                 #if IS_MAP_CREATOR
-                    .navigationBarTitle("My Created Invisible Maps", displayMode: .inline)
+                    .navigationBarTitle("Invisible Map Creator Home", displayMode: .inline)
                 #else
-                    .navigationBarTitle("Invisible Maps", displayMode: .inline)
+                    .navigationBarTitle("Invisible Map Home", displayMode: .inline)
                 #endif
                     .navigationBarItems(leading:
                         //burger menu bar button to drag in/out menu from top, left corner
