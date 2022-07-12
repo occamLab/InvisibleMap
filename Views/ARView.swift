@@ -467,14 +467,13 @@ extension ARView: ARViewController {
         }
         // hides or shows nodes
         for i in 0...vertices.count-2 {
-            self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
+          self.renderEdge(from: vertices[i], to: vertices[i + 1], isPath: isPath)
         }
         for key in pathNodes.keys {
-            let pathObj = pathNodes[key]!.0
-            let shouldRender = pathNodes[key]!.1
-            pathObj.isHidden = !shouldRender
+          let pathObj = pathNodes[key]!.0
+          let shouldRender = pathNodes[key]!.1
+          pathObj.isHidden = !shouldRender
         }
-        
         if isPath {
             /// Ping audio from a few nodes down to ensure direction
             print("vertices.count \(vertices.count)")
@@ -505,8 +504,9 @@ extension ARView: ARViewController {
                     print("Volume scale: \(volumeScale)")
                 }
             }
+          }
         }
-    }
+      }
     
     /// Renders entire path for debugging
     func renderDebugGraph(){
@@ -624,8 +624,10 @@ extension ARView: ARViewController {
          do {
              try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
              try AVAudioSession.sharedInstance().setActive(true)
-             guard let player = self.audioPlayers[type] else { return }
-             player!.play()
+             guard let player = self.audioPlayers[type]! else {
+                 return
+             }
+             player.play()
          } catch let error {
              print(error.localizedDescription)
          }
