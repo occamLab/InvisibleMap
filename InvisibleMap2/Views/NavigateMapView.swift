@@ -47,7 +47,6 @@ enum InstructionType: Equatable {
     }
     
     // Function to transition from one instruction text field to another; when to display instructions/feedback text and to control how long it stays on screen
-    //TODO: end point reached feedback - for both location and tag location
     mutating func transition(tagFound: Bool, endPointReached: Bool = false) {
         let previousInstruction = self
         switch self {
@@ -72,7 +71,6 @@ enum InstructionType: Equatable {
             }
         case .destinationReached:
             break
-            //self = .none
         }
         
         if self != previousInstruction {
@@ -113,13 +111,14 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
     func updateInstructionText() {
         DispatchQueue.main.async {
             if let map = InvisibleMapController.shared.mapNavigator.map {
-                if !map.firstTagFound == true {
+                if !map.firstTagFound {
                     self.tagFound = false
                 } else {
                     print("first tag was found!")
                     self.tagFound = true
                 }
                 print("Instruction wrapper: \(self.instructionWrapper)")
+                print("tagFound: \(self.tagFound)")
                 self.instructionWrapper.transition(tagFound: self.tagFound, endPointReached: self.endPointReached)
                 print("Instruction wrapper: \(self.instructionWrapper)")
             }

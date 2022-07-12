@@ -32,6 +32,7 @@ struct SelectPathView: View {
                             }) {
                                 Text("\(location)")
                             }
+                            .navigationBarBackButtonHidden(true)
                         }
                     }
                     // populate list of saved locations of interest of selected map

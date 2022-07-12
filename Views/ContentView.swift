@@ -24,6 +24,9 @@ struct ContentView: View {
     @State var showMenu = false
     @State var searchText = ""
     @Environment(\.isPresented) private var isPresented
+    #if !IS_MAP_CREATOR
+ //   var backBarButtonItem: UIBarButtonItem? { get set }
+    #endif
     
     var body: some View {
         if Auth.auth().currentUser == nil {

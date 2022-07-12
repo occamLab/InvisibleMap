@@ -36,6 +36,7 @@ indirect enum InvisibleMapAppState: StateType {
         case DismissPathRequested
         case LeaveMapRequested(mapFileName: String)
         case PlanPath
+        case HomeRequested
     }
     
     // All the effectful outputs which the state desires to have performed on the app
@@ -84,6 +85,11 @@ indirect enum InvisibleMapAppState: StateType {
             
             case (.NavigateMap, .PlanPath):
                 return [.PlanPath]
+            
+            case (.NavigateMap, .HomeRequested):
+                self = .MainScreen
+                return []
+            
             case (.SelectPath, .NewARFrame(let cameraFrame)):
                 return []
             

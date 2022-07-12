@@ -147,7 +147,7 @@ extension ARView: ARSessionDelegate {
             print("Timestamp: \(frame.timestamp)")
             sharedController.process(event: .NewARFrame(cameraFrame: frame))
         }
-        self.memoryChecker.printRemainingMemory()
+     //   self.memoryChecker.printRemainingMemory()
         if(self.memoryChecker.getRemainingMemory() < 500) {
             self.resetArSession()
         }

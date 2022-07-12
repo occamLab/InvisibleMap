@@ -25,7 +25,6 @@ struct BaseNavigationView: View {
             // Hides the default navigation bar so that we can replace it with custom exit and save buttons
             //.navigationBarHidden(true)
             .navigationBarBackButtonHidden(true)
-           // self.navigationItem.hidesBackButton = true
     }
 }
 
