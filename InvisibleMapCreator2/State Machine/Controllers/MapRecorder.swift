@@ -14,7 +14,7 @@ import FirebaseStorage
 class MapRecorder: MapRecorderController, ObservableObject {
     var map: Map! {
         didSet {
-            print(map.waypointDictionary)
+           // print(map.waypointDictionary)
             objectWillChange.send()
         }
     }

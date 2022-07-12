@@ -11,7 +11,13 @@ import ARKit
 import SwiftGraph
 
 class MapNavigator: ObservableObject {
-    @Published var map: Map?
+   // @Published var map: Map?
+    var map: Map! {
+        didSet {
+           // print(map.waypointDictionary)
+            objectWillChange.send()
+        }
+    }
     
     // endpoints are either tag locations or waypoint locations
     var locationType: String = "tag"
@@ -88,7 +94,7 @@ class MapNavigator: ObservableObject {
         let path: [WeightedEdge<Float>] = pathDictToPath(from: map.pathPlanningGraph!.indexOfVertex(String(startpoint!))!, to: map.pathPlanningGraph!.indexOfVertex(String(endpoint))!, pathDict: pathDict)
         //stops are the vertices of edges that make up path
         let stops = map.pathPlanningGraph!.edgesToVertices(edges: path)
-        print("Time to path plan \(-start.timeIntervalSinceNow)")
+     //   print("Time to path plan \(-start.timeIntervalSinceNow)")
         return stops.map({map.odometryDict![Int($0)!]!})
     }
     
@@ -156,7 +162,7 @@ class MapNavigator: ObservableObject {
         
         aprilTagQueue.async {
             let arTags = self.checkTagDetection(image: uiImage,cameraIntrinsics: cameraFrame.camera.intrinsics, cameraTransform: cameraFrame.camera.transform)
-            print("arTags array of detected tags: \(arTags)")
+        //    print("arTags array of detected tags: \(arTags)")
             DispatchQueue.main.async {
                 // checks if tags were detected and assigns seesTag depending on that
                 self.seesTag = !arTags.isEmpty
@@ -164,8 +170,8 @@ class MapNavigator: ObservableObject {
                 if let map = self.map {
                     if !map.firstTagFound && self.seesTag {
                         print("Starting path planning")
-                        map.renderGraphPath()
                         map.firstTagFound = true
+                        map.renderGraphPath()
                         print("firstTagFound: \(map.firstTagFound)")
                     }
                     self.processingFrame = false

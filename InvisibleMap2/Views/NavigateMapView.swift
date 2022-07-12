@@ -48,7 +48,9 @@ enum InstructionType: Equatable {
     
     // Function to transition from one instruction text field to another; when to display instructions/feedback text and to control how long it stays on screen
     mutating func transition(tagFound: Bool, endPointReached: Bool = false) {
-        let previousInstruction = self
+        let previousInstruction = self // current instruction that's updated every time there's a transition
+        print("text state previous instruction: \(previousInstruction)")
+        print("text state: \(self.text)")
         switch self {
         case .findTag:
             // when first tag is found -> tagFound
@@ -59,10 +61,11 @@ enum InstructionType: Equatable {
         case .tagFound:
             // case stays as .tagFound until frame is processed again when 'Start Tag Detection' is pressed again -> resets seesTag variable depending on reprocessed camera AR frame.
             if !InvisibleMapController.shared.mapNavigator.seesTag {
-                print("tag found and camera doesn't see tag so get rid of instruction text field")
+                print("tagFound -> none case - camera doesn't see tag so get rid of instruction text field")
                 self = .none
             }
         case .none:
+            print("case is none")
             // seesTag is not reset until tag detection starts again
             if InvisibleMapController.shared.mapNavigator.seesTag {
                 self = .tagFound(startTime: NSDate().timeIntervalSince1970)
@@ -70,16 +73,21 @@ enum InstructionType: Equatable {
                 self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
             }
         case .destinationReached:
+            print("case is destination reached")
             break
         }
         
         if self != previousInstruction {
             let instructions = self.text
+            print("text state: \(instructions)")
+            print("end point reached: \(endPointReached)")
             if endPointReached {
+                print("text state: \(instructions)")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     UIAccessibility.post(notification: .announcement, argument: instructions)
                 }
             } else {
+                print("text state: \(instructions)")
                 UIAccessibility.post(notification: .announcement, argument: instructions)
             }
         } else {
@@ -120,6 +128,7 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
                 print("Instruction wrapper: \(self.instructionWrapper)")
                 print("tagFound: \(self.tagFound)")
                 self.instructionWrapper.transition(tagFound: self.tagFound, endPointReached: self.endPointReached)
+               // self.objectWillChange.send()
                 print("Instruction wrapper: \(self.instructionWrapper)")
             }
         }

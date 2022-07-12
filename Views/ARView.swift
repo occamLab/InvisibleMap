@@ -144,7 +144,7 @@ extension ARView: ARSessionDelegate {
                 
             
             lastRecordedTimestamp = frame.timestamp
-            print("Timestamp: \(frame.timestamp)")
+       //     print("Timestamp: \(frame.timestamp)")
             sharedController.process(event: .NewARFrame(cameraFrame: frame))
         }
      //   self.memoryChecker.printRemainingMemory()
@@ -267,7 +267,7 @@ extension ARView: ARViewController {
             tagNode.addChildNode(yAxis)
             tagNode.addChildNode(zAxis)
             
-            print("April tag number: ", tag.number)
+        //    print("April tag number: ", tag.number)
         }
     }
 
@@ -476,7 +476,7 @@ extension ARView: ARViewController {
         }
         if isPath {
             /// Ping audio from a few nodes down to ensure direction
-            print("vertices.count \(vertices.count)")
+           // print("vertices.count \(vertices.count)")
             // compare the camera's current position to the destination's position, and if they are close enough, process event that waypoint or destination was reached
             if let cameraNode = cameraNode, let rootNode = arView?.scene.rootNode, let cameraPosConverted = convertNodeOrigintoMapFrame(node: cameraNode), let destinationVertex = vertices.last {
                 // TODO: factor 0.3 out as a constant somewhere (maybe MapNavigator)
@@ -489,19 +489,19 @@ extension ARView: ARViewController {
                 } else {
                     // TODO: revisit this to see how to better set the source location
                     let audioSource = vertices[min(2, vertices.count-1)]  // near the camera's start point
-                    print("audio source: \(audioSource)")
-                    print("audio source vector: \(vector2(audioSource.translation.x, audioSource.translation.z))")
-                    print("camera pos: \(vector2(cameraPosConverted.x, cameraPosConverted.z))")
+                 //   print("audio source: \(audioSource)")
+                 //   print("audio source vector: \(vector2(audioSource.translation.x, audioSource.translation.z))")
+                 //   print("camera pos: \(vector2(cameraPosConverted.x, cameraPosConverted.z))")
                     let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
                     let phoneZAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
                     let phoneZAxisInMapFrame = rootNode.convertVector(phoneZAxisInGlobalFrame, to: mapNode)
-                    print("direction to Source = camera pos - audio source: \(directionToSource) \(phoneZAxisInMapFrame)")
+                 //   print("direction to Source = camera pos - audio source: \(directionToSource) \(phoneZAxisInMapFrame)")
                     var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneZAxisInMapFrame.x, phoneZAxisInMapFrame.z)))
                     volumeScale = acos(volumeScale) / Float.pi
                     volumeScale = 1 - volumeScale
                     volumeScale = pow(volumeScale, 3)
                     self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
-                    print("Volume scale: \(volumeScale)")
+                //    print("Volume scale: \(volumeScale)")
                 }
             }
         }
