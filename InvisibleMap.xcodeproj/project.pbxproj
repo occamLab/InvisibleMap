@@ -192,6 +192,7 @@
 		98211CA428725A620027860B /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
 		984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		98A859B7287F50B80017D09A /* DirectionFeeback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionFeeback.swift; sourceTree = "<group>"; };
+		98A859B9287F5BBF0017D09A /* InvisibleMap2Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap2Release.entitlements; sourceTree = "<group>"; };
 		98BF269526AF01F60076427E /* AppleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInController.swift; sourceTree = "<group>"; };
 		98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
 		98BF269926AF14D50076427E /* InvisibleMap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap.entitlements; sourceTree = "<group>"; };
@@ -342,6 +343,7 @@
 		1F77A36026F2493A0044BE18 /* InvisibleMap2 */ = {
 			isa = PBXGroup;
 			children = (
+				98A859B9287F5BBF0017D09A /* InvisibleMap2Release.entitlements */,
 				1F83DB6C273EF8D800D0148F /* Views */,
 				1F77A36F26F251A90044BE18 /* State Machine */,
 				1F77A36126F2493A0044BE18 /* InvisibleMap2App.swift */,
@@ -790,7 +792,7 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_ENTITLEMENTS = InvisibleMapCreator2/InvisibleMapCreator2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
@@ -823,7 +825,7 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_ENTITLEMENTS = InvisibleMapCreator2/InvisibleMapCreator2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
@@ -853,7 +855,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
@@ -882,8 +884,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = InvisibleMap2/InvisibleMap2Release.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
@@ -900,6 +904,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Utils/TagFinder-Swift.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
