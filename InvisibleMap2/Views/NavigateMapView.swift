@@ -20,7 +20,7 @@ enum InstructionType: Equatable {
         get {
             switch self {
                 case .findTag: return "Point your camera at a tag \nnearby and START TAG DETECTION to start navigation."
-                case .tagFound: return "Tag detected!"
+                case .tagFound: return "Tag detected! STOP TAG DETECTION until you reach the next tag."
                 case .destinationReached: return "You have arrived at your destination!"
                 case .none: return nil
             }
@@ -42,6 +42,7 @@ enum InstructionType: Equatable {
         case .findTag(let startTime), .tagFound(let startTime), .destinationReached(let startTime):
             return startTime
         default:
+            // .none case
             return -1
         }
     }
@@ -93,6 +94,10 @@ enum InstructionType: Equatable {
         } else {
             let currentTime = NSDate().timeIntervalSince1970
             // time that instructions stay on screen
+            print("current time: \(currentTime)")
+            print("start time: \(self.getStartTime())")
+            print("current - start time = \(currentTime - self.getStartTime())")
+            
             if currentTime - self.getStartTime() > 8 {
                 self = .none
             }
@@ -128,15 +133,21 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
                 print("Instruction wrapper: \(self.instructionWrapper)")
                 print("tagFound: \(self.tagFound)")
                 self.instructionWrapper.transition(tagFound: self.tagFound, endPointReached: self.endPointReached)
-               // self.objectWillChange.send()
                 print("Instruction wrapper: \(self.instructionWrapper)")
             }
         }
     }
 }
 
+class NavigateGlobalStateSingleton {
+    public static var shared = NavigateGlobalState()
+}
+
+
 struct NavigateMapView: View {
-    @StateObject var navigateGlobalState = NavigateGlobalState()
+    //@StateObject var navigateGlobalState = NavigateGlobalState()
+    @ObservedObject var navigateGlobalState = NavigateGlobalStateSingleton.shared
+
     var mapFileName: String
     
     init(mapFileName: String = "") {

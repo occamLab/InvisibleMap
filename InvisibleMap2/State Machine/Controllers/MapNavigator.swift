@@ -11,13 +11,7 @@ import ARKit
 import SwiftGraph
 
 class MapNavigator: ObservableObject {
-   // @Published var map: Map?
-    var map: Map! {
-        didSet {
-           // print(map.waypointDictionary)
-            objectWillChange.send()
-        }
-    }
+    @Published var map: Map?
     
     // endpoints are either tag locations or waypoint locations
     var locationType: String = "tag"

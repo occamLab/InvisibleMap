@@ -39,9 +39,6 @@ protocol ARViewController {
 class ARView: UIViewController {
     // TODO: make less gross
     var pathNodes: [String: (SCNNode, Bool)] = [:]
-    #if !IS_MAP_CREATOR
-    let navigateGlobalState = NavigateGlobalState()
-    #endif
     let memoryChecker : MemoryChecker = MemoryChecker()
     let configuration = ARWorldTrackingConfiguration()
     #if IS_MAP_CREATOR
@@ -483,7 +480,7 @@ extension ARView: ARViewController {
                 if simd_distance(simd_float3(cameraPosConverted), simd_float3(destinationVertex.translation.x, destinationVertex.translation.y, destinationVertex.translation.z)) < 0.3 {
                     #if !IS_MAP_CREATOR
                     InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
-                    self.navigateGlobalState.endPointReached = true
+                    NavigateGlobalStateSingleton.shared.endPointReached = true
                     print("ARView.swift: Reached endpoint")
                     #endif
                 } else {

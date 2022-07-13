@@ -16,10 +16,10 @@ struct LocationListView: View {
     
     var body: some View {
         NavigationView {
-            if mapRecorder.map != nil {
+            if let map = mapRecorder.map {
                 List{
-                    ForEach(Array(mapRecorder.map.waypointDictionary.keys), id: \.self) {
-                        location in Text("\(mapRecorder.map.waypointDictionary[location]!.id)")
+                    ForEach(Array(map.waypointDictionary.keys), id: \.self) {
+                        location in Text("\(map.waypointDictionary[location]!.id)")
                     }
                 }
              

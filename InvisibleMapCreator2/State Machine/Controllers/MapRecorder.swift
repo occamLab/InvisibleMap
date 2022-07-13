@@ -12,12 +12,8 @@ import FirebaseDatabase
 import FirebaseStorage
 
 class MapRecorder: MapRecorderController, ObservableObject {
-    var map: Map! {
-        didSet {
-           // print(map.waypointDictionary)
-            objectWillChange.send()
-        }
-    }
+    @Published var map: Map?
+   
     // for tag detection visualization for creator 
     var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
     var currentFrameTransform: simd_float4x4 = simd_float4x4.init()
