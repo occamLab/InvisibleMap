@@ -461,8 +461,8 @@
 				82A8259E24B3854000AFC390 /* simd+ext.swift */,
 				86F39542210FA42500F209EC /* Main.storyboard */,
 				86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */,
-				86F39545210FA42600F209EC /* Assets.xcassets */,
 				86F39547210FA42600F209EC /* LaunchScreen.storyboard */,
+				86F39545210FA42600F209EC /* Assets.xcassets */,
 				86F3954A210FA42600F209EC /* Info.plist */,
 				86A84771210FA6440004C325 /* GoogleService-Info.plist */,
 			);
@@ -855,7 +855,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
@@ -887,7 +887,7 @@
 				CODE_SIGN_ENTITLEMENTS = InvisibleMap2/InvisibleMap2Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
