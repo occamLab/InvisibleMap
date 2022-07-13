@@ -26,6 +26,7 @@ class InvisibleMapController: AppController {
     
     func process(commands: [InvisibleMapAppState.Command]) {
         for command in commands {
+            print("arViewer: \(arViewer)")
             switch (command) {
                 case .LoadMap(let mapFileName):
                     FirebaseManager.createMap(from: mapFileName) { newMap in
@@ -35,6 +36,7 @@ class InvisibleMapController: AppController {
                 case .StartPath(let locationType, let Id):
                     // check: if ping was not invalidated, stop it before starting navigation?
                 // Question: ping sound from previous navigation to a POI continues for navigation to another POI (navmap -> selectpath -> navmap (ping starts before detecting first tag)
+                 //   self.arViewer?.session.run(ARWorldTrackingConfiguration())
                     self.mapNavigator.locationType = locationType
                     if locationType == "tag" {
                         self.mapNavigator.endpointTagKey = Id

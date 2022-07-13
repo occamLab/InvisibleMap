@@ -99,8 +99,10 @@ indirect enum InvisibleMapAppState: StateType {
             
             // Note: dismiss select path view back and set app state back to main screen
             case (.SelectPath(let lastState), .DismissPathRequested):
-                self = lastState
+                //self = lastState
+                self = .MainScreen
                 return []
+            
             
         /*    case (.EditMap, .CancelEditRequested):
                 self = .NavigateMap

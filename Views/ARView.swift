@@ -179,7 +179,7 @@ extension ARView: ARViewController {
     // resets ArView and pings when user leaves map navigating view
     func reset() {
         self.stopPing()
-        self.resetArSession()
+        arView.session.pause()
     }
     
     /// Stops ping sound that plays during navigation
