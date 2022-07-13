@@ -103,18 +103,6 @@ class MapNavigator: ObservableObject {
         var tagArray: Array<AprilTags> = Array()
         let numTags = tagFinder.getNumberOfTags()
         if numTags > 0 {
-           // moved to updateTags function
-         /*   DispatchQueue.main.async {
-                self.seesTag = true
-            }
-            if let map = self.map {
-                if !map.firstTagFound {
-                    print("Starting path planning")
-                    map.renderGraphPath()
-                    map.firstTagFound = true
-                }
-            } */
-            
             // remove all of the child nodes of the detection node using the map operation (map plays nicer with optionals than writing it as a for loop)
             let _ = InvisibleMapController.shared.arViewer?.detectionNode?.childNodes.map({ childNode in childNode.removeFromParentNode() })
  

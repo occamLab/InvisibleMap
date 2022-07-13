@@ -481,14 +481,16 @@ extension ARView: ARViewController {
                     #if !IS_MAP_CREATOR
                     InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
                     NavigateGlobalStateSingleton.shared.endPointReached = true
-                    print("ARView.swift: Reached endpoint")
+                    print("Reached endpoint")
                     #endif
                 } else {
                     // TODO: revisit this to see how to better set the source location
                     let audioSource = vertices[min(2, vertices.count-1)]  // near the camera's start point
-                 //   print("audio source: \(audioSource)")
-                 //   print("audio source vector: \(vector2(audioSource.translation.x, audioSource.translation.z))")
-                 //   print("camera pos: \(vector2(cameraPosConverted.x, cameraPosConverted.z))")
+                    
+                   // print("audio source: \(audioSource)")
+                    print("audio source vector: \(vector2(audioSource.translation.x, audioSource.translation.y))")
+                    print("camera pos vector: \(vector2(cameraPosConverted.x, cameraPosConverted.y))")
+                    
                     let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
                     let phoneZAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
                     let phoneZAxisInMapFrame = rootNode.convertVector(phoneZAxisInGlobalFrame, to: mapNode)
