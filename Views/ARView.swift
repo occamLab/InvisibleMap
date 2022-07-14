@@ -20,7 +20,7 @@ protocol ARViewController {
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
     func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4?
     func pinLocation(locationName: String)
-    func resetArSession()
+    func resetRecordingSession()
 }
 
 //TODO: Check if this is needed
@@ -124,10 +124,12 @@ extension ARView: ARSessionDelegate {
         #if IS_MAP_CREATOR
             let processingFrame = self.sharedController.mapRecorder.processingFrame
         #else
+            //if we are in preparingtoleavemap state then break out of this session
             let processingFrame = self.sharedController.mapNavigator.processingFrame
         #endif
-        
-        if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame {
+        print("Exiting map: \(InvisibleMapController.shared.exitingMap)")
+        // start processing frame if frame is not processing yet after 0.1 seconds
+        if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame && !InvisibleMapController.shared.exitingMap {
             let scene = SCNMatrix4(frame.camera.transform)
             if let cameraNode = self.cameraNode {
                 cameraNode.transform = scene
@@ -138,15 +140,15 @@ extension ARView: ARSessionDelegate {
                 cameraNode!.name = "camera"
                 arView.scene.rootNode.addChildNode(cameraNode!)
             }
-                
-            
             lastRecordedTimestamp = frame.timestamp
-       //     print("Timestamp: \(frame.timestamp)")
+            //print("Timestamp: \(frame.timestamp)")
+            
+            //if we are processing the frame and user triggers LeaveMapRequested event then, make processing frame
             sharedController.process(event: .NewARFrame(cameraFrame: frame))
         }
-     //   self.memoryChecker.printRemainingMemory()
+        //self.memoryChecker.printRemainingMemory()
         if(self.memoryChecker.getRemainingMemory() < 500) {
-            self.resetArSession()
+            self.resetRecordingSession()
         }
     }
     
@@ -176,16 +178,24 @@ extension ARView: ARViewController {
         self.createMapNode()
     }
     
-    // resets ArView and pings when user leaves map navigating view
-    func reset() {
-        self.stopPing()
+    /// Stops ping sound that plays during navigation
+        func stopPing() {
+            self.pingTimer.invalidate()
+            self.pingTimer = Timer()
+        }
+    
+    
+    /// Reset ARSession after a map recording has been exited
+    func resetRecordingSession() {
         arView.session.pause()
+        arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction])
     }
     
-    /// Stops ping sound that plays during navigation
-    func stopPing() {
-        self.pingTimer.invalidate()
-        self.pingTimer = Timer()
+    /// Resets ArView and pings when user leaves map navigating view
+    func resetNavigatingSession() {
+        pathNodes = [:]
+        self.stopPing()
+        arView.session.pause()
     }
     
     /// Adds or updates a tag node when a tag is detected
@@ -338,13 +348,6 @@ extension ARView: ARViewController {
         node.transform = SCNMatrix4(updatedTransform)
     }
     
-    /// Reset ARSession after a map recording has been exited
-    func resetArSession() {
-        pathNodes = [:]
-        arView.session.pause()
-        arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction])
-    }
-    
     /// Initializes the map node, of which all of the tags and waypoints downloaded from firebase are children
     func createMapNode() {
         mapNode = SCNNode()
@@ -474,12 +477,12 @@ extension ARView: ARViewController {
         if isPath {
             /// Ping audio from a few nodes down to ensure direction
            // print("vertices.count \(vertices.count)")
-            // compare the camera's current position to the destination's position, and if they are close enough, process event that waypoint or destination was reached
-            if let cameraNode = cameraNode, let rootNode = arView?.scene.rootNode, let cameraPosConverted = convertNodeOrigintoMapFrame(node: cameraNode), let destinationVertex = vertices.last {
+            // compare the camera's current position to the destination's position, and if they are close enough, tell users they reached destination
+            if let cameraNode = cameraNode, let rootNode = arView?.scene.rootNode, let cameraPosConverted = convertNodeOrigintoMapFrame(node: cameraNode), let endpointVertex = vertices.last {
                 // TODO: factor 0.3 out as a constant somewhere (maybe MapNavigator)
-                if simd_distance(simd_float3(cameraPosConverted), simd_float3(destinationVertex.translation.x, destinationVertex.translation.y, destinationVertex.translation.z)) < 0.3 {
+                if simd_distance(simd_float3(cameraPosConverted), simd_float3(endpointVertex.translation.x, endpointVertex.translation.y, endpointVertex.translation.z)) < 0.3 {
                     #if !IS_MAP_CREATOR
-                    InvisibleMapController.shared.process(event: .WaypointReached(finalWaypoint: true))
+                    InvisibleMapController.shared.process(event: .EndpointReached(finalEndpoint: true))
                     NavigateGlobalStateSingleton.shared.endPointReached = true
                     print("Reached endpoint")
                     #endif

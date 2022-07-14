@@ -38,7 +38,7 @@ class InvisibleMapCreatorController: AppController {
                 mapRecorder.cacheLocation(node: node, picture: picture, textNode: textNode)
             case .ClearData:
                 mapRecorder.clearData()
-                arViewer?.resetArSession()
+                arViewer?.resetRecordingSession()
             case .SendToFirebase(let mapName):
                 mapRecorder.sendToFirebase(mapName: mapName)
             // ARViewer commands

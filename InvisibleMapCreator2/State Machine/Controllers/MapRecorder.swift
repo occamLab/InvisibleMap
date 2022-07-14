@@ -189,11 +189,11 @@ extension MapRecorder {
                 if self.tagRecordingState && self.seesTag {
                     self.tagData.append(arTags)
                 }
-                
+
                 if !self.tagRecordingState && self.previousTagRecordedState {
                     self.tagWasRecorded = true
                 }
-                    
+
                 if !self.seesTag {
                     self.previousTagRecordedState = self.tagRecordingState
                     self.tagRecordingState = false

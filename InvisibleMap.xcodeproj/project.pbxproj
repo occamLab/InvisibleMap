@@ -109,6 +109,8 @@
 		984C21DE26B44F99006EEF4F /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 984C21DD26B44F99006EEF4F /* FirebaseStorage */; };
 		9860ED6A26B4532400C1EC55 /* SwiftGraph in Frameworks */ = {isa = PBXBuildFile; productRef = 9860ED6926B4532400C1EC55 /* SwiftGraph */; };
 		98A859B8287F50B80017D09A /* DirectionFeeback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A859B7287F50B80017D09A /* DirectionFeeback.swift */; };
+		98A859BF288050440017D09A /* Localizable (en).strings in Resources */ = {isa = PBXBuildFile; fileRef = 98A859BE288050440017D09A /* Localizable (en).strings */; };
+		98A859C0288050440017D09A /* Localizable (en).strings in Resources */ = {isa = PBXBuildFile; fileRef = 98A859BE288050440017D09A /* Localizable (en).strings */; };
 		98BF26A026AF4F9E0076427E /* AppleSignInController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269526AF01F60076427E /* AppleSignInController.swift */; };
 		98BF26A126AF4F9E0076427E /* AuthenticationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */; };
 		98BF26A526B03EAA0076427E /* AppleSignInController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269526AF01F60076427E /* AppleSignInController.swift */; };
@@ -193,6 +195,7 @@
 		984C21CA26B445C9006EEF4F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		98A859B7287F50B80017D09A /* DirectionFeeback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionFeeback.swift; sourceTree = "<group>"; };
 		98A859B9287F5BBF0017D09A /* InvisibleMap2Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap2Release.entitlements; sourceTree = "<group>"; };
+		98A859BE288050440017D09A /* Localizable (en).strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = "Localizable (en).strings"; sourceTree = "<group>"; };
 		98BF269526AF01F60076427E /* AppleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInController.swift; sourceTree = "<group>"; };
 		98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
 		98BF269926AF14D50076427E /* InvisibleMap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap.entitlements; sourceTree = "<group>"; };
@@ -429,6 +432,7 @@
 				1F83DB6F273EFBDA00D0148F /* Views */,
 				1F64364A269DD75B007BD526 /* Utils */,
 				1FE9717526FB881F00DEB00A /* State Machine */,
+				98A859BD2880501E0017D09A /* Localizations */,
 				86F3953D210FA42500F209EC /* InvisibleMap */,
 				86F39552210FA42600F209EC /* InvisibleMapTests */,
 				1447B704262421CC00230A58 /* InvisibleMapCreator2 */,
@@ -494,6 +498,14 @@
 				98211CA428725A620027860B /* FeedbackView.swift */,
 			);
 			path = "Menu Subviews";
+			sourceTree = "<group>";
+		};
+		98A859BD2880501E0017D09A /* Localizations */ = {
+			isa = PBXGroup;
+			children = (
+				98A859BE288050440017D09A /* Localizable (en).strings */,
+			);
+			path = Localizations;
 			sourceTree = "<group>";
 		};
 		98BF269A26AF2E4F0076427E /* Authentication */ = {
@@ -634,6 +646,7 @@
 				1447B70D262421CF00230A58 /* Preview Assets.xcassets in Resources */,
 				1447B70A262421CF00230A58 /* Assets.xcassets in Resources */,
 				984C21CB26B445C9006EEF4F /* GoogleService-Info.plist in Resources */,
+				98A859BF288050440017D09A /* Localizable (en).strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -644,6 +657,7 @@
 				1F77A36926F249480044BE18 /* Preview Assets.xcassets in Resources */,
 				1F77A36626F249480044BE18 /* Assets.xcassets in Resources */,
 				1F83DB76275AADA200D0148F /* GoogleService-Info.plist in Resources */,
+				98A859C0288050440017D09A /* Localizable (en).strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -855,7 +869,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
@@ -887,7 +901,7 @@
 				CODE_SIGN_ENTITLEMENTS = InvisibleMap2/InvisibleMap2Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;

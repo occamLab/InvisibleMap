@@ -19,8 +19,9 @@ enum InstructionType: Equatable {
     var text: String? {
         get {
             switch self {
-                case .findTag: return "Point your camera at a tag \nnearby and START TAG DETECTION to start navigation."
-                case .tagFound: return "Tag detected! STOP TAG DETECTION until you reach the next tag."
+                /*case .findTag: return "Point your camera at a tag \nnearby and press START TAG DETECTION to start navigation."*/
+                case .findTag: return "To start navigation, press START TAG DETECTION and pan your camera until you are notified of a tag detection. Follow the ping sound along the path. The ping will grow quieter the further you face away from the right direction. "
+                case .tagFound: return "Tag detected! In order to stabalize the path, press STOP TAG DETECTION." //Press STOP TAG DETECTION until you reach the next tag."
                 case .destinationReached: return "You have arrived at your destination!"
                 case .none: return nil
             }
@@ -98,7 +99,7 @@ enum InstructionType: Equatable {
             print("start time: \(self.getStartTime())")
             print("current - start time = \(currentTime - self.getStartTime())")
             
-            if currentTime - self.getStartTime() > 8 {
+            if currentTime - self.getStartTime() > 12 {
                 self = .none
             }
         }
@@ -153,6 +154,7 @@ struct NavigateMapView: View {
     init(mapFileName: String = "") {
         print("currentUser is \(Auth.auth().currentUser!.uid)")
         self.mapFileName = mapFileName
+      //  self.navigateGlobalState.instructionWrapper = .findTag(startTime: NSDate().timeIntervalSince1970)
     }
     
     var body : some View {

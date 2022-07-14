@@ -47,6 +47,10 @@ class MapNavigator: ObservableObject {
         InvisibleMapController.shared.process(event: .PlanPath)
     }
     
+    @objc func waitBeforeLeavingMap(mapFileName: String) {
+        InvisibleMapController.shared.process(event: .ReadyToLeaveMap(mapFileName: mapFileName))
+    }
+    
     /// Plans a path from the current location to the end and visualizes it in red
     /// retunrs an arry of Vertices between Edges of path
     func planPath(from currentLocation: simd_float3) -> [RawMap.OdomVertex]? {
@@ -123,7 +127,7 @@ class MapNavigator: ObservableObject {
     /// Processes the pose, april tags, and nearby waypoints.
     func updateTags(from cameraFrame: ARFrame) {
         // only continue if user chooses to detect tags
-        if !detectTags {
+      if !detectTags {
             // don't allow camera to see tags if user did not start tag detection
             self.seesTag = false
             return
@@ -165,6 +169,7 @@ class MapNavigator: ObservableObject {
     // clears data for map
     func resetMap() {
         self.stopPathPlanning()
+        self.processingFrame = false
         self.map = nil  // this also resets firstTagFound var to false 
         self.detectTags = false
         self.seesTag = false

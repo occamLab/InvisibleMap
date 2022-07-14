@@ -18,6 +18,8 @@ class InvisibleMapController: AppController {
     public var arViewer: ARView?
     var navigateViewer: NavigateViewController?
     
+    // state of whether the current app is in the process of leaving the app
+    var exitingMap = false
     
     func initialize() {
         InvisibleMapController.shared.arViewer?.initialize()
@@ -26,9 +28,10 @@ class InvisibleMapController: AppController {
     
     func process(commands: [InvisibleMapAppState.Command]) {
         for command in commands {
-            print("arViewer: \(arViewer)")
+            //print("last command: \(command)")
             switch (command) {
                 case .LoadMap(let mapFileName):
+                print("loading select path view")
                     FirebaseManager.createMap(from: mapFileName) { newMap in
                          self.mapNavigator.map = newMap
                     }
@@ -37,6 +40,10 @@ class InvisibleMapController: AppController {
                     // check: if ping was not invalidated, stop it before starting navigation?
                 // Question: ping sound from previous navigation to a POI continues for navigation to another POI (navmap -> selectpath -> navmap (ping starts before detecting first tag)
                  //   self.arViewer?.session.run(ARWorldTrackingConfiguration())
+                
+                    // need to re-initialize NavigateGlobalState which is a property of NavigateGlobalStateSingleton to update instructions for new ARSessions
+                    NavigateGlobalStateSingleton.shared = NavigateGlobalState()
+                
                     self.mapNavigator.locationType = locationType
                     if locationType == "tag" {
                         self.mapNavigator.endpointTagKey = Id
@@ -48,7 +55,6 @@ class InvisibleMapController: AppController {
                         self.mapNavigator.scheduledPathPlanningTimer()
                         self.arViewer?.scheduledPingTimer()
                     }
-                
                 
                 case .UpdatePoseVIO(let cameraFrame):
                     self.mapNavigator.updateTags(from: cameraFrame)
@@ -65,9 +71,20 @@ class InvisibleMapController: AppController {
                     self.mapNavigator.stopPathPlanning()
                     print("navigation finished")
                 
+                case .PrepareToLeaveMap(let mapFileName):
+                    self.exitingMap = true
+                let timer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { (timer) in
+                        InvisibleMapController.shared.process(event: .ReadyToLeaveMap(mapFileName: mapFileName))
+                        }
+
+                    //let secondsToDelay = 2.0
+                    /*perform(#selector(mapNavigator.waitBeforeLeavingMap(mapFileName: mapFileName)), with: nil, afterDelay: secondsToDelay)*/
+                    print("preparing to leave map - stop processing frame")
+                
                 case .LeaveMap(let mapFileName):
-                    self.arViewer?.reset()
+                    self.arViewer?.resetNavigatingSession()
                     self.mapNavigator.resetMap() // destroys the map
+                    self.exitingMap = false
                     process(commands: [.LoadMap(mapFileName: mapFileName)])  // loads the map (with its tag locations and POIs) that the user just left
                     print("leave map")
                 
@@ -86,7 +103,7 @@ class InvisibleMapController: AppController {
                     print("updated instruction text")
                 
                 // TODO: Add functionality for these
-                case .GetNewWaypoint:
+                case .GetNewEndpoint:
                     continue
                 case .EditMap:
                     continue

@@ -15,6 +15,7 @@ indirect enum InvisibleMapAppState: StateType {
     case NavigateMap
     case EditMap
     case SelectPath(lastState: InvisibleMapAppState)
+    case PreparingToLeaveMap
     
     // Initial state upon opening the app
     static let initialState = InvisibleMapAppState.MainScreen
@@ -28,15 +29,16 @@ indirect enum InvisibleMapAppState: StateType {
         // NavigateMap events
         case NewARFrame(cameraFrame: ARFrame)
         case TagFound(tag: AprilTags, cameraTransform: simd_float4x4)
-        case WaypointReached(finalWaypoint: Bool)
+        case EndpointReached(finalEndpoint: Bool)
         case EditMapRequested
         case CancelEditRequested
         case SaveEditRequested
         case ViewPathRequested
         case DismissPathRequested
         case LeaveMapRequested(mapFileName: String)
+        case ReadyToLeaveMap(mapFileName: String)
         case PlanPath
-        case HomeRequested
+       // case HomeRequested
     }
     
     // All the effectful outputs which the state desires to have performed on the app
@@ -45,9 +47,10 @@ indirect enum InvisibleMapAppState: StateType {
         case StartPath(locationType: String, Id: Int)
         case UpdatePoseVIO(cameraFrame: ARFrame)
         case UpdatePoseTag(tag: AprilTags, cameraTransform: simd_float4x4)
-        case GetNewWaypoint
+        case GetNewEndpoint
         case EditMap
         case FinishedNavigation
+        case PrepareToLeaveMap(mapFileName: String)
         case LeaveMap(mapFileName: String)
         case PlanPath
         case UpdateInstructionText
@@ -62,34 +65,6 @@ indirect enum InvisibleMapAppState: StateType {
                 self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
                 return [.LoadMap(mapFileName: mapFileName)]
             
-            // Note: go back to saved location list [SelectPathView] when cancel button is pressed; lastState of SelectPath must be MainScreen in order to reload maps' location lists in SelectPath view
-            case (.NavigateMap, .LeaveMapRequested(let mapFileName)):
-                self = .SelectPath(lastState: InvisibleMapAppState.NavigateMap)
-                return [.LeaveMap(mapFileName: mapFileName)]
-            
-            case (.NavigateMap, .NewARFrame(let cameraFrame)):
-            return [.UpdatePoseVIO(cameraFrame: cameraFrame), .UpdateInstructionText]
-            
-            case (.NavigateMap, .TagFound(let tag, let cameraTransform)):
-                return [.UpdatePoseTag(tag: tag, cameraTransform: cameraTransform)]
-            
-            // Note: As of now this case is when users reach their selected destination
-            case (.NavigateMap, .WaypointReached(let finalWaypoint)):
-               // self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
-                return [.FinishedNavigation]
-               // return finalWaypoint ? [.GetNewWaypoint] : [.FinishedNavigation]
-            
-            case (.NavigateMap, .EditMapRequested):
-                self = .EditMap
-                return []
-            
-            case (.NavigateMap, .PlanPath):
-                return [.PlanPath]
-            
-            case (.NavigateMap, .HomeRequested):
-                self = .MainScreen
-                return []
-            
             case (.SelectPath, .NewARFrame(let cameraFrame)):
                 return []
             
@@ -102,6 +77,40 @@ indirect enum InvisibleMapAppState: StateType {
                 //self = lastState
                 self = .MainScreen
                 return []
+            
+            // Note: go back to saved location list [SelectPathView] when cancel button is pressed; lastState of SelectPath must be MainScreen in order to reload maps' location lists in SelectPath view
+            case (.NavigateMap, .LeaveMapRequested(let mapFileName)):
+                self = .PreparingToLeaveMap
+            
+                return [.PrepareToLeaveMap(mapFileName: mapFileName)]
+            
+            case (.NavigateMap, .NewARFrame(let cameraFrame)):
+                return [.UpdatePoseVIO(cameraFrame: cameraFrame), .UpdateInstructionText]
+            
+            case (.NavigateMap, .TagFound(let tag, let cameraTransform)):
+                return [.UpdatePoseTag(tag: tag, cameraTransform: cameraTransform)]
+            
+            // Note: As of now this case is when users reach their selected destination
+            case (.NavigateMap, .EndpointReached(let finalEndpoint)):
+               // self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
+                return [.FinishedNavigation]
+               // return finalEndpoint ? [.GetNewEndpoint] : [.FinishedNavigation]
+            
+            case (.NavigateMap, .EditMapRequested):
+                self = .EditMap
+                return []
+            
+            case (.NavigateMap, .PlanPath):
+                return [.PlanPath]
+            
+            case (.PreparingToLeaveMap, .ReadyToLeaveMap(let mapFileName)):
+                self = .SelectPath(lastState: InvisibleMapAppState.PreparingToLeaveMap)
+                return [.LeaveMap(mapFileName: mapFileName)]
+            
+            
+           /* case (.NavigateMap, .HomeRequested):
+                self = .MainScreen
+                return [] */
             
             
         /*    case (.EditMap, .CancelEditRequested):

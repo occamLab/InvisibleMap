@@ -1,0 +1,26 @@
+/* 
+  Localizable (en).strings
+  InvisibleMap
+
+  Created by occamlab on 7/14/22.
+  Copyright © 2022 Occam Lab. All rights reserved.
+*/
+
+// Strings from DirectionFeedback - binary directions
+"straightDirection" = "Continue straight";
+"slightRightDirection" = "Slight right";
+"rightDirection" = "Turn right";
+"uTurnDirection" = "Turn around";
+"leftDirection" = "Turn left";
+"slightLeftDirection" = "Slight left";
+
+// Strings from DirectionFeedback - clock directions
+"1o'clockDirection" = "Slight right towards 1 o'clock";
+"2o'clockDirection" = "Slight right towards 2 o'clock";
+"4o'clockDirection" = "Turn towards 4 o'clock";
+"5o'clockDirection" = "Turn around towards 5 o'clock";
+"6o'clockDirection" = "Turn around towards 6 o'clock";
+"7o'clockDirection" = "Turn around towards 7 o'clock";
+"8o'clockDirection" = "Turn towards 8 o'clock";
+"10o'clockDirection" = "Slight left towards 10 o'clock";
+"11o'clockDirection" = "Slight left towards 11 o'clock";
