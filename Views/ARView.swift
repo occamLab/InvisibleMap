@@ -488,18 +488,19 @@ extension ARView: ARViewController {
                     #endif
                 } else {
                     // TODO: revisit this to see how to better set the source location
-                    let audioSource = vertices[min(2, vertices.count-1)]  // near the camera's start point
+                    let audioSource = vertices[min(2, vertices.count-1)]  // the point in the map's path in front of current phone position
                     
                    // print("audio source: \(audioSource)")
                     print("audio source vector: \(vector2(audioSource.translation.x, audioSource.translation.y))")
                     print("camera pos vector: \(vector2(cameraPosConverted.x, cameraPosConverted.y))")
                     
                     let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
-                    let phoneZAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
-                    let phoneZAxisInMapFrame = rootNode.convertVector(phoneZAxisInGlobalFrame, to: mapNode)
+                    let phoneAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
+                    let phoneAxisInMapFrame = rootNode.convertVector(phoneAxisInGlobalFrame, to: mapNode)
                  //   print("direction to Source = camera pos - audio source: \(directionToSource) \(phoneZAxisInMapFrame)")
-                    var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneZAxisInMapFrame.x, phoneZAxisInMapFrame.z)))
+                    var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneAxisInMapFrame.x, phoneAxisInMapFrame.z)))
                     volumeScale = acos(volumeScale) / Float.pi
+                    print("volume: \(volumeScale)")
                     volumeScale = 1 - volumeScale
                     volumeScale = pow(volumeScale, 3)
                     self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)

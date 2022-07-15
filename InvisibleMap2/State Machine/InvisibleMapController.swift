@@ -72,8 +72,10 @@ class InvisibleMapController: AppController {
                     print("navigation finished")
                 
                 case .PrepareToLeaveMap(let mapFileName):
+                    // stops processing frame in AR Session
                     self.exitingMap = true
-                let timer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { (timer) in
+                    // pauses the app for a split second
+                    let timer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { (timer) in
                         InvisibleMapController.shared.process(event: .ReadyToLeaveMap(mapFileName: mapFileName))
                         }
 

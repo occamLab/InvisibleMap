@@ -73,6 +73,10 @@ public struct DirectionInfo {
 
 /// Navigation class that provides direction information based on current camera position and the endpoint position in the mapFrame
 /*class Navigation {
-    public var endpoint
-} */
+    public var endpointX: Float
+    public var endpointY: Float
+    public var endpointZ: Float
+    
+    
+}*/
 
