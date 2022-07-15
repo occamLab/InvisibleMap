@@ -120,9 +120,12 @@
 		98E9BE982756BAE9001B5A2B /* ViewStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98E9BE972756BAE9001B5A2B /* ViewStructs.swift */; };
 		98E9BE992756BAE9001B5A2B /* ViewStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98E9BE972756BAE9001B5A2B /* ViewStructs.swift */; };
 		98E9BE9B2756C104001B5A2B /* SelectPathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98E9BE9A2756C104001B5A2B /* SelectPathView.swift */; };
+		C877715DD3993C1546752400 /* Pods_InvisibleMapCreator2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5A63C0A2B587A5D91D672F4 /* Pods_InvisibleMapCreator2.framework */; };
+		E67DB35865431E6E90A75930 /* Pods_InvisibleMap2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 449C8A84DFF2AF257417FE29 /* Pods_InvisibleMap2.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		13128ACB3A8D61D36FB81CFE /* Pods-InvisibleMap2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMap2.release.xcconfig"; path = "Target Support Files/Pods-InvisibleMap2/Pods-InvisibleMap2.release.xcconfig"; sourceTree = "<group>"; };
 		141497E52645A41700BF0ABC /* InstructionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionOverlay.swift; sourceTree = "<group>"; };
 		141FF9C126499FCE00845059 /* ManageLocationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageLocationsView.swift; sourceTree = "<group>"; };
 		143011F82629D8AF0042FDFC /* AddLocationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLocationButton.swift; sourceTree = "<group>"; };
@@ -158,6 +161,8 @@
 		1FE9717C26FB8B2D00DEB00A /* InvisibleMapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapController.swift; sourceTree = "<group>"; };
 		1FE9718126FE50E400DEB00A /* MapNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapNavigator.swift; sourceTree = "<group>"; };
 		1FE9718F2703AC9600DEB00A /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
+		449C8A84DFF2AF257417FE29 /* Pods_InvisibleMap2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMap2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E25B413B2E0FE76C13CDD29 /* Pods-InvisibleMap2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMap2.debug.xcconfig"; path = "Target Support Files/Pods-InvisibleMap2/Pods-InvisibleMap2.debug.xcconfig"; sourceTree = "<group>"; };
 		822FA78224E2F9750001F463 /* DebugHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugHelpers.swift; sourceTree = "<group>"; };
 		822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AprilTagTracker.swift; sourceTree = "<group>"; };
 		82A8259E24B3854000AFC390 /* simd+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "simd+ext.swift"; sourceTree = "<group>"; };
@@ -201,6 +206,9 @@
 		98BF269926AF14D50076427E /* InvisibleMap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap.entitlements; sourceTree = "<group>"; };
 		98E9BE972756BAE9001B5A2B /* ViewStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStructs.swift; sourceTree = "<group>"; };
 		98E9BE9A2756C104001B5A2B /* SelectPathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectPathView.swift; sourceTree = "<group>"; };
+		B5A63C0A2B587A5D91D672F4 /* Pods_InvisibleMapCreator2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InvisibleMapCreator2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EF2E2FF8C503C8B9FED6F7F7 /* Pods-InvisibleMapCreator2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator2.debug.xcconfig"; path = "Target Support Files/Pods-InvisibleMapCreator2/Pods-InvisibleMapCreator2.debug.xcconfig"; sourceTree = "<group>"; };
+		FE77FD3AF5F5AADAAE3CB969 /* Pods-InvisibleMapCreator2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InvisibleMapCreator2.release.xcconfig"; path = "Target Support Files/Pods-InvisibleMapCreator2/Pods-InvisibleMapCreator2.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -215,6 +223,7 @@
 				14995FC426263BA800A7C78B /* visp3.framework in Frameworks */,
 				984C21DE26B44F99006EEF4F /* FirebaseStorage in Frameworks */,
 				984C21D826B44F88006EEF4F /* FirebaseAnalytics in Frameworks */,
+				C877715DD3993C1546752400 /* Pods_InvisibleMapCreator2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,6 +238,7 @@
 				1F131D77271F608100568FEC /* FirebaseStorage in Frameworks */,
 				1F131D7B271F60B500568FEC /* FirebaseAuth in Frameworks */,
 				1FE971922704D8AE00DEB00A /* SwiftGraph in Frameworks */,
+				E67DB35865431E6E90A75930 /* Pods_InvisibleMap2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +264,8 @@
 			children = (
 				86616BC42113369200DD565C /* visp3.framework */,
 				8630963B21125E89003D4434 /* opencv2.framework */,
+				B5A63C0A2B587A5D91D672F4 /* Pods_InvisibleMapCreator2.framework */,
+				449C8A84DFF2AF257417FE29 /* Pods_InvisibleMap2.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -426,6 +438,18 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
+		306DDB0BE48E40E5F3F908FD /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				EF2E2FF8C503C8B9FED6F7F7 /* Pods-InvisibleMapCreator2.debug.xcconfig */,
+				FE77FD3AF5F5AADAAE3CB969 /* Pods-InvisibleMapCreator2.release.xcconfig */,
+				7E25B413B2E0FE76C13CDD29 /* Pods-InvisibleMap2.debug.xcconfig */,
+				13128ACB3A8D61D36FB81CFE /* Pods-InvisibleMap2.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		86F39532210FA42500F209EC = {
 			isa = PBXGroup;
 			children = (
@@ -439,6 +463,7 @@
 				1F77A36026F2493A0044BE18 /* InvisibleMap2 */,
 				86F3953C210FA42500F209EC /* Products */,
 				126D761BA492BEFEDB8E7347 /* Frameworks */,
+				306DDB0BE48E40E5F3F908FD /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -524,6 +549,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1447B711262421CF00230A58 /* Build configuration list for PBXNativeTarget "InvisibleMapCreator2" */;
 			buildPhases = (
+				B6C2B22C461A24906D5F23CF /* [CP] Check Pods Manifest.lock */,
 				1447B6FF262421CC00230A58 /* Sources */,
 				1447B700262421CC00230A58 /* Frameworks */,
 				1447B701262421CC00230A58 /* Resources */,
@@ -548,9 +574,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1F77A36D26F249480044BE18 /* Build configuration list for PBXNativeTarget "InvisibleMap2" */;
 			buildPhases = (
+				F5C140015E0A7EE8F21FCB0A /* [CP] Check Pods Manifest.lock */,
 				1F77A35B26F2493A0044BE18 /* Sources */,
 				1F77A35C26F2493A0044BE18 /* Frameworks */,
 				1F77A35D26F2493A0044BE18 /* Resources */,
+				786A1A6B5AAD39869E072E85 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -624,7 +652,7 @@
 			);
 			mainGroup = 86F39532210FA42500F209EC;
 			packageReferences = (
-				984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */,
 				9860ED6826B4532400C1EC55 /* XCRemoteSwiftPackageReference "SwiftGraph" */,
 			);
 			productRefGroup = 86F3953C210FA42500F209EC /* Products */;
@@ -673,6 +701,70 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		786A1A6B5AAD39869E072E85 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-InvisibleMap2/Pods-InvisibleMap2-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-InvisibleMap2/Pods-InvisibleMap2-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-InvisibleMap2/Pods-InvisibleMap2-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B6C2B22C461A24906D5F23CF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-InvisibleMapCreator2-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F5C140015E0A7EE8F21FCB0A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-InvisibleMap2-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1447B6FF262421CC00230A58 /* Sources */ = {
@@ -800,6 +892,7 @@
 /* Begin XCBuildConfiguration section */
 		1447B70F262421CF00230A58 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EF2E2FF8C503C8B9FED6F7F7 /* Pods-InvisibleMapCreator2.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -833,6 +926,7 @@
 		};
 		1447B710262421CF00230A58 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE77FD3AF5F5AADAAE3CB969 /* Pods-InvisibleMapCreator2.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -865,6 +959,7 @@
 		};
 		1F77A36B26F249480044BE18 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7E25B413B2E0FE76C13CDD29 /* Pods-InvisibleMap2.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -895,6 +990,7 @@
 		};
 		1F77A36C26F249480044BE18 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 13128ACB3A8D61D36FB81CFE /* Pods-InvisibleMap2.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1059,7 +1155,7 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					$SDKROOT/usr/include/libxml2,
+					"$SDKROOT/usr/include/libxml2",
 				);
 				INFOPLIST_FILE = InvisibleMap/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -1092,7 +1188,7 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					$SDKROOT/usr/include/libxml2,
+					"$SDKROOT/usr/include/libxml2",
 				);
 				INFOPLIST_FILE = InvisibleMap/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -1150,7 +1246,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+		984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
@@ -1171,22 +1267,22 @@
 /* Begin XCSwiftPackageProductDependency section */
 		1F131D74271F607A00568FEC /* FirebaseDatabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseDatabase;
 		};
 		1F131D76271F608100568FEC /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseStorage;
 		};
 		1F131D78271F60B000568FEC /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseAnalytics;
 		};
 		1F131D7A271F60B500568FEC /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseAuth;
 		};
 		1F131D7C27288FA400568FEC /* SwiftGraph */ = {
@@ -1201,42 +1297,42 @@
 		};
 		984C21CF26B44F4D006EEF4F /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseAnalytics;
 		};
 		984C21D126B44F4D006EEF4F /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseStorage;
 		};
 		984C21D326B44F4D006EEF4F /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseAuth;
 		};
 		984C21D526B44F4D006EEF4F /* FirebaseDatabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseDatabase;
 		};
 		984C21D726B44F88006EEF4F /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseAnalytics;
 		};
 		984C21D926B44F8C006EEF4F /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseAuth;
 		};
 		984C21DB26B44F93006EEF4F /* FirebaseDatabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseDatabase;
 		};
 		984C21DD26B44F99006EEF4F /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk.git" */;
 			productName = FirebaseStorage;
 		};
 		9860ED6926B4532400C1EC55 /* SwiftGraph */ = {
