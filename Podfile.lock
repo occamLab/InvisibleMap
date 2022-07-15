@@ -1,16 +1,42 @@
 PODS:
+  - MaterialComponents/ActivityIndicator (124.2.0):
+    - MaterialComponents/Palettes
+    - MaterialComponents/private/Application
+    - MDFInternationalization
+    - MotionAnimator (~> 4.0)
+  - MaterialComponents/Palettes (124.2.0)
+  - MaterialComponents/private/Application (124.2.0)
+  - MaterialComponents/private/Math (124.2.0)
+  - MaterialComponents/ProgressView (124.2.0):
+    - MaterialComponents/Palettes
+    - MaterialComponents/private/Math
+    - MDFInternationalization
+  - MDFInternationalization (3.0.0)
+  - MotionAnimator (4.0.1):
+    - MotionInterchange (~> 3.0)
+  - MotionInterchange (3.0.0)
   - SwiftGraph (3.1)
 
 DEPENDENCIES:
+  - MaterialComponents/ActivityIndicator
+  - MaterialComponents/ProgressView
   - SwiftGraph
 
 SPEC REPOS:
   trunk:
+    - MaterialComponents
+    - MDFInternationalization
+    - MotionAnimator
+    - MotionInterchange
     - SwiftGraph
 
 SPEC CHECKSUMS:
+  MaterialComponents: 1a9b2d9d45b1601ae544de85089adc4c464306d4
+  MDFInternationalization: d697c55307816222a55685c4ccb1044ffb030c12
+  MotionAnimator: 5f99d7c9592928c0f28a66283eda9c3b657dc480
+  MotionInterchange: 13adae439b377e31d1674cc165539d50e1d1566a
   SwiftGraph: f97852fc9372815b71426cd38baf2609a8a92f76
 
-PODFILE CHECKSUM: 9e2df9b25f594da76c411c7a90f628a278fe8036
+PODFILE CHECKSUM: 71a57f03eb6116100b1dfd226ab8d862bd415406
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.3

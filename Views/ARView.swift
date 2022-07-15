@@ -503,7 +503,7 @@ extension ARView: ARViewController {
                     self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
                     print("Volume scale: \(volumeScale)")
                 }
-            }
+            
           }
         }
       }

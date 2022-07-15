@@ -8,6 +8,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import MaterialComponents
 
 // Describes all the instructions that will exist on-screen for the user
 enum InstructionType: Equatable {
@@ -39,8 +40,8 @@ enum InstructionType: Equatable {
     // To get start time of when the instructions were displayed
     func getStartTime() -> Double {
         switch self {
-        case .findTag(let startTime), .tagFound(let startTime), .destinationReached(let startTime):
-            return startTime
+            case .findTag(let startTime), .tagFound(let startTime), .destinationReached(let startTime):
+                return startTime
         default:
             return -1
         }
@@ -51,29 +52,29 @@ enum InstructionType: Equatable {
     mutating func transition(tagFound: Bool, endPointReached: Bool = false) {
         let previousInstruction = self
         switch self {
-        case .findTag:
-            // when first tag is found -> tagFound
-            if tagFound {
-                print("switch instructions from findTag to tagFound after camera finds the first tag")
-                self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+            case .findTag:
+                // when first tag is found -> tagFound
+                if tagFound {
+                    print("switch instructions from findTag to tagFound after camera finds the first tag")
+                    self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+                }
+            case .tagFound:
+                // case stays as .tagFound until frame is processed again when 'Start Tag Detection' is pressed again -> resets seesTag variable depending on reprocessed camera AR frame.
+                if !InvisibleMapController.shared.mapNavigator.seesTag {
+                    print("tag found and camera doesn't see tag so get rid of instruction text field")
+                    self = .none
+                }
+            case .none:
+                // seesTag is not reset until tag detection starts again
+                if InvisibleMapController.shared.mapNavigator.seesTag {
+                    self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+                } else if endPointReached {
+                    self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
+                }
+            case .destinationReached:
+                break
+                //self = .none
             }
-        case .tagFound:
-            // case stays as .tagFound until frame is processed again when 'Start Tag Detection' is pressed again -> resets seesTag variable depending on reprocessed camera AR frame.
-            if !InvisibleMapController.shared.mapNavigator.seesTag {
-                print("tag found and camera doesn't see tag so get rid of instruction text field")
-                self = .none
-            }
-        case .none:
-            // seesTag is not reset until tag detection starts again
-            if InvisibleMapController.shared.mapNavigator.seesTag {
-                self = .tagFound(startTime: NSDate().timeIntervalSince1970)
-            } else if endPointReached {
-                self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
-            }
-        case .destinationReached:
-            break
-            //self = .none
-        }
         
         if self != previousInstruction {
             let instructions = self.text
