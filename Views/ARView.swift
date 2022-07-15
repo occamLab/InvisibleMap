@@ -499,8 +499,8 @@ extension ARView: ARViewController {
                     let phoneAxisInMapFrame = rootNode.convertVector(phoneAxisInGlobalFrame, to: mapNode)
                  //   print("direction to Source = camera pos - audio source: \(directionToSource) \(phoneZAxisInMapFrame)")
                     var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneAxisInMapFrame.x, phoneAxisInMapFrame.z)))
-                    volumeScale = acos(volumeScale) / Float.pi
-                    print("volume: \(volumeScale)")
+                    volumeScale = acos(volumeScale) / Float.pi 
+                    print("volume: \(volumeScale)") // increases off track; decreases at right track -> subtracts it from 1 to have greater volumeScale when on right track
                     volumeScale = 1 - volumeScale
                     volumeScale = pow(volumeScale, 3)
                     self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)

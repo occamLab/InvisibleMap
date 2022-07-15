@@ -72,11 +72,20 @@ public struct DirectionInfo {
        ]
 
 /// Navigation class that provides direction information based on current camera position and the endpoint position in the mapFrame
-/*class Navigation {
-    public var endpointX: Float
-    public var endpointY: Float
-    public var endpointZ: Float
+class Navigation {
+    public var endpointX: Float = 0
+    public var endpointY: Float = 0
+    public var endpointZ: Float = 0
+    
+    // need to get vertices or stops in map's path
+    // set audioSource as point in front of user
+    // audioSource x,y,z -> change name to nextPointOnPath
+    // phone's current location x,y,z
+    // -> these two points make the directionToSource vector
+    // phone's axis in mapFrame
     
     
-}*/
+    
+    
+}
 
