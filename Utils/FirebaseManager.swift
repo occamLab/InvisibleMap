@@ -23,8 +23,8 @@ class FirebaseManager {
                 print(error.localizedDescription)
                 // Error occurred
             } else {
-                if mapData != nil {
-                    map = Map(from: mapData!)!
+                if let mapData = mapData {
+                    map = Map(from: mapData)!
                     completionHandler(map!)
                 }
             }

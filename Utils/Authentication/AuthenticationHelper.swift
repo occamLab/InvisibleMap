@@ -58,13 +58,18 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
     @available(iOS 13, *)
     func startSignInWithAppleFlow() {
       let nonce = randomNonceString()
+    print("created random ID name")
       currentNonce = nonce
       let appleIDProvider = ASAuthorizationAppleIDProvider()
+        print("created appleID provider whatever that means")
       let request = appleIDProvider.createRequest()
+        print("created apple ID request")
       request.requestedScopes = [.fullName, .email]
+        print("name and email: \(request.requestedScopes)")
       request.nonce = sha256(nonce)
 
       let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        print("authorization controller: \(authorizationController)")
       authorizationController.delegate = self
       authorizationController.presentationContextProvider = self
       authorizationController.performRequests()
@@ -82,6 +87,7 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        print("good function happening: Sign in with apple id pressed")
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
           guard let nonce = currentNonce else {
             fatalError("Invalid state: A login callback was received, but no login request was sent.")
@@ -125,14 +131,25 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
       func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         // Handle error.
         print("Sign in with Apple errored: \(error)")
-        Auth.auth().signInAnonymously() { (authResult, error) in
+          
+          // if canceled auth (from Sign in pop-up) prompt users to sign in manually? or sign in with apple id again?
+          // if users have already signed in anonymously before, tell them to delete app and re-download test flight
+          
+          
+     //     self.authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization: ASAuthorization)
+          
+          
+   /*  Auth.auth().signInAnonymously() { (authResult, error) in
             guard let _ = authResult else {
                 print("Anonymous login error", error!.localizedDescription)
                 return
             }
             print("Successful anonymous login \(String(describing: Auth.auth().currentUser?.uid))")
             self.transitionToMainApp()
-        }
+          
+        } */
+        
+    
       }
     
     func transitionToMainApp() {

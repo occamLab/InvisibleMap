@@ -73,19 +73,74 @@ public struct DirectionInfo {
 
 /// Navigation class that provides direction information based on current camera position and the endpoint position in the mapFrame
 class Navigation {
-    public var endpointX: Float = 0
-    public var endpointY: Float = 0
-    public var endpointZ: Float = 0
+    // Note: All positions in mapFrame
+    public var endpointX: Float = ARView().endpointX
+    public var endpointY: Float = ARView().endpointY
+    public var endpointZ: Float = ARView().endpointZ
     
-    // need to get vertices or stops in map's path
-    // set audioSource as point in front of user
-    // audioSource x,y,z -> change name to nextPointOnPath
-    // phone's current location x,y,z
-    // -> these two points make the directionToSource vector
-    // phone's axis in mapFrame
+    public var nextPointOnPathX: Float = ARView().audioSourceX
+    public var nextPointOnPathZ: Float = ARView().audioSourceZ
     
+    public var currentCameraPositionX: Float = ARView().currentCameraPosX
+    public var currentCameraPositionZ: Float = ARView().currentCameraPosZ
     
+    public var angleDiff: Float = ARView().angleDifference
     
-    
+    func getDirections() -> DirectionInfo? {
+        let clockDirectionKey = getClockDirection(angle: angleDiff)
+        let binaryDirectionKey = getBinaryDirection(angle: angleDiff)
+        
+        // TODO: get distance from endpoint for distanceToEndpoint
+        
+        var direction = DirectionInfo(clockDirectionKey: clockDirectionKey, binaryDirectionKey: binaryDirectionKey, distanceToEndpoint: 10.0, angleDiffFromPath: angleDiff)
+        
+        if NavigateGlobalStateSingleton.shared.endPointReached == true {
+            direction.endPointState = .atEndpoint
+        }
+        else {
+            direction.endPointState = .notAtEndpoint
+        }
+        
+        // TODO: need end point state when near endpoint
+        
+        return direction
+    }
+
 }
 
+/// Determine clock direction from angle in radians, where 0 radians is 12 o'clock.
+///
+/// - Parameter angle: input angle in radians
+/// - Returns: `Int` between 1 and 12, inclusive, representing clock position
+func getClockDirection(angle: Float) -> Int {
+    let clockDirectionKey: Int = Int(angle * (6 / Float.pi))
+    print("clock direction key: \(clockDirectionKey)")
+    if clockDirectionKey == 0 {
+        return 12
+    }
+    return clockDirectionKey
+}
+
+/// Divides all possible directional angles into 7 sections for using with haptic feedback.
+///
+/// - Parameter angle: angle in radians from straight ahead.
+/// - Returns: `String` that represents the direction the user needs to go
+func getBinaryDirection(angle: Float) -> String {
+    if (-Float.pi/6 <= angle && angle <= Float.pi/6) {
+        return "straight"
+    } else if (Float.pi/6 <= angle && angle <= Float.pi/3) {
+        return "slightRight"
+    } else if (Float.pi/3 <= angle && angle <= (2*Float.pi/3)) {
+        return "right"
+    } else if ((2*Float.pi/3) <= angle && angle <= Float.pi) {
+        return "uturn"
+    } else if (-Float.pi <= angle && angle <= -(2*Float.pi/3)) {
+        return "uturn"
+    } else if (-(2*Float.pi/3) <= angle && angle <= -(Float.pi/3)) {
+        return "left"
+    } else if (-Float.pi/3 <= angle && angle <= -Float.pi/6) {
+        return "slightLeft"
+    } else {
+        return "none"
+    }
+}

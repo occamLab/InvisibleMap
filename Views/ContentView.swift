@@ -12,9 +12,12 @@ import FirebaseAuth
 class AuthListener: ObservableObject {
     init() {
         FirebaseApp.configure()
+        print("Firebase configured")
         Auth.auth().addStateDidChangeListener { auth, user in
             self.objectWillChange.send()
+        print("auth listener listened")
         }
+        print("auth listener created")
     }
 }
 
@@ -152,15 +155,6 @@ struct ContentView: View {
             #else
                 .navigationTitle("Invisible Maps")
             #endif
-//            .navigationBarItems(trailing:
-//                Button(action: {
-//                    // TODO: Build settings menu
-//                }) {
-//                    Image(systemName: "gearshape").imageScale(.large)
-//                        .foregroundColor(.black)
-//                }
-//                .accessibilityLabel(Text("Settings"))
-//            )
         }
     }
 }

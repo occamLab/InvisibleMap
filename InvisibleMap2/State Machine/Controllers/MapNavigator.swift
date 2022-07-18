@@ -13,6 +13,9 @@ import SwiftGraph
 class MapNavigator: ObservableObject {
     @Published var map: Map?
     
+    /// endpoint sphere; if users enter this sphere announce that they're arrived at their destination
+    let endpointSphere: Float = 0.3
+    
     // endpoints are either tag locations or waypoint locations
     var locationType: String = "tag"
     

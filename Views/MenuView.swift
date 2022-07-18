@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct MenuView: View {
     @State private var isShowingHelpView = false
@@ -77,6 +78,28 @@ struct MenuView: View {
             .sheet(isPresented: $isShowingFeedbackView) {
                 FeedbackView(showFeedbackView: $isShowingFeedbackView)
             }
+            
+            
+            // Sign out
+            HStack {
+                Button(action: {
+                    do {
+                        try! Auth.auth().signOut()
+                    }
+                }) {
+                    //Image(systemName: "envelope")
+                     //   .imageScale(.large)
+                     //   .foregroundColor(.black)
+                    Text("Sign Out")
+                        .foregroundColor(.black)
+                        .font(.headline)
+                }
+                .accessibilityLabel(Text("Sign out button"))
+            }
+            .padding(.top, 30)
+            
+            
+            
             Spacer()
         }
         .padding()
