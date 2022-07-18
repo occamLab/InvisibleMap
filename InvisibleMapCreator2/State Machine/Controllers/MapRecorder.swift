@@ -46,6 +46,9 @@ class MapRecorder: MapRecorderController, ObservableObject {
     @Published var tagWasRecorded = false
     @Published var previousTagRecordedState = false
     
+    @Published var tagRecordingStartTime = 0.0
+    @Published var tagRecordingInterval = 0.0
+    
     /// Correct the orientation estimate such that the normal vector of the tag is perpendicular to gravity
     let snapTagsToVertical = true
     
@@ -188,6 +191,16 @@ extension MapRecorder {
                 }
                 if self.tagRecordingState && self.seesTag {
                     self.tagData.append(arTags)
+                    //self.TagRecordingStateTimer = NSDate().timeIntervalSince1970
+                    
+                    let currentTime = NSDate().timeIntervalSince1970
+                    self.tagRecordingInterval = currentTime - self.tagRecordingStartTime
+                    print("tag record interval: \(self.tagRecordingInterval * (1.0 / 3.0))")
+                    if self.tagRecordingInterval > 3 {
+                        self.previousTagRecordedState = self.tagRecordingState
+                        self.tagRecordingState = false
+                        self.tagRecordingInterval = 0.0
+                    }
                 }
 
                 if !self.tagRecordingState && self.previousTagRecordedState {

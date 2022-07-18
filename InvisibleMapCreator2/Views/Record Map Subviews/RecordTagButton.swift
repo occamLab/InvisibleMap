@@ -20,6 +20,11 @@ struct RecordTagButton: View {
                 print("previous tag recording state: \(self.mapRecorder.previousTagRecordedState)")
                 print("current tag recording state: \(self.mapRecorder.tagRecordingState)")
                 self.mapRecorder.tagRecordingState.toggle() // toggle between green start and red stop button
+                if self.mapRecorder.tagRecordingState {
+                    self.mapRecorder.tagRecordingStartTime = NSDate().timeIntervalSince1970
+                } else {
+                    self.mapRecorder.tagRecordingStartTime = 0.0
+                }
                 
             } else {
                 recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, markTagRequested: true)

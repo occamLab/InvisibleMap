@@ -138,7 +138,7 @@ class RecordGlobalState: ObservableObject, RecordViewController {
     @Published var tagFound: Bool
     @Published var instructionWrapper: InstructionType
     @Published var nodeList: [NodeData]
-    //@Published var TagRecordingStateTimer
+    //@Published var TagRecordingStateTimer: Double
 
     init() {
         tagFound = false
@@ -170,6 +170,7 @@ class RecordGlobalState: ObservableObject, RecordViewController {
 
 struct RecordMapView: View {
     @StateObject var recordGlobalState = RecordGlobalState()
+    //@StateObject var progress = (InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval) * (1.0 / 3.0)
     
     init() {
         //print("currentUser is \(Auth.auth().currentUser!.uid)")
@@ -201,8 +202,9 @@ struct RecordMapView: View {
                         .animation(.easeInOut)
                 }
                 if InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState {
-                    //CircularProgressView()
-                    //    .frame(width: 200, height: 200)
+                    var progress = (InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval) * (1.0 / 3.0)
+                    CircularProgressView(progress: progress)
+                        .frame(width: 200, height: 200)
                 } else {
                     RecordTagButton(recordGlobalState: recordGlobalState)
                         .environmentObject(InvisibleMapCreatorController.shared.mapRecorder)

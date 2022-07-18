@@ -122,7 +122,7 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
       func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         // Handle error.
         print("Sign in with Apple errored: \(error)")
-          startSignInWithAppleFlow()
+          //startSignInWithAppleFlow()
 //        Auth.auth().signInAnonymously() { (authResult, error) in
 //            guard let _ = authResult else {
 //                print("Anonymous login error", error!.localizedDescription)

@@ -20,7 +20,7 @@ struct CircularProgressView: View {
                     lineWidth: 30
                 )
             Circle()
-                .trim(from: 0, to: 0.25)
+                .trim(from: 0, to: progress)
                 .stroke(
                     Color.blue,
                     style: StrokeStyle(
@@ -30,16 +30,18 @@ struct CircularProgressView: View {
                 )
                 .rotationEffect(.degrees(-90))
                 // 1
+                .animation(.easeOut)
                 //.animation(.easeOut, value: progress)
-                .animation(.easeOut(duration: 1))
+                //.animation(.easeOut(duration: 1))
 
         }
     }
 }
 
-struct CircularProgressView_Previews: PreviewProvider {
-    static var previews: some View {
-        Text("placeholder")
-        //CircularProgressView()
-    }
-}
+//struct CircularProgressView_Previews: PreviewProvider {
+//    let progress: Double
+//    static var previews: some View {
+//        Text("placeholder")
+//        CircularProgressView(progress: progress)
+//    }
+//}
