@@ -138,6 +138,7 @@ class RecordGlobalState: ObservableObject, RecordViewController {
     @Published var tagFound: Bool
     @Published var instructionWrapper: InstructionType
     @Published var nodeList: [NodeData]
+    //@Published var TagRecordingStateTimer
 
     init() {
         tagFound = false
@@ -161,13 +162,18 @@ class RecordGlobalState: ObservableObject, RecordViewController {
     func updateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
         self.nodeList.append(NodeData(node: node, picture: picture, textNode: textNode, poseId: poseId))
     }
+    
+    /*func tagRecordinginProgress() {
+        
+    }*/
 }
 
 struct RecordMapView: View {
     @StateObject var recordGlobalState = RecordGlobalState()
     
     init() {
-        print("currentUser is \(Auth.auth().currentUser!.uid)")
+        //print("currentUser is \(Auth.auth().currentUser!.uid)")
+        print("Initializing Record Map View!")
     }
     
     var body : some View {
@@ -194,9 +200,14 @@ struct RecordMapView: View {
                     InstructionOverlay(instruction: $recordGlobalState.instructionWrapper.text)
                         .animation(.easeInOut)
                 }
-                RecordTagButton(recordGlobalState: recordGlobalState)
-                    .environmentObject(InvisibleMapCreatorController.shared.mapRecorder)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
+                if InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState {
+                    //CircularProgressView()
+                    //    .frame(width: 200, height: 200)
+                } else {
+                    RecordTagButton(recordGlobalState: recordGlobalState)
+                        .environmentObject(InvisibleMapCreatorController.shared.mapRecorder)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                }
             }
             .padding()
         }

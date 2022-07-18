@@ -152,15 +152,6 @@ struct ContentView: View {
             #else
                 .navigationTitle("Invisible Maps")
             #endif
-//            .navigationBarItems(trailing:
-//                Button(action: {
-//                    // TODO: Build settings menu
-//                }) {
-//                    Image(systemName: "gearshape").imageScale(.large)
-//                        .foregroundColor(.black)
-//                }
-//                .accessibilityLabel(Text("Settings"))
-//            )
         }
     }
 }

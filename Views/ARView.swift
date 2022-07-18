@@ -123,13 +123,19 @@ extension ARView: ARSessionDelegate {
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         #if IS_MAP_CREATOR
             let processingFrame = self.sharedController.mapRecorder.processingFrame
+            //print("processing frame: \(processingFrame)")
+            //this variable is important for Invisible Map not Invisible Map Creator so always make it false
+            let exitingMap = false
         #else
             //if we are in preparingtoleavemap state then break out of this session
             let processingFrame = self.sharedController.mapNavigator.processingFrame
+            let exitingMap = InvisibleMapController.shared.exitingMap
+            //print("Exiting map: \(exitingMap)")
         #endif
-        print("Exiting map: \(InvisibleMapController.shared.exitingMap)")
         // start processing frame if frame is not processing yet after 0.1 seconds
-        if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame && !InvisibleMapController.shared.exitingMap {
+        if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame &&
+            !exitingMap {
+            print("processing frame!")
             let scene = SCNMatrix4(frame.camera.transform)
             if let cameraNode = self.cameraNode {
                 cameraNode.transform = scene
@@ -500,6 +506,7 @@ extension ARView: ARViewController {
                  //   print("direction to Source = camera pos - audio source: \(directionToSource) \(phoneZAxisInMapFrame)")
                     var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneZAxisInMapFrame.x, phoneZAxisInMapFrame.z)))
                     volumeScale = acos(volumeScale) / Float.pi
+                    print("volume scale: \(volumeScale)")
                     volumeScale = 1 - volumeScale
                     volumeScale = pow(volumeScale, 3)
                     self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)

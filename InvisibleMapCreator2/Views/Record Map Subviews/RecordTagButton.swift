@@ -30,7 +30,7 @@ struct RecordTagButton: View {
                                 .foregroundColor(.white)
                                 .background(
                                     RoundedRectangle(cornerRadius: 15)
-                                        .foregroundColor(!self.mapRecorder.tagRecordingState ? .green : .red) // when at recording state red, stop button shows
+                                        .foregroundColor(.green) // when at recording state red, stop button shows
                                         .opacity(self.mapRecorder.seesTag ? 1 : 0.5))  // changes shade of record tag green button if camera is not detecting tags
         }
         //.disabled(!self.mapRecorder.seesTag)
