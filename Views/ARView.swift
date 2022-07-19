@@ -49,6 +49,7 @@ class ARView: UIViewController {
     
     /// position of current phone/camera
     var currentCameraPosX: Float = 0.0
+    var currentCameraPosY: Float = 0.0
     var currentCameraPosZ: Float = 0.0
     
     /// angle in radians that tells you how off users are from the correct path on the map; 0 radians is when camera is facing in the same direction as path
@@ -140,13 +141,15 @@ extension ARView: ARSessionDelegate {
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         #if IS_MAP_CREATOR
             let processingFrame = self.sharedController.mapRecorder.processingFrame
+            let exitingMap = false
         #else
             //if we are in preparingtoleavemap state then break out of this session
             let processingFrame = self.sharedController.mapNavigator.processingFrame
+            let exitingMap = InvisibleMapController.shared.exitingMap
         #endif
-        print("Exiting map: \(InvisibleMapController.shared.exitingMap)")
+        print("Exiting map: \(exitingMap)")
         // start processing frame if frame is not processing yet after 0.1 seconds
-        if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame && !InvisibleMapController.shared.exitingMap {
+        if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame && !exitingMap {
             let scene = SCNMatrix4(frame.camera.transform)
             if let cameraNode = self.cameraNode {
                 cameraNode.transform = scene
@@ -502,6 +505,7 @@ extension ARView: ARViewController {
                 endpointZ = endpointVertex.translation.z
                 
                 currentCameraPosX = cameraPosConverted.x
+                currentCameraPosY = cameraPosConverted.y
                 currentCameraPosX = cameraPosConverted.z
                 
                 #if !IS_MAP_CREATOR

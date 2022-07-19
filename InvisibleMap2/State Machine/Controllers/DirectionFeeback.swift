@@ -82,27 +82,28 @@ class Navigation {
     public var nextPointOnPathZ: Float = ARView().audioSourceZ
     
     public var currentCameraPositionX: Float = ARView().currentCameraPosX
+    public var currentCameraPositionY: Float = ARView().currentCameraPosY
     public var currentCameraPositionZ: Float = ARView().currentCameraPosZ
     
     public var angleDiff: Float = ARView().angleDifference
     
+    /// Gets the clock direction, binary direction, and distance to endpoint information from the user's current location
     func getDirections() -> DirectionInfo? {
         let clockDirectionKey = getClockDirection(angle: angleDiff)
         let binaryDirectionKey = getBinaryDirection(angle: angleDiff)
+        let distanceToEndpoint = getDistanceToEndpoint(endpointX: endpointX, endpointY: endpointY, endpointZ: endpointZ, currPosX: currentCameraPositionX, currPosY: currentCameraPositionY, currPosZ: currentCameraPositionZ)
         
-        // TODO: get distance from endpoint for distanceToEndpoint
-        
-        var direction = DirectionInfo(clockDirectionKey: clockDirectionKey, binaryDirectionKey: binaryDirectionKey, distanceToEndpoint: 10.0, angleDiffFromPath: angleDiff)
+        var direction = DirectionInfo(clockDirectionKey: clockDirectionKey, binaryDirectionKey: binaryDirectionKey, distanceToEndpoint: distanceToEndpoint, angleDiffFromPath: angleDiff)
         
         if NavigateGlobalStateSingleton.shared.endPointReached == true {
             direction.endPointState = .atEndpoint
         }
+        else if distanceToEndpoint < InvisibleMapController.shared.mapNavigator.endpointSphere {
+            direction.endPointState = .closeToEndpoint
+        }
         else {
             direction.endPointState = .notAtEndpoint
         }
-        
-        // TODO: need end point state when near endpoint
-        
         return direction
     }
 
@@ -112,7 +113,7 @@ class Navigation {
 ///
 /// - Parameter angle: input angle in radians
 /// - Returns: `Int` between 1 and 12, inclusive, representing clock position
-func getClockDirection(angle: Float) -> Int {
+private func getClockDirection(angle: Float) -> Int {
     let clockDirectionKey: Int = Int(angle * (6 / Float.pi))
     print("clock direction key: \(clockDirectionKey)")
     if clockDirectionKey == 0 {
@@ -125,7 +126,7 @@ func getClockDirection(angle: Float) -> Int {
 ///
 /// - Parameter angle: angle in radians from straight ahead.
 /// - Returns: `String` that represents the direction the user needs to go
-func getBinaryDirection(angle: Float) -> String {
+private func getBinaryDirection(angle: Float) -> String {
     if (-Float.pi/6 <= angle && angle <= Float.pi/6) {
         return "straight"
     } else if (Float.pi/6 <= angle && angle <= Float.pi/3) {
@@ -143,4 +144,10 @@ func getBinaryDirection(angle: Float) -> String {
     } else {
         return "none"
     }
+}
+
+/// Calculates the distance from the user's current location to the endpoint's location
+private func getDistanceToEndpoint(endpointX: Float, endpointY: Float, endpointZ: Float, currPosX: Float, currPosY: Float, currPosZ: Float) -> Float {
+    let distanceToEndpoint = sqrt(pow((endpointX - currPosX),2) + pow((endpointY - currPosY),2) + pow((endpointZ - currPosZ),2))
+    return distanceToEndpoint
 }

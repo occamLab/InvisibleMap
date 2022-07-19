@@ -13,7 +13,6 @@ import FirebaseAuth
 import Firebase
 
 class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
-    
     private var window: UIWindow?
     
     init(window: UIWindow?) {
@@ -128,29 +127,24 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
         return window!
     }
     
+    // when user hits 'Cancel' button in Sign-in pop up or there's an error signing in
       func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         // Handle error.
         print("Sign in with Apple errored: \(error)")
           
-          // if canceled auth (from Sign in pop-up) prompt users to sign in manually? or sign in with apple id again?
-          // if users have already signed in anonymously before, tell them to delete app and re-download test flight
-          
-          
-     //     self.authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization: ASAuthorization)
-          
-          
-   /*  Auth.auth().signInAnonymously() { (authResult, error) in
+          // current status: disable signing in anonymously
+        /*  Auth.auth().signInAnonymously() { (authResult, error) in
             guard let _ = authResult else {
                 print("Anonymous login error", error!.localizedDescription)
                 return
             }
             print("Successful anonymous login \(String(describing: Auth.auth().currentUser?.uid))")
-            self.transitionToMainApp()
-          
-        } */
-        
-    
+            print("user acc status: \(Auth.auth().currentUser?.isAnonymous)")
+         //   try! Auth.auth().signOut()
+           // self.transitionToMainApp()
+          } */
       }
+        
     
     func transitionToMainApp() {
     }
