@@ -500,16 +500,16 @@ extension ARView: ARViewController {
             // compare the camera's current position to the destination's position, and if they are close enough, tell users they reached destination
             if let cameraNode = cameraNode, let rootNode = arView?.scene.rootNode, let cameraPosConverted = convertNodeOrigintoMapFrame(node: cameraNode), let endpointVertex = vertices.last {
                 
-                endpointX = endpointVertex.translation.x
-                endpointY = endpointVertex.translation.y
-                endpointZ = endpointVertex.translation.z
+                self.endpointX = endpointVertex.translation.x
+                self.endpointY = endpointVertex.translation.y
+                self.endpointZ = endpointVertex.translation.z
                 
-                currentCameraPosX = cameraPosConverted.x
-                currentCameraPosY = cameraPosConverted.y
-                currentCameraPosX = cameraPosConverted.z
+                self.currentCameraPosX = cameraPosConverted.x
+                self.currentCameraPosY = cameraPosConverted.y
+                self.currentCameraPosX = cameraPosConverted.z
                 
                 #if !IS_MAP_CREATOR
-                if simd_distance(simd_float3(cameraPosConverted), simd_float3(endpointX, endpointY, endpointZ)) < self.sharedController.mapNavigator.endpointSphere {
+                if simd_distance(simd_float3(cameraPosConverted), simd_float3(endpointVertex.translation.x, endpointVertex.translation.y, endpointVertex.translation.z)) < self.sharedController.mapNavigator.endpointSphere {
                     InvisibleMapController.shared.process(event: .EndpointReached(finalEndpoint: true))
                     NavigateGlobalStateSingleton.shared.endPointReached = true
                     print("Reached endpoint")
@@ -517,17 +517,19 @@ extension ARView: ARViewController {
                     // TODO: revisit this to see how to better set the source location
                     let audioSource = vertices[min(2, vertices.count-1)]  // the point in the map's path in front of current phone position
                     
-                    audioSourceX = audioSource.translation.x
-                    audioSourceZ = audioSource.translation.z
+                    self.audioSourceX = audioSource.translation.x
+                    self.audioSourceZ = audioSource.translation.z
             
                     // vector from audioSource to current camera location
-                    let directionToSource = vector2(currentCameraPosX, currentCameraPosZ) - vector2(audioSourceX, audioSourceZ)
+                    let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
                     // vector in phone axis
                     let phoneAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
                     let phoneAxisInMapFrame = rootNode.convertVector(phoneAxisInGlobalFrame, to: mapNode)
                     var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneAxisInMapFrame.x, phoneAxisInMapFrame.z)))
+                    
                     // angle between the two vectors that's used to determine how offtrack current phone position is in relative to the map's path in mapFrame
-                    angleDifference = acos(volumeScale)
+                    self.angleDifference = acos(volumeScale)
+                    
                     volumeScale = acos(volumeScale) / Float.pi 
                     print("volume: \(volumeScale)") // increases off track; decreases at right track -> subtracts it from 1 to have greater volumeScale when on right track
                     volumeScale = 1 - volumeScale

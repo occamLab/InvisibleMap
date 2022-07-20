@@ -144,20 +144,22 @@ private func getBinaryDirection(angle: Float) -> String {
         angleDiff = -1 * ((2 * Float.pi) - angle)
     }
     
+    print("angle: \(angle)")
+    
     if (-Float.pi/6 <= angleDiff && angleDiff <= Float.pi/6) {
         return "straight"
     } else if (Float.pi/6 <= angleDiff && angleDiff <= Float.pi/3) {
-        return "slightRight"
+        return "slightLeft"
     } else if (Float.pi/3 <= angleDiff && angleDiff <= (2*Float.pi/3)) {
-        return "right"
+        return "left"
     } else if ((2*Float.pi/3) <= angleDiff && angleDiff <= Float.pi) {
         return "uturn"
     } else if (-Float.pi <= angleDiff && angleDiff <= -(2*Float.pi/3)) {
         return "uturn"
     } else if (-(2*Float.pi/3) <= angleDiff && angleDiff <= -(Float.pi/3)) {
-        return "left"
+        return "right"
     } else if (-Float.pi/3 <= angleDiff && angleDiff <= -Float.pi/6) {
-        return "slightLeft"
+        return "slightRight"
     } else {
         return "none"
     }
