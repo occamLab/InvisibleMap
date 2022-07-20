@@ -148,6 +148,10 @@ class NavigateGlobalStateSingleton {
 struct NavigateMapView: View {
     //@StateObject var navigateGlobalState = NavigateGlobalState()
     @ObservedObject var navigateGlobalState = NavigateGlobalStateSingleton.shared
+    @ObservedObject var navigation = Navigation()
+    // for testing purposes
+    @State var binaryDirectionKey: String = ""
+    @State var binaryDirection: String = ""
 
     var mapFileName: String
     
@@ -166,15 +170,25 @@ struct NavigateMapView: View {
                         MapNavigateExitButton(mapFileName: mapFileName)
                     }
                 })
-            VStack{
+            VStack {
                 // Show instructions if there are any
                 if navigateGlobalState.instructionWrapper.text != nil {
                     InstructionOverlay(instruction: $navigateGlobalState.instructionWrapper.text)
                         .animation(.easeInOut)
                 }
-                TagDetectionButton(navigateGlobalState: navigateGlobalState)
-                    .environmentObject(InvisibleMapController.shared.mapNavigator)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
+                Text("Direction: \(self.binaryDirection)")
+                HStack {
+                    TagDetectionButton(navigateGlobalState: navigateGlobalState)
+                        .environmentObject(InvisibleMapController.shared.mapNavigator)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                    Button(action: {
+                        self.binaryDirectionKey = navigation.getDirections().binaryDirectionKey
+                        self.binaryDirection = BinaryDirections[binaryDirectionKey]!
+                        print("binary direction updated")
+                    }) {
+                        Text("audio directions")
+                    }
+                }
             }
             .padding()
         }

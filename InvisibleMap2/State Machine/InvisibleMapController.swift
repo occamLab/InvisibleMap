@@ -15,6 +15,7 @@ class InvisibleMapController: AppController {
     
     // Various controllers for handling commands
     public var mapNavigator = MapNavigator()
+    //public var arView = ARView()
     public var arViewer: ARView?
     var navigateViewer: NavigateViewController?
     

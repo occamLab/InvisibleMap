@@ -132,7 +132,7 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
         // Handle error.
         print("Sign in with Apple errored: \(error)")
           
-          // current status: disable signing in anonymously
+          // NOTE: current status - disable signing in anonymously
         /*  Auth.auth().signInAnonymously() { (authResult, error) in
             guard let _ = authResult else {
                 print("Anonymous login error", error!.localizedDescription)

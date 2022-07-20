@@ -55,7 +55,8 @@ public struct DirectionInfo {
                            8: NSLocalizedString("8o'clockDirection", comment: "direction to the user to turn towards the 8 o'clock direction"),
                            9: NSLocalizedString("leftDirection", comment: "Direction to the user to make an approximately 90 degree left turn."),
                            10: NSLocalizedString("10o'clockDirection", comment: "direction to the user to turn towards the 10 o'clock direction"),
-                           11: NSLocalizedString("11o'clockDirection", comment: "direction to the user to turn towards the 11 o'clock direction")]
+                           11: NSLocalizedString("11o'clockDirection", comment: "direction to the user to turn towards the 11 o'clock direction"),
+                           -1: ""]
     
     /// Dictionary of binary (L/R) directions.
     ///
@@ -68,44 +69,54 @@ public struct DirectionInfo {
         "uturn": NSLocalizedString("uTurnDirection", comment: "Direction to the user to turn around"),
         "left": NSLocalizedString("leftDirection", comment: "Direction to the user to make an approximately 90 degree left turn."),
         "slightLeft": NSLocalizedString("slightLeftDirection", comment: "Direction to user to take a slight left turn"),
-        "none": "ERROR"
+        "none": ""
        ]
 
 /// Navigation class that provides direction information based on current camera position and the endpoint position in the mapFrame
-class Navigation {
-    // Note: All positions in mapFrame
-    public var endpointX: Float = ARView().endpointX
-    public var endpointY: Float = ARView().endpointY
-    public var endpointZ: Float = ARView().endpointZ
-    
-    public var nextPointOnPathX: Float = ARView().audioSourceX
-    public var nextPointOnPathZ: Float = ARView().audioSourceZ
-    
-    public var currentCameraPositionX: Float = ARView().currentCameraPosX
-    public var currentCameraPositionY: Float = ARView().currentCameraPosY
-    public var currentCameraPositionZ: Float = ARView().currentCameraPosZ
-    
-    public var angleDiff: Float = ARView().angleDifference
+class Navigation: ObservableObject {
     
     /// Gets the clock direction, binary direction, and distance to endpoint information from the user's current location
-    func getDirections() -> DirectionInfo? {
-        let clockDirectionKey = getClockDirection(angle: angleDiff)
-        let binaryDirectionKey = getBinaryDirection(angle: angleDiff)
-        let distanceToEndpoint = getDistanceToEndpoint(endpointX: endpointX, endpointY: endpointY, endpointZ: endpointZ, currPosX: currentCameraPositionX, currPosY: currentCameraPositionY, currPosZ: currentCameraPositionZ)
+    func getDirections() -> DirectionInfo {
         
-        var direction = DirectionInfo(clockDirectionKey: clockDirectionKey, binaryDirectionKey: binaryDirectionKey, distanceToEndpoint: distanceToEndpoint, angleDiffFromPath: angleDiff)
+        var direction = DirectionInfo(clockDirectionKey: -1, binaryDirectionKey: "none", distanceToEndpoint: 0.0, angleDiffFromPath: 0.0)
         
-        if NavigateGlobalStateSingleton.shared.endPointReached == true {
-            direction.endPointState = .atEndpoint
+        if let arViewer = InvisibleMapController.shared.arViewer {
+            let endpointX = arViewer.endpointX
+            let endpointY = arViewer.endpointY
+            let endpointZ = arViewer.endpointZ
+            
+           // let nextPointOnPathX = arView.audioSourceX
+           // let nextPointOnPathZ = arView.audioSourceZ
+            
+            let currentCameraPositionX = arViewer.currentCameraPosX
+            let currentCameraPositionY = arViewer.currentCameraPosY
+            let currentCameraPositionZ = arViewer.currentCameraPosZ
+                
+            let angleDiff = arViewer.angleDifference
+            
+            let clockDirectionKey = getClockDirection(angle: angleDiff)
+            let binaryDirectionKey = getBinaryDirection(angle: angleDiff)
+            let distanceToEndpoint = getDistanceToEndpoint(endpointX: endpointX, endpointY: endpointY, endpointZ: endpointZ, currPosX: currentCameraPositionX, currPosY: currentCameraPositionY, currPosZ: currentCameraPositionZ)
+            
+            direction = DirectionInfo(clockDirectionKey: clockDirectionKey, binaryDirectionKey: binaryDirectionKey, distanceToEndpoint: distanceToEndpoint, angleDiffFromPath: angleDiff)
+            
+            if NavigateGlobalStateSingleton.shared.endPointReached == true {
+                direction.endPointState = .atEndpoint
+            }
+            else if distanceToEndpoint < InvisibleMapController.shared.mapNavigator.endpointSphere {
+                direction.endPointState = .closeToEndpoint
+            }
+            else {
+                direction.endPointState = .notAtEndpoint
+            }
+            return direction
+        
+        } else {
+            return direction
         }
-        else if distanceToEndpoint < InvisibleMapController.shared.mapNavigator.endpointSphere {
-            direction.endPointState = .closeToEndpoint
-        }
-        else {
-            direction.endPointState = .notAtEndpoint
-        }
-        return direction
     }
+        
+    
 
 }
 
