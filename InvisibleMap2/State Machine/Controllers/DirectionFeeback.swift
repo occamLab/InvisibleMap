@@ -138,19 +138,25 @@ private func getClockDirection(angle: Float) -> Int {
 /// - Parameter angle: angle in radians from straight ahead.
 /// - Returns: `String` that represents the direction the user needs to go
 private func getBinaryDirection(angle: Float) -> String {
-    if (-Float.pi/6 <= angle && angle <= Float.pi/6) {
+    // angle should be between [0, pi] and [0, -pi]
+    var angleDiff = angle
+    if angle > Float.pi {
+        angleDiff = -1 * ((2 * Float.pi) - angle)
+    }
+    
+    if (-Float.pi/6 <= angleDiff && angleDiff <= Float.pi/6) {
         return "straight"
-    } else if (Float.pi/6 <= angle && angle <= Float.pi/3) {
+    } else if (Float.pi/6 <= angleDiff && angleDiff <= Float.pi/3) {
         return "slightRight"
-    } else if (Float.pi/3 <= angle && angle <= (2*Float.pi/3)) {
+    } else if (Float.pi/3 <= angleDiff && angleDiff <= (2*Float.pi/3)) {
         return "right"
-    } else if ((2*Float.pi/3) <= angle && angle <= Float.pi) {
+    } else if ((2*Float.pi/3) <= angleDiff && angleDiff <= Float.pi) {
         return "uturn"
-    } else if (-Float.pi <= angle && angle <= -(2*Float.pi/3)) {
+    } else if (-Float.pi <= angleDiff && angleDiff <= -(2*Float.pi/3)) {
         return "uturn"
-    } else if (-(2*Float.pi/3) <= angle && angle <= -(Float.pi/3)) {
+    } else if (-(2*Float.pi/3) <= angleDiff && angleDiff <= -(Float.pi/3)) {
         return "left"
-    } else if (-Float.pi/3 <= angle && angle <= -Float.pi/6) {
+    } else if (-Float.pi/3 <= angleDiff && angleDiff <= -Float.pi/6) {
         return "slightLeft"
     } else {
         return "none"
