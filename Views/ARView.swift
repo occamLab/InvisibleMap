@@ -37,6 +37,8 @@ protocol ARViewController {
 //}
 
 class ARView: UIViewController {
+    // var for debugging purposes for DirectionFeedback
+    var cosValue: Float = 0.0
     
     /// next point on the map's path; always in front of the current phone position
     var audioSourceX: Float = 0.0
@@ -52,7 +54,7 @@ class ARView: UIViewController {
     var currentCameraPosY: Float = 0.0
     var currentCameraPosZ: Float = 0.0
     
-    /// angle in radians that tells you how off users are from the correct path on the map; 0 radians is when camera is facing in the same direction as path
+    /// angle in radians that tells you how off users are from the correct path on the map; 0 radians is when camera is facing in the same direction as path - var that's updated every 5 AR frames to not make DirectionFeedback less glitchy(?)
     var angleDifference: Float = 0.0
     
     // TODO: make less gross
@@ -527,8 +529,20 @@ extension ARView: ARViewController {
                     let phoneAxisInMapFrame = rootNode.convertVector(phoneAxisInGlobalFrame, to: mapNode)
                     var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneAxisInMapFrame.x, phoneAxisInMapFrame.z)))
                     
-                    // angle between the two vectors that's used to determine how offtrack current phone position is in relative to the map's path in mapFrame
-                    self.angleDifference = acos(volumeScale)
+                    // var for debugging purposes
+                    self.cosValue = volumeScale
+                    
+                 //   if InvisibleMapController.shared.countFrame >= 5 {
+                        // angle between the two vectors that's used to determine how off current phone orientation is in relative to the map's path in mapFrame
+                        if volumeScale < 0 {
+                            // left side of unit circle -> right directions
+                            self.angleDifference = -1 * acos(volumeScale)
+                        }
+                        else {
+                            // right side of unit circle -> left directions
+                            self.angleDifference = acos(volumeScale)
+                        }
+                 //   }
                     
                     volumeScale = acos(volumeScale) / Float.pi 
                     print("volume: \(volumeScale)") // increases off track; decreases at right track -> subtracts it from 1 to have greater volumeScale when on right track
@@ -540,7 +554,8 @@ extension ARView: ARViewController {
                 #endif
             }
         }
-      }
+    }
+    
     
     /// Renders entire path for debugging
     func renderDebugGraph(){

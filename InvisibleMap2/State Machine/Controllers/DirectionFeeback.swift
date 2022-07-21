@@ -2,7 +2,7 @@
 //  DirectionFeeback.swift
 //  InvisibleMap2
 //
-//  Created by Joyce Chung on 7/13/22.
+//  Created by Joyce Chung and Gabby Blake on 7/13/22.
 //  Adapted from Clew Maps' Navigation.swift
 //  Copyright © 2022 Occam Lab. All rights reserved.
 //
@@ -22,30 +22,51 @@ public enum PositionState {
 /// Struct to store information about user's current position relative to path on map
 public struct DirectionInfo {
     /// key of the clock direction that's associated with the description of the angle to next keypoint
-    public var clockDirectionKey: Int
+    var clockDirectionKey: Int
     /// key of the binary direction that's associated with the description of the angle to next keypoint
-    public var binaryDirectionKey: String
+    var binaryDirectionKey: NavigationBinaryDirection
     /// distance in meters from the tag or waypoint destination
-    public var distanceToEndpoint: Float
+    var distanceToEndpoint: Float
     /// angle in radians of the user's current path from the right path in the map
-    public var angleDiffFromPath: Float
-    public var endPointState = PositionState.notAtEndpoint
+    var angleDiffFromPath: Float
+    var endPointState = PositionState.notAtEndpoint
     
     /// Initialize a DirectionInfo Object
-    public init(clockDirectionKey: Int, binaryDirectionKey: String, distanceToEndpoint: Float, angleDiffFromPath: Float) {
+    init(clockDirectionKey: Int, binaryDirectionKey: NavigationBinaryDirection, distanceToEndpoint: Float, angleDiffFromPath: Float) {
         self.clockDirectionKey = clockDirectionKey
         self.binaryDirectionKey = binaryDirectionKey
         self.distanceToEndpoint = distanceToEndpoint
         self.angleDiffFromPath = angleDiffFromPath
     }
 }
+
+    enum NavigationClockDirection {
+        case twelve
+        case one
+        case two
+        case three
+        case four
+        case five
+        case six
+        case seven
+        case eight
+        case nine
+        case ten
+        case eleven
+        case none
+    }
     
     /// Dictionary of clock directions
     ///
     /// * Keys (`Int` from 1 to 12 inclusive): clock position
     /// * Values (`String`): corresponding spoken direction (e.g. "Slight right towards 2 o'clock")
-    public let ClockDirections = [12: NSLocalizedString("straightDirection", comment: "Direction to user to continue moving in forward direction"),
-                           1: NSLocalizedString("1o'clockDirection", comment: "direction to the user to turn towards the 1 o'clock direction"),
+    func clockDirectionToDirectionText(dir: NavigationClockDirection) -> String {
+        switch (dir) {
+        case .twelve:
+            return NSLocalizedString("straightDirection", comment: "Direction to user to continue moving in forward direction"),
+            
+        case .one:
+            return NSLocalizedString("1o'clockDirection", comment: "direction to the user to turn towards the 1 o'clock direction"),
                            2: NSLocalizedString("2o'clockDirection", comment: "direction to the user to turn towards the 2 o'clock direction"),
                            3: NSLocalizedString("rightDirection", comment: "Direction to the user to make an approximately 90 degree right turn."),
                            4: NSLocalizedString("4o'clockDirection", comment: "direction to the user to turn towards the 4 o'clock direction"),
@@ -58,29 +79,46 @@ public struct DirectionInfo {
                            11: NSLocalizedString("11o'clockDirection", comment: "direction to the user to turn towards the 11 o'clock direction"),
                            -1: ""]
     
-    /// Dictionary of binary (L/R) directions.
-    ///
-    /// * Keys (`String`: coresponding to direction
-    /// * Values (`String`): corresponding spoken direction (e.g. "Slight right")
-    public let BinaryDirections = [
-        "straight": NSLocalizedString("straightDirection", comment: "Direction to user to continue moving in forward direction"),
-        "slightRight": NSLocalizedString("slightRightDirection", comment: "Direction to user to take a slight right turn"),
-        "right": NSLocalizedString("rightDirection", comment: "Direction to the user to make an approximately 90 degree right turn."),
-        "uturn": NSLocalizedString("uTurnDirection", comment: "Direction to the user to turn around"),
-        "left": NSLocalizedString("leftDirection", comment: "Direction to the user to make an approximately 90 degree left turn."),
-        "slightLeft": NSLocalizedString("slightLeftDirection", comment: "Direction to user to take a slight left turn"),
-        "none": ""
-       ]
+    enum NavigationBinaryDirection {
+        case straight
+        case slightRight
+        case right
+        case uturn
+        case left
+        case slightLeft
+        case none
+    }
+
+    func binaryDirectionToDirectionText(dir: NavigationBinaryDirection) -> String {
+        switch (dir) {
+        case .straight:
+            return NSLocalizedString("straightDirection", comment: "Direction to user to continue moving in forward direction")
+        case .slightRight:
+            return NSLocalizedString("slightRightDirection", comment: "Direction to user to take a slight right turn")
+        case .right:
+            return NSLocalizedString("rightDirection", comment: "Direction to the user to make an approximately 90 degree right turn.")
+        case .uturn:
+            return NSLocalizedString("uTurnDirection", comment: "Direction to the user to turn around")
+        case .left:
+            return NSLocalizedString("leftDirection", comment: "Direction to the user to make an approximately 90 degree left turn.")
+        case .slightLeft:
+            return NSLocalizedString("slightLeftDirection", comment: "Direction to user to take a slight left turn")
+        case .none:
+            return ""
+        }
+  }
 
 /// Navigation class that provides direction information based on current camera position and the endpoint position in the mapFrame
 class Navigation: ObservableObject {
-    
+    @Published var cosValue: Float = 0.0
     /// Gets the clock direction, binary direction, and distance to endpoint information from the user's current location
     func getDirections() -> DirectionInfo {
-        
-        var direction = DirectionInfo(clockDirectionKey: -1, binaryDirectionKey: "none", distanceToEndpoint: 0.0, angleDiffFromPath: 0.0)
+        // default value in case arViewer doesn't exist which is never the case(?)
+        var direction = DirectionInfo(clockDirectionKey: -1, binaryDirectionKey: .none, distanceToEndpoint: 0.0, angleDiffFromPath: 0.0)
         
         if let arViewer = InvisibleMapController.shared.arViewer {
+            self.cosValue = arViewer.cosValue
+            
             let endpointX = arViewer.endpointX
             let endpointY = arViewer.endpointY
             let endpointZ = arViewer.endpointZ
@@ -115,9 +153,6 @@ class Navigation: ObservableObject {
             return direction
         }
     }
-        
-    
-
 }
 
 /// Determine clock direction from angle in radians, where 0 radians is 12 o'clock.
@@ -137,31 +172,32 @@ private func getClockDirection(angle: Float) -> Int {
 ///
 /// - Parameter angle: angle in radians from straight ahead.
 /// - Returns: `String` that represents the direction the user needs to go
-private func getBinaryDirection(angle: Float) -> String {
+private func getBinaryDirection(angle: Float) -> NavigationBinaryDirection {
     // angle should be between [0, pi] and [0, -pi]
-    var angleDiff = angle
+   /* var angleDiff = angle
     if angle > Float.pi {
         angleDiff = -1 * ((2 * Float.pi) - angle)
-    }
+    } */
     
-    print("angle: \(angle)")
+    print("angle in rad: \(angle)")
+    print("angle in degrees: \(angle * (180/Float.pi))")
     
-    if (-Float.pi/6 <= angleDiff && angleDiff <= Float.pi/6) {
-        return "straight"
-    } else if (Float.pi/6 <= angleDiff && angleDiff <= Float.pi/3) {
-        return "slightLeft"
-    } else if (Float.pi/3 <= angleDiff && angleDiff <= (2*Float.pi/3)) {
-        return "left"
-    } else if ((2*Float.pi/3) <= angleDiff && angleDiff <= Float.pi) {
-        return "uturn"
-    } else if (-Float.pi <= angleDiff && angleDiff <= -(2*Float.pi/3)) {
-        return "uturn"
-    } else if (-(2*Float.pi/3) <= angleDiff && angleDiff <= -(Float.pi/3)) {
-        return "right"
-    } else if (-Float.pi/3 <= angleDiff && angleDiff <= -Float.pi/6) {
-        return "slightRight"
+    if (-Float.pi/6 <= angle && angle <= Float.pi/6) {
+        return .straight
+    } else if (Float.pi/6 <= angle && angle <= Float.pi/3) {
+        return .slightLeft
+    } else if (Float.pi/3 <= angle && angle <= (2*Float.pi/3)) {
+        return .left
+    } else if ((2*Float.pi/3) <= angle && angle <= Float.pi) {
+        return .uturn
+    } else if (-Float.pi <= angle && angle <= -(2*Float.pi/3)) {
+        return .uturn
+    } else if (-(2*Float.pi/3) <= angle && angle <= -(Float.pi/3)) {
+        return .right
+    } else if (-Float.pi/3 <= angle && angle <= -Float.pi/6) {
+        return .slightRight
     } else {
-        return "none"
+        return .none
     }
 }
 
