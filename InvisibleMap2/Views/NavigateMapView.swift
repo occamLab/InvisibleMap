@@ -115,7 +115,7 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
     @ObservedObject var navigation = Navigation()
     @Published var binaryDirectionKey = NavigationBinaryDirection.none
     @Published var binaryDirection: String = ""
-    @Published var clockDirectionKey: Int = -1
+    @Published var clockDirectionKey = NavigationClockDirection.none
     @Published var clockDirection: String = ""
     
     @Published var tagFound: Bool

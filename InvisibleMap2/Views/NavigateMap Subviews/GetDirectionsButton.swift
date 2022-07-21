@@ -23,7 +23,7 @@ struct GetDirectionsButton: View {
             print("binary direction updated")
             
             navigateGlobalState.clockDirectionKey = navigateGlobalState.navigation.getDirections().clockDirectionKey
-            navigateGlobalState.clockDirection = ClockDirections[navigateGlobalState.clockDirectionKey]!
+            navigateGlobalState.clockDirection = clockDirectionToDirectionText(dir: navigateGlobalState.clockDirectionKey)
             
             print("angle - clock direction: \(navigateGlobalState.clockDirection)")
             print("clock direction updated")
