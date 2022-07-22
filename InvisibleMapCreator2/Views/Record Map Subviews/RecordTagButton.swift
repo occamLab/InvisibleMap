@@ -18,13 +18,14 @@ struct RecordTagButton: View {
             if self.mapRecorder.seesTag {
                 self.mapRecorder.previousTagRecordedState = self.mapRecorder.tagRecordingState
                 print("previous tag recording state: \(self.mapRecorder.previousTagRecordedState)")
+                self.mapRecorder.tagRecordingState = true
+                //self.mapRecorder.tagRecordingState.toggle() // toggle between green start and red stop button
                 print("current tag recording state: \(self.mapRecorder.tagRecordingState)")
-                self.mapRecorder.tagRecordingState.toggle() // toggle between green start and red stop button
-                if self.mapRecorder.tagRecordingState {
+                //if self.mapRecorder.tagRecordingState {
                     self.mapRecorder.tagRecordingStartTime = NSDate().timeIntervalSince1970
-                } else {
-                    self.mapRecorder.tagRecordingStartTime = 0.0
-                }
+                //} else {
+                    //self.mapRecorder.tagRecordingStartTime = 0.0
+                //}
                 
             } else {
                 recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, markTagRequested: true)
