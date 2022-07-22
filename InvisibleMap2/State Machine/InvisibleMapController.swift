@@ -120,7 +120,7 @@ class InvisibleMapController: AppController {
     func process(event: InvisibleMapAppState.Event) {
         process(commands: state.handle(event: event))
     }
-    
+   /*
     
     /// Set the direction text based on the current location and direction info.
     ///
@@ -192,7 +192,7 @@ class InvisibleMapController: AppController {
     }
      
     
-    
+  */
     
 } // end of Controller class
 

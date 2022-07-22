@@ -22,7 +22,7 @@ enum InstructionType: Equatable {
             switch self {
                 /*case .findTag: return "Point your camera at a tag \nnearby and press START TAG DETECTION to start navigation."*/
                 case .findTag: return "To start navigation, press START TAG DETECTION and pan your camera until you are notified of a tag detection. Follow the ping sound along the path. The ping will grow quieter the further you face away from the right direction. "
-                case .tagFound: return "Tag detected! In order to stabalize the path, press STOP TAG DETECTION." //Press STOP TAG DETECTION until you reach the next tag."
+                case .tagFound: return "Tag detected! In order to stabilize the path, press STOP TAG DETECTION." //Press STOP TAG DETECTION until you reach the next tag."
                 case .destinationReached: return "You have arrived at your destination!"
                 case .none: return nil
             }
@@ -182,8 +182,10 @@ struct NavigateMapView: View {
             VStack {
                 
                 // for testing purposes; TODO: update text with directions
-                Text("Binary direction: \(navigateGlobalState.binaryDirection)")
-                Text("Clock direction: \(navigateGlobalState.clockDirection)")
+                //Text("Binary direction: \(navigateGlobalState.binaryDirection)")
+                //Text("Clock direction: \(navigateGlobalState.clockDirection)")
+                //let direction = navigateGlobalState.navigation.getDirections()
+                Text("\(binaryDirectionToDirectionText(dir: navigateGlobalState.binaryDirectionKey))")
                 
                 // Show instructions if there are any
                 if navigateGlobalState.instructionWrapper.text != nil {
