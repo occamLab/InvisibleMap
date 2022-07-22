@@ -146,7 +146,7 @@ struct ContentView: View {
                         }) {
                             Image(systemName: "line.horizontal.3")
                                 .imageScale(.large)
-                                .foregroundColor(.black)
+                                .foregroundColor(Color.primary)
                         }
                         .accessibilityLabel(Text("Menu Bar"))
                     )

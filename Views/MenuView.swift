@@ -26,9 +26,9 @@ struct MenuView: View {
                 }) {
                     Image(systemName: "questionmark")
                         .imageScale(.large)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                     Text("Help")
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                         .font(.headline)
                 }
                 .accessibilityLabel(Text("Help button"))
@@ -47,10 +47,11 @@ struct MenuView: View {
                 }) {
                     Image(systemName: "gearshape")
                         .imageScale(.large)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                     Text("Settings")
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                         .font(.headline)
+                    
                 }
                 .accessibilityLabel(Text("Settings button"))
             }
@@ -68,9 +69,9 @@ struct MenuView: View {
                 }) {
                     Image(systemName: "envelope")
                         .imageScale(.large)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                     Text("Give Feedback")
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                         .font(.headline)
                 }
                 .accessibilityLabel(Text("Give feedback button"))
@@ -87,9 +88,9 @@ struct MenuView: View {
                 }) {
                     Image(systemName: "person.circle")
                         .imageScale(.large)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                     Text("User Account")
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                         .font(.headline)
                 }
                 .accessibilityLabel(Text("User Account button"))
@@ -108,9 +109,9 @@ struct MenuView: View {
                 }) {
                     Image(systemName: "arrowshape.turn.up.left")
                         .imageScale(.large)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                     Text("Sign Out")
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
                         .font(.headline)
                 }
                 .accessibilityLabel(Text("Sign out button"))
