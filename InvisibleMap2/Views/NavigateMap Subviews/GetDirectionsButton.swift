@@ -30,7 +30,7 @@ struct GetDirectionsButton: View {
         }) {
             Image(systemName: "paperplane")
                 .imageScale(.large)
-                .foregroundColor(.black)
+                .foregroundColor(Color.primary)
                 .accessibility(label: Text("Get directions button"))
         }
         .buttonStyle(RectangleButtonStyle())

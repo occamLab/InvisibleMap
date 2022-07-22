@@ -25,8 +25,8 @@ class MapNavigator: ObservableObject {
     
     let tagFinder = imageToData()
     
-    /// Tracks whether the user has asked for a tag to be detected
-    @Published var detectTags = false //changed true -> false - don't start detecting tags until user presses start detect tag button on navigate map view
+    /// Tracks whether the user has asked for tags to be detected
+    @Published var detectTags = false
     /// Tracks whether the tag was found after the user asked a tag to be detected
     @Published var seesTag = false
     
@@ -115,15 +115,20 @@ class MapNavigator: ObservableObject {
  
             for i in 0...tagFinder.getNumberOfTags()-1 {
                 let tag = tagFinder.getTagAt(i)
-                tagArray.append(tag)
-                if let map = self.map {
-                    if let _ = map.tagDictionary[Int(tag.number)] {
-                        InvisibleMapController.shared.process(event: .TagFound(tag: tagArray[tagArray.count-1], cameraTransform: cameraTransform))
-                        InvisibleMapController.shared.arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: map.snapTagsToVertical)
+                
+                // if the tag is within a certain range from the current camera position, detect the tag; only detect tags that are nearby for now -> temporary method to stop constant path shifts when multiple tags or tags that are far away are detected
+                if tag.poseData.11 <= 2.5 {
+                    tagArray.append(tag)
+                    if let map = self.map {
+                        if let _ = map.tagDictionary[Int(tag.number)] {
+                            InvisibleMapController.shared.process(event: .TagFound(tag: tagArray[tagArray.count-1], cameraTransform: cameraTransform))
+                            InvisibleMapController.shared.arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: map.snapTagsToVertical)
+                        }
                     }
                 }
             }
         }
+        print(tagArray.map {$0.number})
         return tagArray;
     }
     
