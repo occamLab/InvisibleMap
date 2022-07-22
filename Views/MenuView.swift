@@ -7,11 +7,13 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct MenuView: View {
     @State private var isShowingHelpView = false
     @State private var isShowingSettingsView = false
     @State private var isShowingFeedbackView = false
+    @State private var isShowingUserAccView = false
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -77,6 +79,44 @@ struct MenuView: View {
             .sheet(isPresented: $isShowingFeedbackView) {
                 FeedbackView(showFeedbackView: $isShowingFeedbackView)
             }
+            
+            /// User Account Information
+            HStack {
+                Button(action: {
+                    isShowingUserAccView = true
+                }) {
+                    Image(systemName: "person.circle")
+                        .imageScale(.large)
+                        .foregroundColor(.black)
+                    Text("User Account")
+                        .foregroundColor(.black)
+                        .font(.headline)
+                }
+                .accessibilityLabel(Text("User Account button"))
+            }
+            .padding(.top, 30)
+            .sheet(isPresented: $isShowingUserAccView) {
+                UserAccountView(showUserAccView: $isShowingUserAccView)
+            }
+
+            /// Sign out
+            HStack {
+                Button(action: {
+                    do {
+                        try! Auth.auth().signOut()
+                    }
+                }) {
+                    Image(systemName: "arrowshape.turn.up.left")
+                        .imageScale(.large)
+                        .foregroundColor(.black)
+                    Text("Sign Out")
+                        .foregroundColor(.black)
+                        .font(.headline)
+                }
+                .accessibilityLabel(Text("Sign out button"))
+            }
+            .padding(.top, 30)
+            
             Spacer()
         }
         .padding()

@@ -13,7 +13,6 @@ import FirebaseAuth
 import Firebase
 
 class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
-    
     private var window: UIWindow?
     
     init(window: UIWindow?) {
@@ -58,13 +57,18 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
     @available(iOS 13, *)
     func startSignInWithAppleFlow() {
       let nonce = randomNonceString()
+    print("created random ID name")
       currentNonce = nonce
       let appleIDProvider = ASAuthorizationAppleIDProvider()
+        print("created appleID provider whatever that means")
       let request = appleIDProvider.createRequest()
+        print("created apple ID request")
       request.requestedScopes = [.fullName, .email]
+        print("name and email: \(request.requestedScopes)")
       request.nonce = sha256(nonce)
 
       let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        print("authorization controller: \(authorizationController)")
       authorizationController.delegate = self
       authorizationController.presentationContextProvider = self
       authorizationController.performRequests()
@@ -82,6 +86,7 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        print("good function happening: Sign in with apple id pressed")
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
           guard let nonce = currentNonce else {
             fatalError("Invalid state: A login callback was received, but no login request was sent.")
@@ -122,18 +127,24 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
         return window!
     }
     
+    // when user hits 'Cancel' button in Sign-in pop up or there's an error signing in
       func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         // Handle error.
         print("Sign in with Apple errored: \(error)")
-        Auth.auth().signInAnonymously() { (authResult, error) in
+          
+          // NOTE: current status - disable signing in anonymously
+        /*  Auth.auth().signInAnonymously() { (authResult, error) in
             guard let _ = authResult else {
                 print("Anonymous login error", error!.localizedDescription)
                 return
             }
             print("Successful anonymous login \(String(describing: Auth.auth().currentUser?.uid))")
-            self.transitionToMainApp()
-        }
+            print("user acc status: \(Auth.auth().currentUser?.isAnonymous)")
+         //   try! Auth.auth().signOut()
+           // self.transitionToMainApp()
+          } */
       }
+        
     
     func transitionToMainApp() {
     }

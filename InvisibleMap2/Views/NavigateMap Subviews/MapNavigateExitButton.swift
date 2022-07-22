@@ -19,7 +19,7 @@ struct MapNavigateExitButton: View {
             showCancelConfirmation = true
         }){
             Image(systemName: "xmark")
-                .accessibility(label: Text("Exit Navigation"))
+                .accessibility(label: Text("Exit Navigation button"))
         }
         .buttonStyle(RectangleButtonStyle())
         .alert(isPresented: $showCancelConfirmation) {

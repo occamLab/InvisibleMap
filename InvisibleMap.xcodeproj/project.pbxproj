@@ -111,6 +111,9 @@
 		98A859B8287F50B80017D09A /* DirectionFeeback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A859B7287F50B80017D09A /* DirectionFeeback.swift */; };
 		98A859BF288050440017D09A /* Localizable (en).strings in Resources */ = {isa = PBXBuildFile; fileRef = 98A859BE288050440017D09A /* Localizable (en).strings */; };
 		98A859C0288050440017D09A /* Localizable (en).strings in Resources */ = {isa = PBXBuildFile; fileRef = 98A859BE288050440017D09A /* Localizable (en).strings */; };
+		98A859C22886FBED0017D09A /* UserAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A859C12886FBED0017D09A /* UserAccountView.swift */; };
+		98A859C32886FBED0017D09A /* UserAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A859C12886FBED0017D09A /* UserAccountView.swift */; };
+		98A859CB2889C7530017D09A /* GetDirectionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A859CA2889C7530017D09A /* GetDirectionsButton.swift */; };
 		98BF26A026AF4F9E0076427E /* AppleSignInController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269526AF01F60076427E /* AppleSignInController.swift */; };
 		98BF26A126AF4F9E0076427E /* AuthenticationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */; };
 		98BF26A526B03EAA0076427E /* AppleSignInController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BF269526AF01F60076427E /* AppleSignInController.swift */; };
@@ -196,6 +199,8 @@
 		98A859B7287F50B80017D09A /* DirectionFeeback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionFeeback.swift; sourceTree = "<group>"; };
 		98A859B9287F5BBF0017D09A /* InvisibleMap2Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap2Release.entitlements; sourceTree = "<group>"; };
 		98A859BE288050440017D09A /* Localizable (en).strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = "Localizable (en).strings"; sourceTree = "<group>"; };
+		98A859C12886FBED0017D09A /* UserAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAccountView.swift; sourceTree = "<group>"; };
+		98A859CA2889C7530017D09A /* GetDirectionsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetDirectionsButton.swift; sourceTree = "<group>"; };
 		98BF269526AF01F60076427E /* AppleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInController.swift; sourceTree = "<group>"; };
 		98BF269726AF0A7E0076427E /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
 		98BF269926AF14D50076427E /* InvisibleMap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap.entitlements; sourceTree = "<group>"; };
@@ -378,9 +383,9 @@
 		1F83DB6C273EF8D800D0148F /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				1FE46D7E27644F72001A3812 /* NavigateMap Subviews */,
 				1F83DB74273F081300D0148F /* NavigateMapView.swift */,
 				98E9BE9A2756C104001B5A2B /* SelectPathView.swift */,
+				1FE46D7E27644F72001A3812 /* NavigateMap Subviews */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -404,6 +409,7 @@
 			children = (
 				1FE46D7F27644F93001A3812 /* TagDetectionButton.swift */,
 				98082AC2286CB6AC009E808C /* MapNavigateExitButton.swift */,
+				98A859CA2889C7530017D09A /* GetDirectionsButton.swift */,
 			);
 			path = "NavigateMap Subviews";
 			sourceTree = "<group>";
@@ -493,6 +499,7 @@
 		98211CA028724C6B0027860B /* Menu Subviews */ = {
 			isa = PBXGroup;
 			children = (
+				98A859C12886FBED0017D09A /* UserAccountView.swift */,
 				98211C9D28724C5A0027860B /* HelpView.swift */,
 				98211CA1287258E60027860B /* SettingsView.swift */,
 				98211CA428725A620027860B /* FeedbackView.swift */,
@@ -703,6 +710,7 @@
 				1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */,
 				1FE9717A26FB8AFB00DEB00A /* AppController.swift in Sources */,
 				1FE97193271619F200DEB00A /* Map.swift in Sources */,
+				98A859C22886FBED0017D09A /* UserAccountView.swift in Sources */,
 				98211C9E28724C5B0027860B /* HelpView.swift in Sources */,
 				14995FEA262713EC00A7C78B /* RecordMapView.swift in Sources */,
 				143011F92629D8AF0042FDFC /* AddLocationButton.swift in Sources */,
@@ -722,6 +730,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98A859CB2889C7530017D09A /* GetDirectionsButton.swift in Sources */,
 				98A859B8287F50B80017D09A /* DirectionFeeback.swift in Sources */,
 				1FE9718326FE614700DEB00A /* TagFinder.mm in Sources */,
 				1FE9717B26FB8AFC00DEB00A /* AppController.swift in Sources */,
@@ -745,6 +754,7 @@
 				98211CA3287258E60027860B /* SettingsView.swift in Sources */,
 				1FE971902703AC9600DEB00A /* Map.swift in Sources */,
 				98082AC3286CB6AD009E808C /* MapNavigateExitButton.swift in Sources */,
+				98A859C32886FBED0017D09A /* UserAccountView.swift in Sources */,
 				1F77A36226F2493A0044BE18 /* InvisibleMap2App.swift in Sources */,
 				1F83DB70273EFC0C00D0148F /* ContentView.swift in Sources */,
 				98E9BE992756BAE9001B5A2B /* ViewStructs.swift in Sources */,
@@ -806,7 +816,7 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_ENTITLEMENTS = InvisibleMapCreator2/InvisibleMapCreator2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
@@ -839,7 +849,7 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_ENTITLEMENTS = InvisibleMapCreator2/InvisibleMapCreator2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMapCreator2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
@@ -869,7 +879,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
@@ -901,7 +911,7 @@
 				CODE_SIGN_ENTITLEMENTS = InvisibleMap2/InvisibleMap2Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_ASSET_PATHS = "\"InvisibleMap2/Preview Content\"";
 				DEVELOPMENT_TEAM = 787TUDMR8Q;
 				ENABLE_PREVIEWS = YES;
