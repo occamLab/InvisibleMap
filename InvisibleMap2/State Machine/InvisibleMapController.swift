@@ -19,7 +19,10 @@ class InvisibleMapController: AppController {
     var navigateViewer: NavigateViewController?
     
     // state of whether the current app is in the process of leaving the app
-    var exitingMap = false
+    public var exitingMap = false
+    
+    // counter incremented each time a graph is rendered in a new AR frame
+    public var countFrame: Int = 0
     
     func initialize() {
         InvisibleMapController.shared.arViewer?.initialize()
@@ -72,8 +75,10 @@ class InvisibleMapController: AppController {
                     print("navigation finished")
                 
                 case .PrepareToLeaveMap(let mapFileName):
+                    // stops processing frame in AR Session
                     self.exitingMap = true
-                let timer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { (timer) in
+                    // pauses the app for a split second
+                    let timer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { (timer) in
                         InvisibleMapController.shared.process(event: .ReadyToLeaveMap(mapFileName: mapFileName))
                         }
 
@@ -94,6 +99,7 @@ class InvisibleMapController: AppController {
                         let stops = self.mapNavigator.planPath(from: simd_float3(cameraPos!.x, cameraPos!.y, cameraPos!.z))
                             if let stops = stops {
                                 self.arViewer!.renderGraph(fromStops: stops)
+                                countFrame += 1
                             }
                         }
                 

@@ -25,6 +25,7 @@ class FirebaseManager {
             } else {
                 if let mapData = mapData {
                     map = Map(from: mapData)
+
                     completionHandler(map!)
                 }
             }
@@ -35,6 +36,7 @@ class FirebaseManager {
         var userMapsPath = "maps/"
         if Auth.auth().currentUser != nil {
             userMapsPath = userMapsPath + String(Auth.auth().currentUser!.uid)
+            print("user id - \(String(Auth.auth().currentUser!.uid))")
         }
         let mapsRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference(withPath: userMapsPath)
         return MapDatabase(from: storageRef, with: mapsRef)
@@ -52,6 +54,14 @@ class MapDatabase: ObservableObject {
     init(from storageRef: StorageReference, with mapsRef: DatabaseReference) {
         self.mapsRef = mapsRef
         self.storageRef = storageRef
+        populateMap()
+    }
+    
+    func populateMap() {
+        mapData = []
+        maps = []
+        images = []
+        files = []
         
         // Tracks any addition, change, or removal to the map database
         self.mapsRef.observe(.childAdded) { (snapshot) -> Void in
@@ -68,6 +78,18 @@ class MapDatabase: ObservableObject {
                 self.mapData.remove(at: existingMapIndex)
             }
         }
+    }
+    
+    func updateMapDatabase() {
+        // TODO: repopulate mapsRef, storageRef, files, etc., etc.
+        var userMapsPath = "maps/"
+        if Auth.auth().currentUser != nil {
+            userMapsPath = userMapsPath + String(Auth.auth().currentUser!.uid)
+            print("user id - \(String(Auth.auth().currentUser!.uid))")
+        }
+        // TODO: maybe reduce copy paste code from FirebaseManager
+        mapsRef = Database.database(url: "https://invisible-map-sandbox.firebaseio.com/").reference(withPath: userMapsPath)
+        populateMap()
     }
     
     func processMap(key: String, values: [String: Any]) {

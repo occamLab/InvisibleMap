@@ -114,6 +114,14 @@ enum InstructionType: Equatable {
 
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
 class NavigateGlobalState: ObservableObject, NavigateViewController {
+    
+    // for testing purposes
+    @ObservedObject var navigation = Navigation()
+    @Published var binaryDirectionKey = NavigationBinaryDirection.none
+    @Published var binaryDirection: String = ""
+    @Published var clockDirectionKey = NavigationClockDirection.none
+    @Published var clockDirection: String = ""
+    
     @Published var tagFound: Bool
     @Published var endPointReached: Bool
     @Published var instructionWrapper: InstructionType
@@ -148,9 +156,7 @@ class NavigateGlobalStateSingleton {
     public static var shared = NavigateGlobalState()
 }
 
-
 struct NavigateMapView: View {
-    //@StateObject var navigateGlobalState = NavigateGlobalState()
     @ObservedObject var navigateGlobalState = NavigateGlobalStateSingleton.shared
 
     var mapFileName: String
@@ -169,8 +175,16 @@ struct NavigateMapView: View {
                     ToolbarItem(placement: .navigationBarLeading) {
                         MapNavigateExitButton(mapFileName: mapFileName)
                     }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        GetDirectionsButton()
+                    }
                 })
-            VStack{
+            VStack {
+                
+                // for testing purposes; TODO: update text with directions
+                Text("Binary direction: \(navigateGlobalState.binaryDirection)")
+                Text("Clock direction: \(navigateGlobalState.clockDirection)")
+                
                 // Show instructions if there are any
                 if navigateGlobalState.instructionWrapper.text != nil {
                     InstructionOverlay(instruction: $navigateGlobalState.instructionWrapper.text)

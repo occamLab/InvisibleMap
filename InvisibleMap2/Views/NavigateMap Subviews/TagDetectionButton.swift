@@ -20,7 +20,7 @@ struct TagDetectionButton: View {
             }
         }){
             Text(self.mapNavigator.detectTags ? "Stop Tag Detection" : "Start Tag Detection")
-                .frame(width: 300, height: 60)
+                .frame(width: 300, height: 70)
                 .foregroundColor(.white)
                 .background(
                     RoundedRectangle(cornerRadius: 15)

@@ -37,6 +37,26 @@ protocol ARViewController {
 //}
 
 class ARView: UIViewController {
+    // var for debugging purposes for DirectionFeedback
+    var cosValue: Float = 0.0
+    
+    /// next point on the map's path; always in front of the current phone position
+    var audioSourceX: Float = 0.0
+    var audioSourceZ: Float = 0.0
+    
+    /// position of the endpoint of the path
+    var endpointX: Float = 0.0
+    var endpointY: Float = 0.0
+    var endpointZ: Float = 0.0
+    
+    /// position of current phone/camera
+    var currentCameraPosX: Float = 0.0
+    var currentCameraPosY: Float = 0.0
+    var currentCameraPosZ: Float = 0.0
+    
+    /// angle in radians that tells you how off users are from the correct path on the map; 0 radians is when camera is facing in the same direction as path - var that's updated every 5 AR frames to not make DirectionFeedback less glitchy(?)
+    var angleDifference: Float = 0.0
+    
     // TODO: make less gross
     var pathNodes: [String: (SCNNode, Bool)] = [:]
     let memoryChecker : MemoryChecker = MemoryChecker()
@@ -123,19 +143,17 @@ extension ARView: ARSessionDelegate {
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         #if IS_MAP_CREATOR
             let processingFrame = self.sharedController.mapRecorder.processingFrame
-            //print("processing frame: \(processingFrame)")
-            //this variable is important for Invisible Map not Invisible Map Creator so always make it false
+
             let exitingMap = false
         #else
             //if we are in preparingtoleavemap state then break out of this session
             let processingFrame = self.sharedController.mapNavigator.processingFrame
             let exitingMap = InvisibleMapController.shared.exitingMap
-            //print("Exiting map: \(exitingMap)")
+
         #endif
+        print("Exiting map: \(exitingMap)")
         // start processing frame if frame is not processing yet after 0.1 seconds
-        if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame &&
-            !exitingMap {
-            print("processing frame!")
+        if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame && !exitingMap {
             let scene = SCNMatrix4(frame.camera.transform)
             if let cameraNode = self.cameraNode {
                 cameraNode.transform = scene
@@ -485,36 +503,63 @@ extension ARView: ARViewController {
            // print("vertices.count \(vertices.count)")
             // compare the camera's current position to the destination's position, and if they are close enough, tell users they reached destination
             if let cameraNode = cameraNode, let rootNode = arView?.scene.rootNode, let cameraPosConverted = convertNodeOrigintoMapFrame(node: cameraNode), let endpointVertex = vertices.last {
-                // TODO: factor 0.3 out as a constant somewhere (maybe MapNavigator)
-                if simd_distance(simd_float3(cameraPosConverted), simd_float3(endpointVertex.translation.x, endpointVertex.translation.y, endpointVertex.translation.z)) < 0.3 {
-                    #if !IS_MAP_CREATOR
+                
+                self.endpointX = endpointVertex.translation.x
+                self.endpointY = endpointVertex.translation.y
+                self.endpointZ = endpointVertex.translation.z
+                
+                self.currentCameraPosX = cameraPosConverted.x
+                self.currentCameraPosY = cameraPosConverted.y
+                self.currentCameraPosX = cameraPosConverted.z
+                
+                #if !IS_MAP_CREATOR
+                if simd_distance(simd_float3(cameraPosConverted), simd_float3(endpointVertex.translation.x, endpointVertex.translation.y, endpointVertex.translation.z)) < self.sharedController.mapNavigator.endpointSphere {
                     InvisibleMapController.shared.process(event: .EndpointReached(finalEndpoint: true))
                     NavigateGlobalStateSingleton.shared.endPointReached = true
                     print("Reached endpoint")
-                    #endif
                 } else {
                     // TODO: revisit this to see how to better set the source location
-                    let audioSource = vertices[min(2, vertices.count-1)]  // near the camera's start point
+                    let audioSource = vertices[min(2, vertices.count-1)]  // the point in the map's path in front of current phone position
                     
-                   // print("audio source: \(audioSource)")
-                    print("audio source vector: \(vector2(audioSource.translation.x, audioSource.translation.y))")
-                    print("camera pos vector: \(vector2(cameraPosConverted.x, cameraPosConverted.y))")
-                    
+                    self.audioSourceX = audioSource.translation.x
+                    self.audioSourceZ = audioSource.translation.z
+            
+                    // vector from audioSource to current camera location
                     let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
-                    let phoneZAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
-                    let phoneZAxisInMapFrame = rootNode.convertVector(phoneZAxisInGlobalFrame, to: mapNode)
-                 //   print("direction to Source = camera pos - audio source: \(directionToSource) \(phoneZAxisInMapFrame)")
-                    var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneZAxisInMapFrame.x, phoneZAxisInMapFrame.z)))
-                    volumeScale = acos(volumeScale) / Float.pi
-                    print("volume scale: \(volumeScale)")
+
+                    // vector in phone axis
+                    let phoneAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
+                    let phoneAxisInMapFrame = rootNode.convertVector(phoneAxisInGlobalFrame, to: mapNode)
+                    var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneAxisInMapFrame.x, phoneAxisInMapFrame.z)))
+                    
+                    // var for debugging purposes
+                    self.cosValue = volumeScale
+                    
+                 //   if InvisibleMapController.shared.countFrame >= 5 {
+                        // angle between the two vectors that's used to determine how off current phone orientation is in relative to the map's path in mapFrame
+                        if volumeScale < 0 {
+                            // left side of unit circle -> right directions
+                            self.angleDifference = -1 * acos(volumeScale)
+                        }
+                        else {
+                            // right side of unit circle -> left directions
+                            self.angleDifference = acos(volumeScale)
+                        }
+                 //   }
+                    
+                    volumeScale = acos(volumeScale) / Float.pi 
+                    print("volume: \(volumeScale)") // increases off track; decreases at right track -> subtracts it from 1 to have greater volumeScale when on right track
+
                     volumeScale = 1 - volumeScale
                     volumeScale = pow(volumeScale, 3)
                     self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)
                 //    print("Volume scale: \(volumeScale)")
                 }
+                #endif
             }
         }
-      }
+    }
+    
     
     /// Renders entire path for debugging
     func renderDebugGraph(){

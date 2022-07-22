@@ -90,56 +90,7 @@ enum CreatorAppState: StateType {
         return []
     }
 }
-/*
-enum EditMapState: StateType {
-    
-    // Lower level app stated nested within EditMapState
-    case EditMapScreen
-    case ViewLocations
-    
-    // Initial state upon transitioning into the EditMapState
-    static let initialState: EditMapState.EditMapScreen
-    
-    // All the effectual inputs from the app which EditMapState can react to
-    enum Event {
-        case MapDeleteRequested(mapID: String)
-        case ViewLocationsRequested
-        case DismissLocationsRequested
-    }
-    
-    // Refers to commands defined in CreatorAppState
-    typealias Command = CreatorAppState.Command
-    
-    // In response to an event, EditMapState may emit a command
-    mutating func handle(event: Event) -> [Command] {
-        switch (self, event) {
-        case(.EditMapScreen, .ViewLocationsRequested):
-            self = .ViewLocations
-            return []
-        case(.ViewLocations, .DismissLocationsRequested):
-            self = .EditMapScreen
-            return []
-            
-        default: break
-        }
-        return []
-    }
-}
 
-extension EditMapState.Event {
-    init?(_ event: CreatorAppState.Event) {
-        // Translate between events in CreatorAppState and events in EditMapState
-        switch event {
-            case .ViewLocationsRequested:
-                self = .ViewLocationsRequested
-            case .DismissLocationsRequested:
-                self = .DismissLocationsRequested
-                
-            default: return nil
-        }
-    }
-}
-*/
 enum RecordMapState: StateType {
     // Lower level app states nested within RecordMapState
     case RecordMap

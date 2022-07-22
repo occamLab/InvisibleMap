@@ -12,15 +12,19 @@ import FirebaseAuth
 class AuthListener: ObservableObject {
     init() {
         FirebaseApp.configure()
+        print("Firebase configured")
         Auth.auth().addStateDidChangeListener { auth, user in
             self.objectWillChange.send()
+        print("auth listener listened")
         }
+        print("auth listener created")
     }
 }
 
 struct ContentView: View {
-    @ObservedObject var authListener = AuthListener()
-    @ObservedObject var mapDatabase = FirebaseManager.createMapDatabase()
+    //@Published var signInState = "signed out"
+    @StateObject var authListener = AuthListener()
+    @StateObject var mapDatabase = FirebaseManager.createMapDatabase()
     @State var showMenu = false
     @State var searchText = ""
     @Environment(\.isPresented) private var isPresented
@@ -29,8 +33,15 @@ struct ContentView: View {
     #endif
     
     var body: some View {
+        // if signed out
         if Auth.auth().currentUser == nil {
+            // sign in
             AppleSignInControllerRepresentable()
+                .onReceive(authListener.objectWillChange) {
+                    // update mapDatabase after authListener changes
+                    mapDatabase.updateMapDatabase()
+                    print("received auth alt \(Auth.auth().currentUser?.uid)")
+                }
         }
         else {
             
@@ -115,7 +126,7 @@ struct ContentView: View {
                                 MenuView()
                                     .frame(width: geometry.size.width/2)
                                     .transition(.move(edge: .leading))
-                                    .background(Color.white)
+                                    .background(Color(UIColor.systemBackground))
                             }
                         }
                         .gesture(drag)
@@ -144,7 +155,11 @@ struct ContentView: View {
                     if isPresented {
                         // Do something when first presented.
                     }
-                }
+                }/*.onReceive(authListener.objectWillChange) {
+                  // if user has already signed in: updates mapDatabase again so populates map list twice 
+                    print("again")
+                    mapDatabase.updateMapDatabase()
+                }*/
         
             //    .listStyle(PlainListStyle())
             #if IS_MAP_CREATOR
@@ -152,6 +167,9 @@ struct ContentView: View {
             #else
                 .navigationTitle("Invisible Maps")
             #endif
+
+               
+
         }
     }
 }

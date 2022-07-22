@@ -31,6 +31,8 @@ class AppleSignInController: UIViewController {
         
     @objc private func signInWithApple() {
         authHelper = AuthenticationHelper(window: nil)
+        print("auth helper created")
         authHelper?.startSignInWithAppleFlow()
+        print("auth helper start sign in with apple flow")
     }
 }
