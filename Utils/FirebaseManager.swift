@@ -24,7 +24,8 @@ class FirebaseManager {
                 // Error occurred
             } else {
                 if let mapData = mapData {
-                    map = Map(from: mapData)!
+                    map = Map(from: mapData)
+
                     completionHandler(map!)
                 }
             }

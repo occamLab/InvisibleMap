@@ -111,14 +111,11 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
                 // your request to Apple.
                 print("Received error during sign in: \(error!.localizedDescription)")
                 print("Transitioning to main app with error")
-                self.transitionToMainApp()
                 return
             }
             // User is signed in to Firebase with Apple.
             // ...
             print("Transitioning to main app")
-            self.transitionToMainApp()
-
           }
         }
       }
@@ -131,23 +128,16 @@ class AuthenticationHelper: NSObject, ASAuthorizationControllerDelegate, ASAutho
       func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         // Handle error.
         print("Sign in with Apple errored: \(error)")
-          
-          // NOTE: current status - disable signing in anonymously
-        /*  Auth.auth().signInAnonymously() { (authResult, error) in
-            guard let _ = authResult else {
-                print("Anonymous login error", error!.localizedDescription)
-                return
-            }
-            print("Successful anonymous login \(String(describing: Auth.auth().currentUser?.uid))")
-            print("user acc status: \(Auth.auth().currentUser?.isAnonymous)")
-         //   try! Auth.auth().signOut()
-           // self.transitionToMainApp()
-          } */
+          //startSignInWithAppleFlow()
+//        Auth.auth().signInAnonymously() { (authResult, error) in
+//            guard let _ = authResult else {
+//                print("Anonymous login error", error!.localizedDescription)
+//                return
+//            }
+//            print("Successful anonymous login \(String(describing: Auth.auth().currentUser?.uid))")
+//        }
       }
-        
-    
-    func transitionToMainApp() {
-    }
+
 
 }
 

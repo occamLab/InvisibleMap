@@ -18,8 +18,14 @@ struct RecordTagButton: View {
             if self.mapRecorder.seesTag {
                 self.mapRecorder.previousTagRecordedState = self.mapRecorder.tagRecordingState
                 print("previous tag recording state: \(self.mapRecorder.previousTagRecordedState)")
+                self.mapRecorder.tagRecordingState = true
+                //self.mapRecorder.tagRecordingState.toggle() // toggle between green start and red stop button
                 print("current tag recording state: \(self.mapRecorder.tagRecordingState)")
-                self.mapRecorder.tagRecordingState.toggle() // toggle between green start and red stop button
+                //if self.mapRecorder.tagRecordingState {
+                    self.mapRecorder.tagRecordingStartTime = NSDate().timeIntervalSince1970
+                //} else {
+                    //self.mapRecorder.tagRecordingStartTime = 0.0
+                //}
                 
             } else {
                 recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, markTagRequested: true)
@@ -30,7 +36,7 @@ struct RecordTagButton: View {
                                 .foregroundColor(.white)
                                 .background(
                                     RoundedRectangle(cornerRadius: 15)
-                                        .foregroundColor(!self.mapRecorder.tagRecordingState ? .green : .red) // when at recording state red, stop button shows
+                                        .foregroundColor(.green) // when at recording state red, stop button shows
                                         .opacity(self.mapRecorder.seesTag ? 1 : 0.5))  // changes shade of record tag green button if camera is not detecting tags
         }
         //.disabled(!self.mapRecorder.seesTag)

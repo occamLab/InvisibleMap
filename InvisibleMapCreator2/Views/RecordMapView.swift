@@ -17,6 +17,7 @@ enum InstructionType: Equatable {
     case findTag(startTime: Double)
     case saveLocation(startTime: Double)
     case tagFound(startTime: Double)
+    //case tagRecording(startTime: Double)
     case tagRecorded(startTime: Double)
     case findTagReminder(startTime: Double)
     case recordTagReminder(startTime: Double)
@@ -30,7 +31,8 @@ enum InstructionType: Equatable {
             case .findTag: return "Pan camera to find a tag."  // displayed as initial instructions
             case .saveLocation: return "First tag detected! \nPress START RECORDING TAG and hold phone still then press STOP RECORDING TAG. /nTo add points of interests, press ADD LOCATIONS at any time."  // displayed when 1st tag is found
             case .tagFound: return "Tag detected! \nYou can now record the tag. \nRemember to hold phone still."  // displayed when tags other than 1st tag is found
-            case .tagRecorded: return "Tag was recorded."  // after user records the tag
+            //case .tagRecording: return "Hold phone still." //displayed while tag is being recorded
+            case .tagRecorded: return "Tag was recorded. Move onto the next tag."  // after user records the tag
             case .findTagReminder: return "WARNING: You must find a tag before you can save a location."
             case .recordTagReminder:  return "WARNING: You must first detect a tag to record the tag position."
             case .none: return nil
@@ -42,6 +44,7 @@ enum InstructionType: Equatable {
             case .saveLocation: self = .saveLocation(startTime: NSDate().timeIntervalSince1970)
             case .tagFound: self = .tagFound(startTime: NSDate().timeIntervalSince1970)
             case .findTagReminder: self = .findTagReminder(startTime: NSDate().timeIntervalSince1970)
+                    //case tagRecording: self = .tagRecording(startTime: <#T##Double#>)
             case .tagRecorded: self = .tagRecorded(startTime: NSDate().timeIntervalSince1970)
             case .recordTagReminder: self = .recordTagReminder(startTime: NSDate().timeIntervalSince1970)
             case .none: self = .none
@@ -138,6 +141,7 @@ class RecordGlobalState: ObservableObject, RecordViewController {
     @Published var tagFound: Bool
     @Published var instructionWrapper: InstructionType
     @Published var nodeList: [NodeData]
+    //@Published var TagRecordingStateTimer: Double
 
     init() {
         tagFound = false
@@ -161,13 +165,19 @@ class RecordGlobalState: ObservableObject, RecordViewController {
     func updateLocationList(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
         self.nodeList.append(NodeData(node: node, picture: picture, textNode: textNode, poseId: poseId))
     }
+    
+    /*func tagRecordinginProgress() {
+        
+    }*/
 }
 
 struct RecordMapView: View {
     @StateObject var recordGlobalState = RecordGlobalState()
+    //@StateObject var progress = (InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval) * (1.0 / 3.0)
     
     init() {
-        print("currentUser is \(Auth.auth().currentUser!.uid)")
+        //print("currentUser is \(Auth.auth().currentUser!.uid)")
+        print("Initializing Record Map View!")
     }
     
     var body : some View {
@@ -194,9 +204,15 @@ struct RecordMapView: View {
                     InstructionOverlay(instruction: $recordGlobalState.instructionWrapper.text)
                         .animation(.easeInOut)
                 }
-                RecordTagButton(recordGlobalState: recordGlobalState)
-                    .environmentObject(InvisibleMapCreatorController.shared.mapRecorder)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
+                if InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState {
+                    let progress = (InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval) * (1.0 / 3.0)
+                    CircularProgressView(progress: progress)
+                        .frame(width: 200, height: 200)
+                } else {
+                    RecordTagButton(recordGlobalState: recordGlobalState)
+                        .environmentObject(InvisibleMapCreatorController.shared.mapRecorder)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                }
             }
             .padding()
         }

@@ -167,7 +167,9 @@ struct ContentView: View {
             #else
                 .navigationTitle("Invisible Maps")
             #endif
+
                
+
         }
     }
 }

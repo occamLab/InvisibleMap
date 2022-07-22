@@ -8,6 +8,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import AudioToolbox
 
 // Describes all the instructions that will exist on-screen for the user
 enum InstructionType: Equatable {
@@ -64,8 +65,11 @@ enum InstructionType: Equatable {
             // case stays as .tagFound until frame is processed again when 'Start Tag Detection' is pressed again -> resets seesTag variable depending on reprocessed camera AR frame.
             if !InvisibleMapController.shared.mapNavigator.seesTag {
                 print("tagFound -> none case - camera doesn't see tag so get rid of instruction text field")
+                
                 self = .none
             }
+            // AudioServices-vibrate phone when a tag is found and Tag Detection is on
+            AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
         case .none:
             print("case is none")
             // seesTag is not reset until tag detection starts again
@@ -207,6 +211,12 @@ extension UINavigationController {
         UIToolbar.appearance().standardAppearance = toolbarAppearance
     }
 }
+extension UIDevice {
+    static func vibrate() {
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+    }
+}
+
 
 /*
 struct NavigateMapView_Previews: PreviewProvider {

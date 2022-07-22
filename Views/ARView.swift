@@ -143,11 +143,13 @@ extension ARView: ARSessionDelegate {
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         #if IS_MAP_CREATOR
             let processingFrame = self.sharedController.mapRecorder.processingFrame
+
             let exitingMap = false
         #else
             //if we are in preparingtoleavemap state then break out of this session
             let processingFrame = self.sharedController.mapNavigator.processingFrame
             let exitingMap = InvisibleMapController.shared.exitingMap
+
         #endif
         print("Exiting map: \(exitingMap)")
         // start processing frame if frame is not processing yet after 0.1 seconds
@@ -524,6 +526,7 @@ extension ARView: ARViewController {
             
                     // vector from audioSource to current camera location
                     let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
+
                     // vector in phone axis
                     let phoneAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
                     let phoneAxisInMapFrame = rootNode.convertVector(phoneAxisInGlobalFrame, to: mapNode)
@@ -546,6 +549,7 @@ extension ARView: ARViewController {
                     
                     volumeScale = acos(volumeScale) / Float.pi 
                     print("volume: \(volumeScale)") // increases off track; decreases at right track -> subtracts it from 1 to have greater volumeScale when on right track
+
                     volumeScale = 1 - volumeScale
                     volumeScale = pow(volumeScale, 3)
                     self.audioPlayers["ping"]??.setVolume(volumeScale, fadeDuration: 0)

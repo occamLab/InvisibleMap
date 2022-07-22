@@ -79,6 +79,7 @@ struct MenuView: View {
             .sheet(isPresented: $isShowingFeedbackView) {
                 FeedbackView(showFeedbackView: $isShowingFeedbackView)
             }
+
             
             /// User Account Information
             HStack {
@@ -99,6 +100,7 @@ struct MenuView: View {
                 UserAccountView(showUserAccView: $isShowingUserAccView)
             }
 
+
             /// Sign out
             HStack {
                 Button(action: {
@@ -106,6 +108,7 @@ struct MenuView: View {
                         try! Auth.auth().signOut()
                     }
                 }) {
+
                     Image(systemName: "arrowshape.turn.up.left")
                         .imageScale(.large)
                         .foregroundColor(.black)
@@ -113,7 +116,9 @@ struct MenuView: View {
                         .foregroundColor(.black)
                         .font(.headline)
                 }
+
                 .accessibilityLabel(Text("Sign out button"))
+
             }
             .padding(.top, 30)
             
