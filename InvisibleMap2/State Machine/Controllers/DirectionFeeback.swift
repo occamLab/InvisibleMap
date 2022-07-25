@@ -20,7 +20,7 @@ public enum PositionState {
 }
 
 /// Struct to store information about user's current position relative to path on map
-public struct DirectionInfo {
+public class DirectionInfo {
     /// key of the clock direction that's associated with the description of the angle to next keypoint
     var clockDirectionKey: NavigationClockDirection
     /// key of the binary direction that's associated with the description of the angle to next keypoint

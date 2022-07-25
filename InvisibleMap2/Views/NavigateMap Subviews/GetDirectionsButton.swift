@@ -17,6 +17,7 @@ struct GetDirectionsButton: View {
             print("angle - cos value: \(navigateGlobalState.navigation.cosValue)")
             
             navigateGlobalState.binaryDirectionKey = navigateGlobalState.navigation.getDirections().binaryDirectionKey
+            print("just key: \(navigateGlobalState.binaryDirectionKey)")
             navigateGlobalState.binaryDirection = binaryDirectionToDirectionText(dir: navigateGlobalState.binaryDirectionKey)
             
             print("angle - binary direction: \(navigateGlobalState.binaryDirection)")
@@ -30,7 +31,7 @@ struct GetDirectionsButton: View {
         }) {
             Image(systemName: "paperplane")
                 .imageScale(.large)
-                .foregroundColor(.black)
+                .foregroundColor(Color.primary)
                 .accessibility(label: Text("Get directions button"))
         }
         .buttonStyle(RectangleButtonStyle())
