@@ -152,7 +152,7 @@ extension ARView: ARSessionDelegate {
             let exitingMap = InvisibleMapController.shared.exitingMap
 
         #endif
-        print("Exiting map: \(exitingMap)")
+        //print("Exiting map: \(exitingMap)")
         // start processing frame if frame is not processing yet after 0.1 seconds
         if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame && !exitingMap {
             let scene = SCNMatrix4(frame.camera.transform)

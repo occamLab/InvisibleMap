@@ -141,11 +141,11 @@ class RecordGlobalState: ObservableObject, RecordViewController {
     @Published var tagFound: Bool
     @Published var instructionWrapper: InstructionType
     @Published var nodeList: [NodeData]
-    //@Published var TagRecordingStateTimer: Double
 
     init() {
         tagFound = false
         instructionWrapper = .findTag(startTime: NSDate().timeIntervalSince1970)
+        //instructionWrapper = .findTag
         nodeList = []
         InvisibleMapCreatorController.shared.recordViewer = self
     }
@@ -173,7 +173,7 @@ class RecordGlobalState: ObservableObject, RecordViewController {
 
 struct RecordMapView: View {
     @StateObject var recordGlobalState = RecordGlobalState()
-    //@StateObject var progress = (InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval) * (1.0 / 3.0)
+    
     
     init() {
         //print("currentUser is \(Auth.auth().currentUser!.uid)")
@@ -205,14 +205,14 @@ struct RecordMapView: View {
                         .animation(.easeInOut)
                 }
                 if InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState {
-                    let progress = (InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval) * (1.0 / 3.0)
+                    let progress = min(2,((InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval) * (1.0 / 2.0)))
                     CircularProgressView(progress: progress)
                         .frame(width: 200, height: 200)
-                } else {
-                    RecordTagButton(recordGlobalState: recordGlobalState)
-                        .environmentObject(InvisibleMapCreatorController.shared.mapRecorder)
-                        .frame(maxHeight: .infinity, alignment: .bottom)
                 }
+                RecordTagButton(recordGlobalState: recordGlobalState)
+                    .environmentObject(InvisibleMapCreatorController.shared.mapRecorder)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                
             }
             .padding()
         }

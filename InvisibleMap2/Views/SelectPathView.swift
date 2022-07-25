@@ -23,18 +23,6 @@ struct SelectPathView: View {
                     Spacer()
                     Text("Select a location of interest to navigate to: ")
                         .font(.title2)
-                    // populate list of tag locations of selected map
-                    List {
-                        Text("Tag Locations: ")
-                        ForEach(Array(map.tagDictionary.keys), id: \.self) { location in
-                            NavigationLink(destination: NavigateMapView(mapFileName: mapFileName).onAppear() {
-                                InvisibleMapController.shared.process(event: .PathSelected(locationType: "tag", Id: location))
-                            }) {
-                                Text("\(location)")
-                            }
-                            .navigationBarBackButtonHidden(true)
-                        }
-                    }
                     // populate list of saved locations of interest of selected map
                     List {
                         Text("Saved Locations of Interests: ")
@@ -45,6 +33,18 @@ struct SelectPathView: View {
                             }) {
                                 Text("\(map.waypointDictionary[location]!.id)")
                             }
+                        }
+                    }
+                    // populate list of tag locations of selected map
+                    List {
+                        Text("Tag Locations: ")
+                        ForEach(Array(map.tagDictionary.keys), id: \.self) { location in
+                            NavigationLink(destination: NavigateMapView(mapFileName: mapFileName).onAppear() {
+                                InvisibleMapController.shared.process(event: .PathSelected(locationType: "tag", Id: location))
+                            }) {
+                                Text("\(location)")
+                            }
+                            .navigationBarBackButtonHidden(true)
                         }
                     }
                 }

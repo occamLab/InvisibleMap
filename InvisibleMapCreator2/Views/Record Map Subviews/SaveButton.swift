@@ -7,9 +7,11 @@
 //
 
 import SwiftUI
+import AudioToolbox
 
 struct SaveButton: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode> // Tracks whether the RecordMap screen is being presented
+    @State private var showEmptyMapNameWarning = false
 
     var body: some View {
         Button(action: {
@@ -19,6 +21,11 @@ struct SaveButton: View {
                 .accessibility(label: Text("Save Map"))
         }
         .buttonStyle(RectangleButtonStyle())
+        .alert("Error!\nYou must enter a valid map name.", isPresented: $showEmptyMapNameWarning) {
+                    Button("OK", role: .cancel) {
+                        alert()
+                    }
+        }
     }
 }
 
@@ -31,9 +38,19 @@ extension SaveButton { // Creates an alert with a textfield (functionality curre
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: "Save", style: .default) { (action: UIAlertAction) in
             if let text = alert.textFields?.first?.text {
-                let textNoSlash = text.replacingOccurrences(of: "/", with: "-")
-                InvisibleMapCreatorController.shared.process(event: .SaveMapRequested(mapName:  textNoSlash)) // Tells the state machine to save the map
-                self.mode.wrappedValue.dismiss() 
+                //ensure that valid map name is entered
+                if !text.isEmptyOrWhitespace() {
+                    let textNoSlash = text.replacingOccurrences(of: "/", with: "-")
+                    InvisibleMapCreatorController.shared.process(event: .SaveMapRequested(mapName:  textNoSlash)) // Tells the state machine to save the map
+                    self.mode.wrappedValue.dismiss()
+                }
+                else {
+                    //vibrate phone and tell user to enter a valid name
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.error)
+                    self.showEmptyMapNameWarning = true
+                    
+                }
             }
         })
         showAlert(alert: alert)
@@ -76,6 +93,18 @@ extension SaveButton { // Creates an alert with a textfield (functionality curre
         return controller
     }
 }
+extension String {
+    func isEmptyOrWhitespace() -> Bool {
+        
+        // Check empty string
+        if self.isEmpty {
+            return true
+        }
+        // Trim and check empty string
+        return (self.trimmingCharacters(in: .whitespaces) == "")
+    }
+}
+
 
 struct SaveButton_Previews: PreviewProvider {
     static var previews: some View {

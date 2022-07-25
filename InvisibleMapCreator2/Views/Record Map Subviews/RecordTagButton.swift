@@ -23,9 +23,6 @@ struct RecordTagButton: View {
                 print("current tag recording state: \(self.mapRecorder.tagRecordingState)")
                 //if self.mapRecorder.tagRecordingState {
                     self.mapRecorder.tagRecordingStartTime = NSDate().timeIntervalSince1970
-                //} else {
-                    //self.mapRecorder.tagRecordingStartTime = 0.0
-                //}
                 
             } else {
                 recordGlobalState.instructionWrapper.transition(tagFound: recordGlobalState.tagFound, markTagRequested: true)
@@ -36,8 +33,8 @@ struct RecordTagButton: View {
                                 .foregroundColor(.white)
                                 .background(
                                     RoundedRectangle(cornerRadius: 15)
-                                        .foregroundColor(.green) // when at recording state red, stop button shows
-                                        .opacity(self.mapRecorder.seesTag ? 1 : 0.5))  // changes shade of record tag green button if camera is not detecting tags
+                                        .foregroundColor(.green)
+                                        .opacity((self.mapRecorder.seesTag && !self.mapRecorder.tagRecordingState) ? 1 : 0.5))  // only "clickable"/full opacity if a tag is seen and not already in tag recording state
         }
         //.disabled(!self.mapRecorder.seesTag)
     }

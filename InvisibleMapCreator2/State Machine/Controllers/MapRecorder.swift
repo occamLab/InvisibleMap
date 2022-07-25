@@ -84,7 +84,6 @@ class MapRecorder: MapRecorderController, ObservableObject {
             self.pendingLocation = nil
             self.pendingNode = nil
         }
-        print("Running \(poseId)")
     }
     
     /// Add new planes and update existing planes
@@ -191,12 +190,10 @@ extension MapRecorder {
                 }
                 if self.tagRecordingState && self.seesTag {
                     self.tagData.append(arTags)
-                    //self.TagRecordingStateTimer = NSDate().timeIntervalSince1970
                     
                     let currentTime = NSDate().timeIntervalSince1970
                     self.tagRecordingInterval = currentTime - self.tagRecordingStartTime
-                    print("tag record interval: \(self.tagRecordingInterval * (1.0 / 3.0))")
-                    if self.tagRecordingInterval > 3 {
+                    if self.tagRecordingInterval > 2 {
                         self.previousTagRecordedState = self.tagRecordingState
                         self.tagRecordingState = false
                         self.tagRecordingInterval = 0.0

@@ -12,9 +12,16 @@ import AudioToolbox
 
 // Describes all the instructions that will exist on-screen for the user
 enum InstructionType: Equatable {
+    /*
     case findTag(startTime: Double)  // initial instructions when navigate map screen is opened
     case tagFound(startTime: Double)  // pops up each time a tag is found during navigation
     case destinationReached(startTime: Double)  // feedback that user has reached their endpoint
+    case none  // when there are no instructions/feedback to display
+     */
+    
+    case findTag  // initial instructions when navigate map screen is opened
+    case tagFound  // pops up each time a tag is found during navigation
+    case destinationReached  // feedback that user has reached their endpoint
     case none  // when there are no instructions/feedback to display
 
     var text: String? {
@@ -30,14 +37,20 @@ enum InstructionType: Equatable {
         // Set start times for each instruction text so that it shows on the screen for a set amount of time (set in transition func).
         set {
             switch self {
+                /*
                 case .findTag: self = .findTag(startTime: NSDate().timeIntervalSince1970)
                 case .tagFound: self = .tagFound(startTime: NSDate().timeIntervalSince1970)
                 case .destinationReached: self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
                 case .none: self = .none
+                 */
+                case .findTag: self = .findTag
+                case .tagFound: self = .tagFound
+                case .destinationReached: self = .destinationReached
+                case .none: self = .none
             }
         }
     }
-    
+    /*
     // To get start time of when the instructions were displayed
     func getStartTime() -> Double {
         switch self {
@@ -48,6 +61,7 @@ enum InstructionType: Equatable {
             return -1
         }
     }
+     */
     
     // Function to transition from one instruction text field to another; when to display instructions/feedback text and to control how long it stays on screen
     mutating func transition(tagFound: Bool, endPointReached: Bool = false) {
@@ -59,7 +73,8 @@ enum InstructionType: Equatable {
             // when first tag is found -> tagFound
             if tagFound {
                 print("switch instructions from findTag to tagFound after camera finds the first tag")
-                self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+                //self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+                self = .tagFound
             }
         case .tagFound:
             // case stays as .tagFound until frame is processed again when 'Start Tag Detection' is pressed again -> resets seesTag variable depending on reprocessed camera AR frame.
@@ -74,9 +89,11 @@ enum InstructionType: Equatable {
             print("case is none")
             // seesTag is not reset until tag detection starts again
             if InvisibleMapController.shared.mapNavigator.seesTag {
-                self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+                //self = .tagFound(startTime: NSDate().timeIntervalSince1970)
+                self = .tagFound
             } else if endPointReached {
-                self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
+                //self = .destinationReached(startTime: NSDate().timeIntervalSince1970)
+                self = .destinationReached
             }
         case .destinationReached:
             print("case is destination reached")
@@ -96,7 +113,7 @@ enum InstructionType: Equatable {
                 print("text state: \(instructions)")
                 UIAccessibility.post(notification: .announcement, argument: instructions)
             }
-        } else {
+        }/* else {
             let currentTime = NSDate().timeIntervalSince1970
             // time that instructions stay on screen
             print("current time: \(currentTime)")
@@ -106,9 +123,10 @@ enum InstructionType: Equatable {
             if currentTime - self.getStartTime() > 12 {
                 self = .none
             }
+          */
         }
     }
-}
+
 
 
 
@@ -129,7 +147,7 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
     init() {
         tagFound = false
         endPointReached = false 
-        instructionWrapper = .findTag(startTime: NSDate().timeIntervalSince1970)
+        instructionWrapper = .findTag
         InvisibleMapController.shared.navigateViewer = self
     }
     
