@@ -123,6 +123,8 @@ public class DirectionInfo {
 /// Navigation class that provides direction information based on current camera position and the endpoint position in the mapFrame
 class Navigation: ObservableObject {
     @Published var cosValue: Float = 0.0
+    @Published var sinValue: Float = 0.0
+    
     /// Gets the clock direction, binary direction, and distance to endpoint information from the user's current location
     func getDirections() -> DirectionInfo {
         // default value in case arViewer doesn't exist which is never the case(?)
@@ -130,6 +132,7 @@ class Navigation: ObservableObject {
         
         if let arViewer = InvisibleMapController.shared.arViewer {
             self.cosValue = arViewer.cosValue
+            self.sinValue = arViewer.sinValue
             
             let endpointX = arViewer.endpointX
             let endpointY = arViewer.endpointY

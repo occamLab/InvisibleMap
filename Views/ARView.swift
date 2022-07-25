@@ -39,6 +39,7 @@ protocol ARViewController {
 class ARView: UIViewController {
     // var for debugging purposes for DirectionFeedback
     var cosValue: Float = 0.0
+    var sinValue: Float = 0.0
     
     /// next point on the map's path; always in front of the current phone position
     var audioSourceX: Float = 0.0
@@ -527,17 +528,29 @@ extension ARView: ARViewController {
                     // vector from audioSource to current camera location
                     let directionToSource = vector2(cameraPosConverted.x, cameraPosConverted.z) - vector2(audioSource.translation.x, audioSource.translation.z)
 
-                    // vector in phone axis
-                    let phoneAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
-                    let phoneAxisInMapFrame = rootNode.convertVector(phoneAxisInGlobalFrame, to: mapNode)
-                    var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneAxisInMapFrame.x, phoneAxisInMapFrame.z)))
+                    // vector in phone Z-axis
+                    let phoneZAxisInGlobalFrame = SCNVector3(x: cameraNode.transform.m31, y: cameraNode.transform.m32, z: cameraNode.transform.m33)
+                    let phoneZAxisInMapFrame = rootNode.convertVector(phoneZAxisInGlobalFrame, to: mapNode)
+                    var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneZAxisInMapFrame.x, phoneZAxisInMapFrame.z)))
                     
                     // var for debugging purposes
                     self.cosValue = volumeScale
+                    if self.cosValue < 0 {
+                        print("cos value: negative")
+                    } else {
+                        print("cos value: positive")
+                    }
+                    self.sinValue = tan(simd_cross(simd_normalize(directionToSource), simd_normalize(vector2(phoneZAxisInMapFrame.x, phoneZAxisInMapFrame.z))))
+                    if self.sinValue < 0 {
+                        print("sin value: negative")
+                    } else {\
+                        print("sin value: positive")
+                    }
+                    //atan 2
                     
                  //   if InvisibleMapController.shared.countFrame >= 5 {
                         // angle between the two vectors that's used to determine how off current phone orientation is in relative to the map's path in mapFrame
-                        if volumeScale < 0 {
+                    if self.sinValue > 0 {
                             // left side of unit circle -> right directions
                             self.angleDifference = -1 * acos(volumeScale)
                         }
