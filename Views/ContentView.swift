@@ -12,12 +12,9 @@ import FirebaseAuth
 class AuthListener: ObservableObject {
     init() {
         FirebaseApp.configure()
-        print("Firebase configured")
         Auth.auth().addStateDidChangeListener { auth, user in
             self.objectWillChange.send()
-        print("auth listener listened")
         }
-        print("auth listener created")
     }
 }
 
@@ -40,11 +37,10 @@ struct ContentView: View {
                 .onReceive(authListener.objectWillChange) {
                     // update mapDatabase after authListener changes
                     mapDatabase.updateMapDatabase()
-                    print("received auth alt \(Auth.auth().currentUser?.uid)")
+                    //print("received auth alt \(Auth.auth().currentUser?.uid)")
                 }
         }
         else {
-            
             //menu drag in, drag out feature
             let drag = DragGesture()
                 .onEnded {

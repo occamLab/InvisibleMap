@@ -513,7 +513,7 @@ extension ARView: ARViewController {
                 self.currentCameraPosY = cameraPosConverted.y
                 self.currentCameraPosX = cameraPosConverted.z
                 
-                #if !IS_MAP_CREATOR
+                #if !IS_MAP_CREATOR3
                 if simd_distance(simd_float3(cameraPosConverted), simd_float3(endpointVertex.translation.x, endpointVertex.translation.y, endpointVertex.translation.z)) < self.sharedController.mapNavigator.endpointSphere {
                     InvisibleMapController.shared.process(event: .EndpointReached(finalEndpoint: true))
                     NavigateGlobalStateSingleton.shared.endPointReached = true

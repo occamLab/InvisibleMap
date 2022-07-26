@@ -93,7 +93,6 @@ class Map {
                 closestNode = node.key
             }
         }
-        print("closest Node \(closestNode) minDist \(minDist)")
         return closestNode
     }
     

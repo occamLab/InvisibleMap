@@ -202,8 +202,9 @@ struct NavigateMapView: View {
                 // for testing purposes; TODO: update text with directions
                 //Text("Binary direction: \(navigateGlobalState.binaryDirection)")
                 //Text("Clock direction: \(navigateGlobalState.clockDirection)")
-                //let direction = navigateGlobalState.navigation.getDirections()
-                Text("\(binaryDirectionToDirectionText(dir: navigateGlobalState.binaryDirectionKey))")
+                let direction = binaryDirectionToDirectionText(dir: navigateGlobalState.binaryDirectionKey)
+                Text("\(direction)")
+                InvisibleMapController.shared.setDirectionText(direction: navigateGlobalState.getDirections())
                 
                 // Show instructions if there are any
                 if navigateGlobalState.instructionWrapper.text != nil {

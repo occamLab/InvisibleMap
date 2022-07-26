@@ -13,10 +13,23 @@ class InvisibleMapController: AppController {
     public static var shared = InvisibleMapController()
     private var state = InvisibleMapAppState.initialState
     
+    public var navigateGlobalState = NavigateGlobalStateSingleton.shared
+
+    
     // Various controllers for handling commands
     public var mapNavigator = MapNavigator()
     public var arViewer: ARView?
     var navigateViewer: NavigateViewController?
+    
+    // Variable for annoouncing commands
+    /// When VoiceOver is not active, we use AVSpeechSynthesizer for speech feedback
+    let synth = AVSpeechSynthesizer()
+    
+    /// The announcement that is currently being read.  If this is nil, that implies nothing is being read
+    var currentAnnouncement: String?
+    
+    /// The announcement that should be read immediately after this one finishes
+    var nextAnnouncement: String?
     
     // state of whether the current app is in the process of leaving the app
     public var exitingMap = false
@@ -120,7 +133,7 @@ class InvisibleMapController: AppController {
     func process(event: InvisibleMapAppState.Event) {
         process(commands: state.handle(event: event))
     }
-   /*
+   
     
     /// Set the direction text based on the current location and direction info.
     ///
@@ -128,37 +141,22 @@ class InvisibleMapController: AppController {
     ///   - currentLocation: the current location of the device
     ///   - direction: the direction info struct (e.g., as computed by the `Navigation` class)
     ///   - displayDistance: a Boolean that indicates whether the distance to the net keypoint should be displayed (true if it should be displayed, false otherwise)
-    func setDirectionText(currentLocation: LocationInfo, direction: DirectionInfo, displayDistance: Bool) {
-        guard let nextKeypoint = RouteManager.shared.nextKeypoint else {
-            return
-        }
+    func setDirectionText(direction: DirectionInfo) {
+        
         // Set direction text for text label and VoiceOver
-        let xzNorm = sqrtf(powf(currentLocation.x - nextKeypoint.location.x, 2) + powf(currentLocation.z - nextKeypoint.location.z, 2))
-        let slope = (nextKeypoint.location.y - prevKeypointPosition.y) / xzNorm
-        let yDistance = abs(nextKeypoint.location.y - prevKeypointPosition.y)
+        // let xzNorm = sqrtf(powf(currentLocation.x - nextKeypoint.location.x, 2) + powf(currentLocation.z - nextKeypoint.location.z, 2))
+        // let slope = (nextKeypoint.location.y - prevKeypointPosition.y) / xzNorm
+        // let yDistance = abs(nextKeypoint.location.y - prevKeypointPosition.y)
         var dir = ""
         
-        if yDistance > 1 && slope > 0.3 { // Go upstairs
+        // normal directions
+        var hapticFeedback = true
             if(hapticFeedback) {
-                dir += "\(Directions[direction.hapticDirection]!)" + NSLocalizedString("climbStairsDirection", comment: "Additional directions given to user discussing climbing stairs")
+                dir += self.navigateGlobalState.binaryDirection
             } else {
-                dir += "\(Directions[direction.clockDirection]!)" + NSLocalizedString(" and proceed upstairs", comment: "Additional directions given to user telling them to climb stairs")
+                dir += self.navigateGlobalState.binaryDirection
             }
-            updateDirectionText(dir, distance: 0, displayDistance: false)
-        } else if yDistance > 1 && slope < -0.3 { // Go downstairs
-            if(hapticFeedback) {
-                dir += "\(Directions[direction.hapticDirection]!)\(NSLocalizedString("descendStairsDirection" , comment: "This is a direction which instructs the user to descend stairs"))"
-            } else {
-                dir += "\(Directions[direction.clockDirection]!)\(NSLocalizedString("descendStairsDirection" , comment: "This is a direction which instructs the user to descend stairs"))"
-            }
-            updateDirectionText(dir, distance: direction.distance, displayDistance: false)
-        } else { // normal directions
-            if(hapticFeedback) {
-                dir += "\(Directions[direction.hapticDirection]!)"
-            } else {
-                dir += "\(Directions[direction.clockDirection]!)"
-            }
-            updateDirectionText(dir, distance: direction.distance, displayDistance:  displayDistance)
+            updateDirectionText(dir)
         }
     }
     
@@ -169,9 +167,10 @@ class InvisibleMapController: AppController {
     ///   - description: the direction text to display (e.g., may include the direction to turn)
     ///   - distance: the distance (expressed in meters)
     ///   - displayDistance: a Boolean that indicates whether to display the distance (true means display distance)
-    func updateDirectionText(_ description: String, distance: arViewer?., displayDistance: Bool) {
-        let distanceToDisplay = roundToTenths(distance * unitConversionFactor[defaultUnit]!)
+    func updateDirectionText(_ description: String) {
+        
         var altText = description
+        /*
         if (displayDistance) {
             if defaultUnit == 0 || distanceToDisplay >= 10 {
                 // don't use fractional feet or for higher numbers of meters (round instead)
@@ -181,18 +180,19 @@ class InvisibleMapController: AppController {
                 altText += " " + NSLocalizedString("and walk", comment: "this text is presented when getting directions.  It is placed between a direction of how to turn and a distance to travel") + " \(distanceToDisplay)" + unitText[defaultUnit]!
             }
         }
+         
         if !remindedUserOfOffsetAdjustment && adjustOffset {
             altText += ". " + NSLocalizedString("adjustOffsetReminderAnnouncement", comment: "This is the announcement which is spoken after starting navigation if the user has enabled the Correct Offset of Phone / Body option.")
             remindedUserOfOffsetAdjustment = true
         }
         if case .navigatingRoute = state {
             logger.logSpeech(utterance: altText)
-        }
+        } */
         AnnouncementManager.shared.announce(announcement: altText)
     }
      
     
-  */
+  
     
 } // end of Controller class
 
