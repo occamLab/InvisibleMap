@@ -520,8 +520,15 @@ extension ARView: ARViewController {
                     print("Reached endpoint")
                 } else {
                     // TODO: revisit this to see how to better set the source location
-                    let audioSource = vertices[min(2, vertices.count-1)]  // the point in the map's path in front of current phone position
-                    
+                    let startVertexSearchIndex = min(2, vertices.count-1)
+                    var audioSource = vertices[startVertexSearchIndex]  // the point in the map's path in front of current phone position
+
+                    for v in vertices[startVertexSearchIndex...] {
+                        if simd_length(simd_float3(v.translation.x, v.translation.y, v.translation.z) - simd_float3(cameraPosConverted.x, cameraPosConverted.y, cameraPosConverted.z)) > 2.0 {
+                            audioSource = v
+                            break
+                        }
+                    }
                     self.audioSourceX = audioSource.translation.x
                     self.audioSourceZ = audioSource.translation.z
             
@@ -533,31 +540,23 @@ extension ARView: ARViewController {
                     let phoneZAxisInMapFrame = rootNode.convertVector(phoneZAxisInGlobalFrame, to: mapNode)
                     var volumeScale = simd_dot(simd_normalize(directionToSource), simd_normalize(vector2(phoneZAxisInMapFrame.x, phoneZAxisInMapFrame.z)))
                     
-                    // var for debugging purposes
-                    self.cosValue = volumeScale
-                    if self.cosValue < 0 {
-                        print("cos value: negative")
-                    } else {
-                        print("cos value: positive")
-                    }
-                    self.sinValue = tan(simd_cross(simd_normalize(directionToSource), simd_normalize(vector2(phoneZAxisInMapFrame.x, phoneZAxisInMapFrame.z))))
-                    if self.sinValue < 0 {
-                        print("sin value: negative")
-                    } else {\
-                        print("sin value: positive")
-                    }
+
+                    //get angle between directionToSource vector and phone Z-axis vector to know alignment
+                    let w1 = directionToSource.x
+                    let w2 = directionToSource.y
+                    
+                    let v1 = phoneZAxisInMapFrame.x
+                    let v2 = phoneZAxisInMapFrame.z
+                    
+                    //self.angleDifference = angleDiff(atan2(w1, w2), atan2(v1, v2))
+                    
+                    self.angleDifference = atan2((w2*v1 - w1*v2), (w1*v1 + w2*v2))
+                    print("directionToSource \(w1) \(w2)")
+                    print("angle: \(self.angleDifference * (180/Float.pi))")// convert from radians to degrees
                     //atan 2
                     
                  //   if InvisibleMapController.shared.countFrame >= 5 {
                         // angle between the two vectors that's used to determine how off current phone orientation is in relative to the map's path in mapFrame
-                    if self.sinValue > 0 {
-                            // left side of unit circle -> right directions
-                            self.angleDifference = -1 * acos(volumeScale)
-                        }
-                        else {
-                            // right side of unit circle -> left directions
-                            self.angleDifference = acos(volumeScale)
-                        }
                  //   }
                     
                     volumeScale = acos(volumeScale) / Float.pi 

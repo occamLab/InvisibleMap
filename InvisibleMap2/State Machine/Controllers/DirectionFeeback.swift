@@ -232,20 +232,23 @@ private func getBinaryDirection(angle: Float) -> NavigationBinaryDirection {
     print("angle in rad: \(angle)")
     print("angle in degrees: \(angle * (180/Float.pi))")
     
-    if (-Float.pi/6 <= angle && angle <= Float.pi/6) {
+    if (abs(angle) < Float.pi/6) {
         return .straight
-    } else if (Float.pi/6 <= angle && angle <= Float.pi/3) {
-        return .slightLeft
-    } else if (Float.pi/3 <= angle && angle <= (2*Float.pi/3)) {
-        return .left
-    } else if ((2*Float.pi/3) <= angle && angle <= Float.pi) {
-        return .uturn
-    } else if (-Float.pi <= angle && angle <= -(2*Float.pi/3)) {
-        return .uturn
-    } else if (-(2*Float.pi/3) <= angle && angle <= -(Float.pi/3)) {
-        return .right
-    } else if (-Float.pi/3 <= angle && angle <= -Float.pi/6) {
+    }
+    if (Float.pi/6 <= angle && angle < Float.pi/3) {
         return .slightRight
+    }
+    if (-Float.pi/3 < angle && angle <= -Float.pi/6) {
+        return .slightLeft
+    }
+    if (Float.pi/3 <= angle && angle <= (3*Float.pi/4)) {
+        return .right
+    }
+    if (-(3*Float.pi/4) <= angle && angle <= -(Float.pi/3)) {
+        return .left
+    }
+    if (abs(angle) > (3*Float.pi/4)) {
+        return .uturn
     } else {
         return .none
     }
