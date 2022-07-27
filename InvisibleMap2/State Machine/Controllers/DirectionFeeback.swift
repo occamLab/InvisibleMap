@@ -153,7 +153,7 @@ class Navigation: ObservableObject {
             
             direction = DirectionInfo(clockDirectionKey: clockDirectionKey, binaryDirectionKey: binaryDirectionKey, distanceToEndpoint: distanceToEndpoint, angleDiffFromPath: angleDiff)
             
-            if NavigateGlobalStateSingleton.shared.endPointReached == true {
+            if NavigateGlobalState.shared.endPointReached == true {
                 direction.endPointState = .atEndpoint
             }
             else if distanceToEndpoint < InvisibleMapController.shared.mapNavigator.endpointSphere {

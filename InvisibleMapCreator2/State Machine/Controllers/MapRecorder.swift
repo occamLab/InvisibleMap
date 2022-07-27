@@ -193,6 +193,7 @@ extension MapRecorder {
                     
                     let currentTime = NSDate().timeIntervalSince1970
                     self.tagRecordingInterval = currentTime - self.tagRecordingStartTime
+                    print("tag recording interval: \(self.tagRecordingInterval)")
                     if self.tagRecordingInterval > 2 {
                         self.previousTagRecordedState = self.tagRecordingState
                         self.tagRecordingState = false

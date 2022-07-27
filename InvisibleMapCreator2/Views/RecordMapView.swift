@@ -29,10 +29,10 @@ enum InstructionType: Equatable {
         get {
             switch self {
             case .findTag: return "Pan camera to find a tag."  // displayed as initial instructions
-            case .saveLocation: return "First tag detected! \nPress START RECORDING TAG and hold phone still then press STOP RECORDING TAG. /nTo add points of interests, press ADD LOCATIONS at any time."  // displayed when 1st tag is found
+            case .saveLocation: return "First tag detected! \nPress START RECORDING TAG and hold phone still for two seconds to record tag. /nTo add points of interests, press ADD LOCATIONS at any time."  // displayed when 1st tag is found
             case .tagFound: return "Tag detected! \nYou can now record the tag. \nRemember to hold phone still."  // displayed when tags other than 1st tag is found
             //case .tagRecording: return "Hold phone still." //displayed while tag is being recorded
-            case .tagRecorded: return "Tag was recorded. Move onto the next tag."  // after user records the tag
+            case .tagRecorded: return "Tag was recorded. Move on to the next tag."  // after user records the tag
             case .findTagReminder: return "WARNING: You must find a tag before you can save a location."
             case .recordTagReminder:  return "WARNING: You must first detect a tag to record the tag position."
             case .none: return nil
@@ -64,6 +64,7 @@ enum InstructionType: Equatable {
     //Function to transition from one instruction text field to another
     // tagFound -> true if first tag was found, false otherwise
     mutating func transition(tagFound: Bool, locationRequested: Bool = false, markTagRequested: Bool = false) {
+        print("instruction: \(self)")
         let previousInstruction = self
         switch self {
         case .findTag:
@@ -120,10 +121,22 @@ enum InstructionType: Equatable {
             }
         } else {
             let currentTime = NSDate().timeIntervalSince1970
-            // time that instructions stay on screen
-            if currentTime - self.getStartTime() > 8 {
-                self = .none
+            if InvisibleMapCreatorController.shared.mapRecorder.tagWasRecorded {
+                // time that instructions stay on screen
+                if currentTime - self.getStartTime() > 3 {
+                    InvisibleMapCreatorController.shared.mapRecorder.previousTagRecordedState = InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState
+                    InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState = false
+                    self = .none
+                    print()
+                }
             }
+            else {
+                // time that instructions stay on screen
+                if currentTime - self.getStartTime() > 8 {
+                    self = .none
+                }
+            }
+            
         }
     }
 }
@@ -205,7 +218,7 @@ struct RecordMapView: View {
                         .animation(.easeInOut)
                 }
                 if InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState {
-                    let progress = min(2,((InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval) * (1.0 / 2.0)))
+                    let progress = min(2,((InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval))) * (1.0 / 2.0)
                     CircularProgressView(progress: progress)
                         .frame(width: 200, height: 200)
                 }

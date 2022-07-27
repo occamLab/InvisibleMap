@@ -132,11 +132,13 @@ enum InstructionType: Equatable {
 
 // Provides persistent storage for on-screen instructions and state variables outside of the view struct
 class NavigateGlobalState: ObservableObject, NavigateViewController {
-    
+    public static var shared = NavigateGlobalState()
+
     // for testing purposes
     @ObservedObject var navigation = Navigation()
+    @Published var previousBinaryDirectionKey = NavigationBinaryDirection.none
     @Published var binaryDirectionKey = NavigationBinaryDirection.none
-    @Published var binaryDirection: String = ""
+    //@Published var binaryDirection: String = ""
     @Published var clockDirectionKey = NavigationClockDirection.none
     @Published var clockDirection: String = ""
     
@@ -144,11 +146,19 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
     @Published var endPointReached: Bool
     @Published var instructionWrapper: InstructionType
     
-    init() {
+    private init() {
         tagFound = false
         endPointReached = false 
         instructionWrapper = .findTag
+        print("setting navigate viewer")
         InvisibleMapController.shared.navigateViewer = self
+    }
+    
+    func reset() {
+        // TODO: maybe need to reset the other fields as well
+        tagFound = false
+        endPointReached = false
+        instructionWrapper = .findTag
     }
     
     // Navigate view controller commands
@@ -170,12 +180,8 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
     }
 }
 
-class NavigateGlobalStateSingleton {
-    public static var shared = NavigateGlobalState()
-}
-
 struct NavigateMapView: View {
-    @ObservedObject var navigateGlobalState = NavigateGlobalStateSingleton.shared
+    @ObservedObject var navigateGlobalState = NavigateGlobalState.shared
 
     var mapFileName: String
     
@@ -204,7 +210,6 @@ struct NavigateMapView: View {
                 //Text("Clock direction: \(navigateGlobalState.clockDirection)")
                 let direction = binaryDirectionToDirectionText(dir: navigateGlobalState.binaryDirectionKey)
                 Text("\(direction)")
-                InvisibleMapController.shared.setDirectionText(direction: navigateGlobalState.getDirections())
                 
                 // Show instructions if there are any
                 if navigateGlobalState.instructionWrapper.text != nil {

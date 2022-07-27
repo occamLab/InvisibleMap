@@ -30,7 +30,7 @@ struct TagDetectionButton: View {
 }
 
 struct RecordTagButton_Previews: PreviewProvider {
-    @StateObject static var navigateGlobalState = NavigateGlobalState()
+    @StateObject static var navigateGlobalState = NavigateGlobalState.shared
     
     static var previews: some View {
         TagDetectionButton(navigateGlobalState: navigateGlobalState).environmentObject(InvisibleMapController.shared.mapNavigator)

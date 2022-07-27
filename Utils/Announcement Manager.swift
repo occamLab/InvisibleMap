@@ -14,7 +14,7 @@ import UIKit
 class AnnouncementManager: NSObject {
     public static var shared = AnnouncementManager()
     
-    var voiceFeedback: Bool = false
+    var voiceFeedback: Bool = true
     
     /// When VoiceOver is not active, we use AVSpeechSynthesizer for speech feedback
     let synth = AVSpeechSynthesizer()

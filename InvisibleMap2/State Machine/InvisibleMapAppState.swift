@@ -53,7 +53,7 @@ indirect enum InvisibleMapAppState: StateType {
         case PrepareToLeaveMap(mapFileName: String)
         case LeaveMap(mapFileName: String)
         case PlanPath
-        case UpdateInstructionText
+        case AnnounceDirectionText
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
@@ -65,8 +65,6 @@ indirect enum InvisibleMapAppState: StateType {
                 self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
                 return [.LoadMap(mapFileName: mapFileName)]
             
-            case (.SelectPath, .NewARFrame(let cameraFrame)):
-                return []
             
             case (.SelectPath, .PathSelected(let locationType, let Id)):
                 self = .NavigateMap
@@ -85,16 +83,17 @@ indirect enum InvisibleMapAppState: StateType {
                 return [.PrepareToLeaveMap(mapFileName: mapFileName)]
             
             case (.NavigateMap, .NewARFrame(let cameraFrame)):
-                return [.UpdatePoseVIO(cameraFrame: cameraFrame), .UpdateInstructionText]
+                return [.UpdatePoseVIO(cameraFrame: cameraFrame)]
             
             case (.NavigateMap, .TagFound(let tag, let cameraTransform)):
                 return [.UpdatePoseTag(tag: tag, cameraTransform: cameraTransform)]
             
             // Note: As of now this case is when users reach their selected destination
             case (.NavigateMap, .EndpointReached(let finalEndpoint)):
-               // self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
+                // self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
+                // return finalEndpoint ? [.GetNewEndpoint] : [.FinishedNavigation]
                 return [.FinishedNavigation]
-               // return finalEndpoint ? [.GetNewEndpoint] : [.FinishedNavigation]
+               
             
             case (.NavigateMap, .EditMapRequested):
                 self = .EditMap

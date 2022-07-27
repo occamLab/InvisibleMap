@@ -152,7 +152,6 @@ extension ARView: ARSessionDelegate {
             let exitingMap = InvisibleMapController.shared.exitingMap
 
         #endif
-        //print("Exiting map: \(exitingMap)")
         // start processing frame if frame is not processing yet after 0.1 seconds
         if lastRecordedTimestamp + recordInterval <= frame.timestamp && !processingFrame && !exitingMap {
             let scene = SCNMatrix4(frame.camera.transform)
@@ -166,7 +165,6 @@ extension ARView: ARSessionDelegate {
                 arView.scene.rootNode.addChildNode(cameraNode!)
             }
             lastRecordedTimestamp = frame.timestamp
-            //print("Timestamp: \(frame.timestamp)")
             
             //if we are processing the frame and user triggers LeaveMapRequested event then, make processing frame
             sharedController.process(event: .NewARFrame(cameraFrame: frame))
@@ -513,10 +511,10 @@ extension ARView: ARViewController {
                 self.currentCameraPosY = cameraPosConverted.y
                 self.currentCameraPosX = cameraPosConverted.z
                 
-                #if !IS_MAP_CREATOR3
+                #if !IS_MAP_CREATOR
                 if simd_distance(simd_float3(cameraPosConverted), simd_float3(endpointVertex.translation.x, endpointVertex.translation.y, endpointVertex.translation.z)) < self.sharedController.mapNavigator.endpointSphere {
                     InvisibleMapController.shared.process(event: .EndpointReached(finalEndpoint: true))
-                    NavigateGlobalStateSingleton.shared.endPointReached = true
+                    NavigateGlobalState.shared.endPointReached = true
                     print("Reached endpoint")
                 } else {
                     // TODO: revisit this to see how to better set the source location

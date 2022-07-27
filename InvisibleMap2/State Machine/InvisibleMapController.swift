@@ -13,9 +13,8 @@ class InvisibleMapController: AppController {
     public static var shared = InvisibleMapController()
     private var state = InvisibleMapAppState.initialState
     
-    public var navigateGlobalState = NavigateGlobalStateSingleton.shared
+    //public var navigateGlobalState = NavigateGlobalState.shared
 
-    
     // Various controllers for handling commands
     public var mapNavigator = MapNavigator()
     public var arViewer: ARView?
@@ -36,6 +35,11 @@ class InvisibleMapController: AppController {
     
     // counter incremented each time a graph is rendered in a new AR frame
     public var countFrame: Int = 0
+    
+    private init() {
+        print("starting to init")
+    }
+    
     
     func initialize() {
         InvisibleMapController.shared.arViewer?.initialize()
@@ -58,18 +62,20 @@ class InvisibleMapController: AppController {
                  //   self.arViewer?.session.run(ARWorldTrackingConfiguration())
                 
                     // need to re-initialize NavigateGlobalState which is a property of NavigateGlobalStateSingleton to update instructions for new ARSessions
-                    NavigateGlobalStateSingleton.shared = NavigateGlobalState()
+                NavigateGlobalState.shared.reset()
                 
                     self.mapNavigator.locationType = locationType
                     if locationType == "tag" {
                         self.mapNavigator.endpointTagKey = Id
                         self.mapNavigator.scheduledPathPlanningTimer()
                         self.arViewer?.scheduledPingTimer()
+                        self.mapNavigator.scheduledDirectionFeedbackTimer()
                     }
                     if locationType == "waypoint" {
                         self.mapNavigator.endpointWaypointKey = Id
                         self.mapNavigator.scheduledPathPlanningTimer()
                         self.arViewer?.scheduledPingTimer()
+                        self.mapNavigator.scheduledDirectionFeedbackTimer()
                     }
                 
                 case .UpdatePoseVIO(let cameraFrame):
@@ -108,18 +114,25 @@ class InvisibleMapController: AppController {
                 
                 case .PlanPath:
                 if let cameraNode = arViewer?.cameraNode {
-                        let cameraPos = arViewer!.convertNodeOrigintoMapFrame(node: cameraNode)
-                        let stops = self.mapNavigator.planPath(from: simd_float3(cameraPos!.x, cameraPos!.y, cameraPos!.z))
-                            if let stops = stops {
-                                self.arViewer!.renderGraph(fromStops: stops)
-                                countFrame += 1
-                            }
+                    let cameraPos = arViewer!.convertNodeOrigintoMapFrame(node: cameraNode)
+                    let stops = self.mapNavigator.planPath(from: simd_float3(cameraPos!.x, cameraPos!.y, cameraPos!.z))
+                        if let stops = stops {
+                            self.arViewer!.renderGraph(fromStops: stops)
+                            countFrame += 1
                         }
+                    // set previous key
+                    let previousKey = NavigateGlobalState.shared.previousBinaryDirectionKey = NavigateGlobalState.shared.binaryDirectionKey
+                    // update key
+                    let currentKey = NavigateGlobalState.shared.binaryDirectionKey = NavigateGlobalState.shared.navigation.getDirections().binaryDirectionKey
+                    if currentKey != previousKey {
+                        process(commands: [.AnnounceDirectionText])
+                    }
+                }
                 
                 // NavigateViewer commands
-                case .UpdateInstructionText:
-                    navigateViewer?.updateInstructionText()
-                    print("updated instruction text")
+                case .AnnounceDirectionText:
+                    InvisibleMapController.shared.setDirectionText()
+    
                 
                 // TODO: Add functionality for these
                 case .GetNewEndpoint:
@@ -141,7 +154,7 @@ class InvisibleMapController: AppController {
     ///   - currentLocation: the current location of the device
     ///   - direction: the direction info struct (e.g., as computed by the `Navigation` class)
     ///   - displayDistance: a Boolean that indicates whether the distance to the net keypoint should be displayed (true if it should be displayed, false otherwise)
-    func setDirectionText(direction: DirectionInfo) {
+    func setDirectionText() {
         
         // Set direction text for text label and VoiceOver
         // let xzNorm = sqrtf(powf(currentLocation.x - nextKeypoint.location.x, 2) + powf(currentLocation.z - nextKeypoint.location.z, 2))
@@ -150,15 +163,14 @@ class InvisibleMapController: AppController {
         var dir = ""
         
         // normal directions
-        var hapticFeedback = true
-            if(hapticFeedback) {
-                dir += self.navigateGlobalState.binaryDirection
-            } else {
-                dir += self.navigateGlobalState.binaryDirection
-            }
-            updateDirectionText(dir)
+        let hapticFeedback = true
+        if(hapticFeedback) {
+            dir += binaryDirectionToDirectionText(dir: NavigateGlobalState.shared.binaryDirectionKey)
+        } else {
+            dir += binaryDirectionToDirectionText(dir: NavigateGlobalState.shared.binaryDirectionKey)
         }
-    }
+        updateDirectionText(dir)
+    } //end of setDirectiontext method
     
     
     /// Announce the direction (both in text and using speech if appropriate).  The function will automatically use the appropriate units based on settings to convert `distance` from meters to the appropriate unit.
@@ -188,12 +200,14 @@ class InvisibleMapController: AppController {
         if case .navigatingRoute = state {
             logger.logSpeech(utterance: altText)
         } */
-        AnnouncementManager.shared.announce(announcement: altText)
-    }
+        if !description.isEmpty {
+            print("about to try announcement \(altText)")
+            AnnouncementManager.shared.announce(announcement: altText)
+        }
+    } //end of updateDirectionText method
      
-    
+
   
-    
 } // end of Controller class
 
 protocol NavigateViewController {

@@ -34,6 +34,8 @@ class MapNavigator: ObservableObject {
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.invisiblemap", qos: DispatchQoS.userInitiated)
     var pathPlanningTimer = Timer()
     
+    var directionFeedbackTimer = Timer()
+    
     /// Finds and visualizes path repeatedly in intervals to the endpoint based on a timer
     func scheduledPathPlanningTimer() {
         pathPlanningTimer.invalidate()
@@ -42,12 +44,24 @@ class MapNavigator: ObservableObject {
         pathPlanningTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(self.sendPathPlanEvent), userInfo: nil, repeats: true)
     }
     
+    func scheduledDirectionFeedbackTimer() {
+        directionFeedbackTimer.invalidate()
+        
+        directionFeedbackTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(self.sendDirectionFeedbackCommand), userInfo: nil, repeats: true)
+    }
+    
     func stopPathPlanning() {
         self.pathPlanningTimer.invalidate()
+        self.directionFeedbackTimer.invalidate()
     }
+    
     
     @objc func sendPathPlanEvent() {
         InvisibleMapController.shared.process(event: .PlanPath)
+    }
+    
+    @objc func sendDirectionFeedbackCommand() {
+        InvisibleMapController.shared.process(commands: [.AnnounceDirectionText])
     }
     
     @objc func waitBeforeLeavingMap(mapFileName: String) {
