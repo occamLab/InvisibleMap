@@ -52,7 +52,9 @@ class MapNavigator: ObservableObject {
     
     func stopPathPlanning() {
         self.pathPlanningTimer.invalidate()
+        pathPlanningTimer = Timer()
         self.directionFeedbackTimer.invalidate()
+        directionFeedbackTimer = Timer()
     }
     
     

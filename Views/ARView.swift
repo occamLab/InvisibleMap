@@ -411,7 +411,7 @@ extension ARView: ARViewController {
             for p in self.audioPlayers.values {
                 p!.prepareToPlay()
             }
-            self.scheduledPingTimer()
+            //self.scheduledPingTimer()
         }
         catch let audioError {
           print("Could not setup audio: \(audioError)")
@@ -645,6 +645,7 @@ extension ARView: ARViewController {
     }
     
     func scheduledPingTimer() {
+        print("doing the ping")
          self.pingTimer.invalidate()
          self.pingTimer = Timer()
          self.pingTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.ping), userInfo: nil, repeats: true)

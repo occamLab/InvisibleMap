@@ -182,6 +182,8 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
 
 struct NavigateMapView: View {
     @ObservedObject var navigateGlobalState = NavigateGlobalState.shared
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
+    @State private var showFinishedAlert = false
 
     var mapFileName: String
     
@@ -223,7 +225,14 @@ struct NavigateMapView: View {
             .padding()
         }
         .ignoresSafeArea(.keyboard)
+        .alert("You have completed the route! Press OK to return to the Path Selection Screen.", isPresented: $navigateGlobalState.endPointReached, actions: {
+            Button("OK", role: .cancel) {
+                self.mode.wrappedValue.dismiss()
+                InvisibleMapController.shared.process(event: .LeaveMapRequested(mapFileName: mapFileName)) // Tells the state machine to cancel the map navigating
+            }
+        })
     }
+    
 }
 
 extension UINavigationController {

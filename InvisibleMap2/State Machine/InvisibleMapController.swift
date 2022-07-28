@@ -92,6 +92,7 @@ class InvisibleMapController: AppController {
                     self.arViewer?.stopPing()
                     self.mapNavigator.stopPathPlanning()
                     print("navigation finished")
+                    //showFinishedAlert = true
                 
                 case .PrepareToLeaveMap(let mapFileName):
                     // stops processing frame in AR Session
@@ -138,6 +139,7 @@ class InvisibleMapController: AppController {
                 
                 // NavigateViewer commands
                 case .AnnounceDirectionText:
+                    print("timer be timing")
                     setDirectionText()
     
                 
@@ -162,7 +164,10 @@ class InvisibleMapController: AppController {
     ///   - direction: the direction info struct (e.g., as computed by the `Navigation` class)
     ///   - displayDistance: a Boolean that indicates whether the distance to the net keypoint should be displayed (true if it should be displayed, false otherwise)
     func setDirectionText() {
-        
+        if self.mapNavigator.map?.firstTagFound != true {
+                //don't play ping sound if first tag isn't detected
+                return
+            }
         // Set direction text for text label and VoiceOver
         // let xzNorm = sqrtf(powf(currentLocation.x - nextKeypoint.location.x, 2) + powf(currentLocation.z - nextKeypoint.location.z, 2))
         // let slope = (nextKeypoint.location.y - prevKeypointPosition.y) / xzNorm
