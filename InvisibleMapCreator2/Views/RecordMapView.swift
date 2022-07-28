@@ -129,7 +129,6 @@ enum InstructionType: Equatable {
                     InvisibleMapCreatorController.shared.mapRecorder.tagWasRecorded = false
                     //InvisibleMapCreatorController.shared.mapRecorder.previousTagRecordedState = InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState
                     //InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState = false
-                    
                     print()
                 }
             }

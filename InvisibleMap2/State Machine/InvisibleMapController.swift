@@ -121,17 +121,24 @@ class InvisibleMapController: AppController {
                             countFrame += 1
                         }
                     // set previous key
-                    let previousKey = NavigateGlobalState.shared.previousBinaryDirectionKey = NavigateGlobalState.shared.binaryDirectionKey
+                    NavigateGlobalState.shared.previousBinaryDirectionKey = NavigateGlobalState.shared.binaryDirectionKey
+                    var previousKey = binaryDirectionToDirectionText(dir: NavigateGlobalState.shared.previousBinaryDirectionKey)
+                    print("previous key: \(NavigateGlobalState.shared.binaryDirectionKey)")
                     // update key
-                    let currentKey = NavigateGlobalState.shared.binaryDirectionKey = NavigateGlobalState.shared.navigation.getDirections().binaryDirectionKey
-                    if currentKey != previousKey {
+                    NavigateGlobalState.shared.binaryDirectionKey = NavigateGlobalState.shared.navigation.getDirections().binaryDirectionKey
+                    var currentKey = binaryDirectionToDirectionText(dir: NavigateGlobalState.shared.binaryDirectionKey)
+                    print("current key: \(NavigateGlobalState.shared.binaryDirectionKey)")
+                    if previousKey != currentKey {
                         process(commands: [.AnnounceDirectionText])
                     }
                 }
+                case .UpdateInstructionText:
+                    navigateViewer?.updateInstructionText()
+                    print("updated instruction text")
                 
                 // NavigateViewer commands
                 case .AnnounceDirectionText:
-                    InvisibleMapController.shared.setDirectionText()
+                    setDirectionText()
     
                 
                 // TODO: Add functionality for these

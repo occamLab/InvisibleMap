@@ -176,7 +176,7 @@ class Navigation: ObservableObject {
 /// - Returns: `Int` between 1 and 12, inclusive, representing clock position
 private func getClockDirection(angle: Float) -> NavigationClockDirection {
     let clockDirectionKey: Int = Int(angle * (6 / Float.pi))
-    print("clock direction key: \(clockDirectionKey)")
+    //print("clock direction key: \(clockDirectionKey)")
     if clockDirectionKey == 0 {
         return .twelve
     }
