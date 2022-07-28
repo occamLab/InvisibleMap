@@ -19,6 +19,7 @@ struct RecordTagButton: View {
                 self.mapRecorder.previousTagRecordedState = self.mapRecorder.tagRecordingState
                 print("previous tag recording state: \(self.mapRecorder.previousTagRecordedState)")
                 self.mapRecorder.tagRecordingState = true
+                self.mapRecorder.tagWasRecorded = false
                 //self.mapRecorder.tagRecordingState.toggle() // toggle between green start and red stop button
                 print("current tag recording state: \(self.mapRecorder.tagRecordingState)")
                 //if self.mapRecorder.tagRecordingState {

@@ -198,11 +198,12 @@ extension MapRecorder {
                         self.previousTagRecordedState = self.tagRecordingState
                         self.tagRecordingState = false
                         self.tagRecordingInterval = 0.0
+                        self.tagWasRecorded = true
+                        //reset tag recording state as if tag was never recorded
+                        //InvisibleMapCreatorController.shared.mapRecorder.tagWasRecorded = false
+                        //InvisibleMapCreatorController.shared.mapRecorder.previousTagRecordedState = InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState
+                        //InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState = false
                     }
-                }
-
-                if !self.tagRecordingState && self.previousTagRecordedState {
-                    self.tagWasRecorded = true
                 }
 
                 if !self.seesTag {

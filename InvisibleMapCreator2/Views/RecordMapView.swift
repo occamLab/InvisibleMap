@@ -30,7 +30,7 @@ enum InstructionType: Equatable {
             switch self {
             case .findTag: return "Pan camera to find a tag."  // displayed as initial instructions
             case .saveLocation: return "First tag detected! \nPress START RECORDING TAG and hold phone still for two seconds to record tag. /nTo add points of interests, press ADD LOCATIONS at any time."  // displayed when 1st tag is found
-            case .tagFound: return "Tag detected! \nYou can now record the tag. \nRemember to hold phone still."  // displayed when tags other than 1st tag is found
+            case .tagFound: return "Freeze!\nTag detected! \nYou can now record the tag. \nRemember to hold phone still."  // displayed when tags other than 1st tag is found
             //case .tagRecording: return "Hold phone still." //displayed while tag is being recorded
             case .tagRecorded: return "Tag was recorded. Move on to the next tag."  // after user records the tag
             case .findTagReminder: return "WARNING: You must find a tag before you can save a location."
@@ -122,11 +122,14 @@ enum InstructionType: Equatable {
         } else {
             let currentTime = NSDate().timeIntervalSince1970
             if InvisibleMapCreatorController.shared.mapRecorder.tagWasRecorded {
-                // time that instructions stay on screen
-                if currentTime - self.getStartTime() > 3 {
-                    InvisibleMapCreatorController.shared.mapRecorder.previousTagRecordedState = InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState
-                    InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState = false
+                // time that tag was recorded stays on for 3 seconds
+                if currentTime - self.getStartTime() > 2 {
                     self = .none
+                    //reset tag recording state as if tag was never recorded
+                    InvisibleMapCreatorController.shared.mapRecorder.tagWasRecorded = false
+                    //InvisibleMapCreatorController.shared.mapRecorder.previousTagRecordedState = InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState
+                    //InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState = false
+                    
                     print()
                 }
             }
@@ -221,6 +224,13 @@ struct RecordMapView: View {
                     let progress = min(2,((InvisibleMapCreatorController.shared.mapRecorder.tagRecordingInterval))) * (1.0 / 2.0)
                     CircularProgressView(progress: progress)
                         .frame(width: 200, height: 200)
+                        .offset(y: 100)
+                    
+                        //reset tag recording state as if tag was never recorded
+                        //InvisibleMapCreatorController.shared.mapRecorder.tagWasRecorded = false
+                        //InvisibleMapCreatorController.shared.mapRecorder.previousTagRecordedState = InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState
+                        //InvisibleMapCreatorController.shared.mapRecorder.tagRecordingState = false
+                    
                 }
                 RecordTagButton(recordGlobalState: recordGlobalState)
                     .environmentObject(InvisibleMapCreatorController.shared.mapRecorder)
