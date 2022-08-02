@@ -14,6 +14,7 @@ import FirebaseStorage
 class MapRecorder: MapRecorderController, ObservableObject {
     @Published var map: Map?
    
+    static let useRaycastsToRefinePoseOnLIDARPhone = false
     // for tag detection visualization for creator 
     var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
     var currentFrameTransform: simd_float4x4 = simd_float4x4.init()
@@ -248,7 +249,7 @@ extension MapRecorder {
                 var tagDict:[String:Any] = [:]
                 
                 
-                if ((InvisibleMapCreatorController.shared.arViewer?.supportsLidar) != nil ? InvisibleMapCreatorController.shared.arViewer?.supportsLidar as! Bool : false) {
+                if Self.useRaycastsToRefinePoseOnLIDARPhone && InvisibleMapCreatorController.shared.arViewer?.supportsLidar == true {
                     let raycastPose: simd_float4x4? = InvisibleMapCreatorController.shared.arViewer?.raycastTag(tag: tagArray[i], cameraTransform: cameraFrame.camera.transform, snapTagsToVertical: snapTagsToVertical)
                     
                     if raycastPose == nil {

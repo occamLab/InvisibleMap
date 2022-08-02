@@ -14,7 +14,7 @@ indirect enum InvisibleMapAppState: StateType {
     case MainScreen
     case NavigateMap
     case EditMap
-    case SelectPath(lastState: InvisibleMapAppState)
+    case SelectPath
     case PreparingToLeaveMap
     
     // Initial state upon opening the app
@@ -63,17 +63,15 @@ indirect enum InvisibleMapAppState: StateType {
         switch (self, event) {
             // Note: loads the selected map each time state changes from mainscreen to selectpath (location list view) state; when users go from selectpath to mainscreen state is reset to mainscreen (laststate before selectpath) -> dismisspathrequested (event)
             case (.MainScreen, .MapSelected(let mapFileName)):
-                self = .SelectPath(lastState: InvisibleMapAppState.MainScreen)
+                self = .SelectPath
                 return [.LoadMap(mapFileName: mapFileName)]
-            
-            
+                        
             case (.SelectPath, .PathSelected(let locationType, let Id)):
                 self = .NavigateMap
-            return [.StartPath(locationType: locationType, Id: Id)]
+                return [.StartPath(locationType: locationType, Id: Id)]
             
             // Note: dismiss select path view back and set app state back to main screen
-            case (.SelectPath(let lastState), .DismissPathRequested):
-                //self = lastState
+            case (.SelectPath, .DismissPathRequested):
                 self = .MainScreen
                 return []
             
@@ -83,7 +81,7 @@ indirect enum InvisibleMapAppState: StateType {
                 return [.PrepareToLeaveMap(mapFileName: mapFileName)]
             
             case (.NavigateMap, .NewARFrame(let cameraFrame)):
-            return [.UpdatePoseVIO(cameraFrame: cameraFrame), .UpdateInstructionText]
+                return [.UpdatePoseVIO(cameraFrame: cameraFrame), .UpdateInstructionText]
             
             case (.NavigateMap, .TagFound(let tag, let cameraTransform)):
                 return [.UpdatePoseTag(tag: tag, cameraTransform: cameraTransform)]
@@ -103,7 +101,8 @@ indirect enum InvisibleMapAppState: StateType {
                 return [.PlanPath]
             
             case (.PreparingToLeaveMap, .ReadyToLeaveMap(let mapFileName)):
-                self = .SelectPath(lastState: InvisibleMapAppState.PreparingToLeaveMap)
+                self = .SelectPath
+                print("SELECT PATH")
                 return [.LeaveMap(mapFileName: mapFileName)]
             
             

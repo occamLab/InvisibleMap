@@ -122,6 +122,7 @@ class ViewController: UIViewController {
     
     /// Downloads the selected map from firebase
     func createMap() {
+        print("creating map \(mapFileName)")
         createMapNode()
         let storage = Storage.storage()
         storageRef = storage.reference()

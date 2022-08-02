@@ -28,7 +28,7 @@ enum InstructionType: Equatable {
         get {
             switch self {
                 /*case .findTag: return "Point your camera at a tag \nnearby and press START TAG DETECTION to start navigation."*/
-                case .findTag: return "To start navigation, press START TAG DETECTION and pan your camera until you are notified of a tag detection. Follow the ping sound along the path. The ping will grow quieter the further you face away from the right direction. "
+                case .findTag: return "To start navigation, press START TAG DETECTION and pan your camera until you are notified of a tag detection. Listen for directions to stay on path."
                 case .tagFound: return "Tag detected! In order to stabilize the path, press STOP TAG DETECTION." //Press STOP TAG DETECTION until you reach the next tag."
                 case .destinationReached: return "You have arrived at your destination!"
                 case .none: return nil
@@ -66,8 +66,7 @@ enum InstructionType: Equatable {
     // Function to transition from one instruction text field to another; when to display instructions/feedback text and to control how long it stays on screen
     mutating func transition(tagFound: Bool, endPointReached: Bool = false) {
         let previousInstruction = self // current instruction that's updated every time there's a transition
-        print("text state previous instruction: \(previousInstruction)")
-        print("text state: \(self.text)")
+        //print("text state previous instruction: \(previousInstruction)")
         switch self {
         case .findTag:
             // when first tag is found -> tagFound
@@ -102,15 +101,13 @@ enum InstructionType: Equatable {
         
         if self != previousInstruction {
             let instructions = self.text
-            print("text state: \(instructions)")
-            print("end point reached: \(endPointReached)")
             if endPointReached {
-                print("text state: \(instructions)")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                print("end point reached: \(endPointReached)")
+                // delay time previously 1.5
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     UIAccessibility.post(notification: .announcement, argument: instructions)
                 }
             } else {
-                print("text state: \(instructions)")
                 UIAccessibility.post(notification: .announcement, argument: instructions)
             }
         }/* else {
@@ -168,13 +165,13 @@ class NavigateGlobalState: ObservableObject, NavigateViewController {
                 if !map.firstTagFound {
                     self.tagFound = false
                 } else {
-                    print("first tag was found!")
+                    //print("first tag was found!")
                     self.tagFound = true
                 }
-                print("Instruction wrapper: \(self.instructionWrapper)")
-                print("tagFound: \(self.tagFound)")
+                //print("Instruction wrapper: \(self.instructionWrapper)")
+                //print("tagFound: \(self.tagFound)")
                 self.instructionWrapper.transition(tagFound: self.tagFound, endPointReached: self.endPointReached)
-                print("Instruction wrapper: \(self.instructionWrapper)")
+                //print("Instruction wrapper: \(self.instructionWrapper)")
             }
         }
     }
@@ -188,8 +185,9 @@ struct NavigateMapView: View {
     var mapFileName: String
     
     init(mapFileName: String = "") {
-        print("currentUser is \(Auth.auth().currentUser!.uid)")
+        //print("currentUser is \(Auth.auth().currentUser!.uid)")
         self.mapFileName = mapFileName
+        print("initializing navigate map view!")
       //  self.navigateGlobalState.instructionWrapper = .findTag(startTime: NSDate().timeIntervalSince1970)
     }
     
@@ -205,32 +203,23 @@ struct NavigateMapView: View {
                         GetDirectionsButton()
                     }
                 })
-            VStack {
-                
-                // for testing purposes; TODO: update text with directions
-                //Text("Binary direction: \(navigateGlobalState.binaryDirection)")
-                //Text("Clock direction: \(navigateGlobalState.clockDirection)")
-                let direction = binaryDirectionToDirectionText(dir: navigateGlobalState.binaryDirectionKey)
-                Text("\(direction)")
-                
-                // Show instructions if there are any
-                if navigateGlobalState.instructionWrapper.text != nil {
-                    InstructionOverlay(instruction: $navigateGlobalState.instructionWrapper.text)
-                        .animation(.easeInOut)
-                }
-                TagDetectionButton(navigateGlobalState: navigateGlobalState)
-                    .environmentObject(InvisibleMapController.shared.mapNavigator)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
+            // if endpointreached, macke background view inaccessible to voice over; only popup alert can be accessed
+            if navigateGlobalState.endPointReached {
+                InvisibleMapNavigationView()
+                    .accessibilityElement(children: .ignore)
+            } else {
+                InvisibleMapNavigationView()
             }
-            .padding()
         }
         .ignoresSafeArea(.keyboard)
         .alert("You have completed the route! Press OK to return to the Path Selection Screen.", isPresented: $navigateGlobalState.endPointReached, actions: {
             Button("OK", role: .cancel) {
                 self.mode.wrappedValue.dismiss()
                 InvisibleMapController.shared.process(event: .LeaveMapRequested(mapFileName: mapFileName)) // Tells the state machine to cancel the map navigating
-            }
-        })
+                }
+            
+            })
+        
     }
     
 }
@@ -251,6 +240,7 @@ extension UIDevice {
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
     }
 }
+
 
 
 /*

@@ -11,8 +11,9 @@ import SwiftUI
 // Stores the ARView
 struct NavigationIndicator: UIViewControllerRepresentable {
    typealias UIViewControllerType = ARView
+    private static let instance = ARView()
     func makeUIViewController(context: Context) -> ARView {
-        return ARView()
+        return Self.instance
    }
    func updateUIViewController(_ uiViewController:
    NavigationIndicator.UIViewControllerType, context:

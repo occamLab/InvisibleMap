@@ -32,18 +32,16 @@ class Map {
             if let rawJSONParsed = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                 if let tags = rawJSONParsed["tag_vertices"] as? [Any] {
                     for tag in tags {
-                        print(tag)
+                        //print(tag)
                     }
                 }
             }
             
             self.rawData = try JSONDecoder().decode(RawMap.self, from: data)
-            print("test")
             storeTagsInDictionary()
             storeWaypointsInDictionary()
-            print(waypointDictionary)
         } catch {
-            print(error)
+            //print(error)
             return nil
         }
     }

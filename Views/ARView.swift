@@ -125,15 +125,17 @@ class ARView: UIViewController {
     override func viewDidLayoutSubviews() {
        super.viewDidLayoutSubviews()
     }
+    /*
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        print("AR View is gonna appear...")
         arView.session.run(configuration)
         // TODO: have one function to run session (run Session)
     }
     override func viewWillDisappear(_ animated: Bool) {
        super.viewWillDisappear(animated)
        arView.session.pause()
-    }
+    }*/
 }
 
 extension ARView: ARSessionDelegate {
@@ -150,6 +152,9 @@ extension ARView: ARSessionDelegate {
             //if we are in preparingtoleavemap state then break out of this session
             let processingFrame = self.sharedController.mapNavigator.processingFrame
             let exitingMap = InvisibleMapController.shared.exitingMap
+            if exitingMap {
+                print("exiting map...")
+            }
 
         #endif
         // start processing frame if frame is not processing yet after 0.1 seconds
@@ -397,6 +402,7 @@ extension ARView: ARViewController {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal, .vertical]
         pathNodes = [:]
+        print("running brand new AR session")
         arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -515,6 +521,7 @@ extension ARView: ARViewController {
                 if simd_distance(simd_float3(cameraPosConverted), simd_float3(endpointVertex.translation.x, endpointVertex.translation.y, endpointVertex.translation.z)) < self.sharedController.mapNavigator.endpointSphere {
                     InvisibleMapController.shared.process(event: .EndpointReached(finalEndpoint: true))
                     NavigateGlobalState.shared.endPointReached = true
+                    UIAccessibility.post(notification: .screenChanged, argument: nil)
                     print("Reached endpoint")
                 } else {
                     // TODO: revisit this to see how to better set the source location

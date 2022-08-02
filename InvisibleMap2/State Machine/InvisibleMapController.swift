@@ -20,7 +20,7 @@ class InvisibleMapController: AppController {
     public var arViewer: ARView?
     var navigateViewer: NavigateViewController?
     
-    // Variable for annoouncing commands
+    // Variable for announcing commands
     /// When VoiceOver is not active, we use AVSpeechSynthesizer for speech feedback
     let synth = AVSpeechSynthesizer()
     
@@ -62,8 +62,8 @@ class InvisibleMapController: AppController {
                  //   self.arViewer?.session.run(ARWorldTrackingConfiguration())
                 
                     // need to re-initialize NavigateGlobalState which is a property of NavigateGlobalStateSingleton to update instructions for new ARSessions
-                NavigateGlobalState.shared.reset()
-                
+                    NavigateGlobalState.shared.reset()
+                    arViewer?.initialize()
                     self.mapNavigator.locationType = locationType
                     if locationType == "tag" {
                         self.mapNavigator.endpointTagKey = Id
@@ -98,9 +98,9 @@ class InvisibleMapController: AppController {
                     // stops processing frame in AR Session
                     self.exitingMap = true
                     // pauses the app for a split second
-                    let timer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { (timer) in
+                    let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { (timer) in
                         InvisibleMapController.shared.process(event: .ReadyToLeaveMap(mapFileName: mapFileName))
-                        }
+                    }
 
                     //let secondsToDelay = 2.0
                     /*perform(#selector(mapNavigator.waitBeforeLeavingMap(mapFileName: mapFileName)), with: nil, afterDelay: secondsToDelay)*/
@@ -125,6 +125,7 @@ class InvisibleMapController: AppController {
                     NavigateGlobalState.shared.previousBinaryDirectionKey = NavigateGlobalState.shared.binaryDirectionKey
                     var previousKey = binaryDirectionToDirectionText(dir: NavigateGlobalState.shared.previousBinaryDirectionKey)
                     print("previous key: \(NavigateGlobalState.shared.binaryDirectionKey)")
+                    
                     // update key
                     NavigateGlobalState.shared.binaryDirectionKey = NavigateGlobalState.shared.navigation.getDirections().binaryDirectionKey
                     var currentKey = binaryDirectionToDirectionText(dir: NavigateGlobalState.shared.binaryDirectionKey)
@@ -136,10 +137,11 @@ class InvisibleMapController: AppController {
                 case .UpdateInstructionText:
                     navigateViewer?.updateInstructionText()
                     print("updated instruction text")
+                    print("text state is now: \(NavigateGlobalState.shared.instructionWrapper)")
                 
                 // NavigateViewer commands
                 case .AnnounceDirectionText:
-                    print("timer be timing")
+                    //print("timer be timing")
                     setDirectionText()
     
                 
@@ -193,7 +195,7 @@ class InvisibleMapController: AppController {
     ///   - displayDistance: a Boolean that indicates whether to display the distance (true means display distance)
     func updateDirectionText(_ description: String) {
         
-        var altText = description
+        let altText = description
         /*
         if (displayDistance) {
             if defaultUnit == 0 || distanceToDisplay >= 10 {

@@ -131,39 +131,42 @@ class Navigation: ObservableObject {
         var direction = DirectionInfo(clockDirectionKey: .none, binaryDirectionKey: .none, distanceToEndpoint: 0.0, angleDiffFromPath: 0.0)
         
         if let arViewer = InvisibleMapController.shared.arViewer {
-            self.cosValue = arViewer.cosValue
-            self.sinValue = arViewer.sinValue
-            
-            let endpointX = arViewer.endpointX
-            let endpointY = arViewer.endpointY
-            let endpointZ = arViewer.endpointZ
-            
-           // let nextPointOnPathX = arView.audioSourceX
-           // let nextPointOnPathZ = arView.audioSourceZ
-            
-            let currentCameraPositionX = arViewer.currentCameraPosX
-            let currentCameraPositionY = arViewer.currentCameraPosY
-            let currentCameraPositionZ = arViewer.currentCameraPosZ
+            if NavigateGlobalState.shared.instructionWrapper == .findTag && !NavigateGlobalState.shared.tagFound {
+                return direction
+            } else {
+                self.cosValue = arViewer.cosValue
+                self.sinValue = arViewer.sinValue
                 
-            let angleDiff = arViewer.angleDifference
-            
-            let clockDirectionKey = getClockDirection(angle: angleDiff)
-            let binaryDirectionKey = getBinaryDirection(angle: angleDiff)
-            let distanceToEndpoint = getDistanceToEndpoint(endpointX: endpointX, endpointY: endpointY, endpointZ: endpointZ, currPosX: currentCameraPositionX, currPosY: currentCameraPositionY, currPosZ: currentCameraPositionZ)
-            
-            direction = DirectionInfo(clockDirectionKey: clockDirectionKey, binaryDirectionKey: binaryDirectionKey, distanceToEndpoint: distanceToEndpoint, angleDiffFromPath: angleDiff)
-            
-            if NavigateGlobalState.shared.endPointReached == true {
-                direction.endPointState = .atEndpoint
+                let endpointX = arViewer.endpointX
+                let endpointY = arViewer.endpointY
+                let endpointZ = arViewer.endpointZ
+                
+               // let nextPointOnPathX = arView.audioSourceX
+               // let nextPointOnPathZ = arView.audioSourceZ
+                
+                let currentCameraPositionX = arViewer.currentCameraPosX
+                let currentCameraPositionY = arViewer.currentCameraPosY
+                let currentCameraPositionZ = arViewer.currentCameraPosZ
+                    
+                let angleDiff = arViewer.angleDifference
+                
+                let clockDirectionKey = getClockDirection(angle: angleDiff)
+                let binaryDirectionKey = getBinaryDirection(angle: angleDiff)
+                let distanceToEndpoint = getDistanceToEndpoint(endpointX: endpointX, endpointY: endpointY, endpointZ: endpointZ, currPosX: currentCameraPositionX, currPosY: currentCameraPositionY, currPosZ: currentCameraPositionZ)
+                
+                direction = DirectionInfo(clockDirectionKey: clockDirectionKey, binaryDirectionKey: binaryDirectionKey, distanceToEndpoint: distanceToEndpoint, angleDiffFromPath: angleDiff)
+                
+                if NavigateGlobalState.shared.endPointReached == true {
+                    direction.endPointState = .atEndpoint
+                }
+                else if distanceToEndpoint < InvisibleMapController.shared.mapNavigator.endpointSphere {
+                    direction.endPointState = .closeToEndpoint
+                }
+                else {
+                    direction.endPointState = .notAtEndpoint
+                }
+                return direction
             }
-            else if distanceToEndpoint < InvisibleMapController.shared.mapNavigator.endpointSphere {
-                direction.endPointState = .closeToEndpoint
-            }
-            else {
-                direction.endPointState = .notAtEndpoint
-            }
-            return direction
-        
         } else {
             return direction
         }
@@ -229,8 +232,8 @@ private func getBinaryDirection(angle: Float) -> NavigationBinaryDirection {
         angleDiff = -1 * ((2 * Float.pi) - angle)
     } */
     
-    print("angle in rad: \(angle)")
-    print("angle in degrees: \(angle * (180/Float.pi))")
+    //print("angle in rad: \(angle)")
+    //print("angle in degrees: \(angle * (180/Float.pi))")
     
     if (abs(angle) < Float.pi/6) {
         return .straight

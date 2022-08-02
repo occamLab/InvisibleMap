@@ -13,6 +13,12 @@ struct SelectPathView: View {
     var mapName: String
     var mapFileName: String
     
+    init(mapName: String, mapFileName: String) {
+        self.mapName = mapName
+        self.mapFileName = mapFileName
+        print("intitializing select path view...")
+    }
+    
     var body: some View {
         NavigationView {
             if let map = mapNavigator.map {

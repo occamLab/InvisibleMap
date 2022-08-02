@@ -69,6 +69,7 @@ class ChooseMapViewController: UITableViewController {
     
     func processMap(mapName: String, mapInfo: [String: Any]) {
         // TODO: pick a sensible default image
+        print("processing map \(mapName)")
         let imageRef = storageRef.child((mapInfo["image"] as? String) ?? "olin_library.jpg")
         imageRef.getData(maxSize: 10*1024*1024) { imageData, error in
             if let error = error {

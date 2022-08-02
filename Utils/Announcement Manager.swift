@@ -77,6 +77,7 @@ class AnnouncementManager: NSObject {
             self.announcementText?.isHidden = true
         }
         if UIAccessibility.isVoiceOverRunning {
+            print("voice over status: \(UIAccessibility.isVoiceOverRunning)")
             // use the VoiceOver API instead of text to speech
             currentAnnouncement = announcement
             UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: announcement)

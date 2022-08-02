@@ -126,6 +126,7 @@
 		98E9BE982756BAE9001B5A2B /* ViewStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98E9BE972756BAE9001B5A2B /* ViewStructs.swift */; };
 		98E9BE992756BAE9001B5A2B /* ViewStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98E9BE972756BAE9001B5A2B /* ViewStructs.swift */; };
 		98E9BE9B2756C104001B5A2B /* SelectPathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98E9BE9A2756C104001B5A2B /* SelectPathView.swift */; };
+		98F286AB2899E836001E2BC5 /* InvisibleMapNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98F286AA2899E835001E2BC5 /* InvisibleMapNavigationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -211,6 +212,7 @@
 		98BF269926AF14D50076427E /* InvisibleMap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvisibleMap.entitlements; sourceTree = "<group>"; };
 		98E9BE972756BAE9001B5A2B /* ViewStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStructs.swift; sourceTree = "<group>"; };
 		98E9BE9A2756C104001B5A2B /* SelectPathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectPathView.swift; sourceTree = "<group>"; };
+		98F286AA2899E835001E2BC5 /* InvisibleMapNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvisibleMapNavigationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -392,6 +394,7 @@
 			children = (
 				1F83DB74273F081300D0148F /* NavigateMapView.swift */,
 				98E9BE9A2756C104001B5A2B /* SelectPathView.swift */,
+				98F286AA2899E835001E2BC5 /* InvisibleMapNavigationView.swift */,
 				1FE46D7E27644F72001A3812 /* NavigateMap Subviews */,
 			);
 			path = Views;
@@ -745,6 +748,7 @@
 				1FE9717B26FB8AFC00DEB00A /* AppController.swift in Sources */,
 				98082AC5286CBDE4009E808C /* InvisibleMapAppState.swift in Sources */,
 				1FE46D8027644F93001A3812 /* TagDetectionButton.swift in Sources */,
+				98F286AB2899E836001E2BC5 /* InvisibleMapNavigationView.swift in Sources */,
 				1FE9717F26FBA29E00DEB00A /* ARView.swift in Sources */,
 				1FE9718B26FE635D00DEB00A /* MemoryChecker.m in Sources */,
 				1F131D73271F5FCC00568FEC /* FirebaseManager.swift in Sources */,

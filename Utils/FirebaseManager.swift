@@ -18,6 +18,7 @@ class FirebaseManager {
     static func createMap(from mapFileName: String, completionHandler: @escaping (Map)->()) {
         let mapRef = storageRef.child(mapFileName)
         var map: Map?
+        print("creating map")
         mapRef.getData(maxSize: 10 * 1024 * 1024) { mapData, error in
             if let error = error {
                 print(error.localizedDescription)
@@ -96,6 +97,7 @@ class MapDatabase: ObservableObject {
         // Only include in the list if it is processed
         if let processedMapFile = values["map_file"] as? String {
             // TODO: pick a sensible default image
+            print("donwload image")
             let imageRef = storageRef.child((values["image"] as? String) ?? "olin_library.jpg")
             imageRef.getData(maxSize: 10*1024*1024) { imageData, error in
                 if let error = error {
