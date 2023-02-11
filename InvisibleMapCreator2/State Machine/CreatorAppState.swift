@@ -14,6 +14,7 @@ enum CreatorAppState: StateType {
     case RecordMap(RecordMapState)
     case EditMapScreen//(EditMapState)
     
+    
     // Initial state upon opening the app
     static let initialState = CreatorAppState.MainScreen
     
