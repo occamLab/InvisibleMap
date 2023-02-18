@@ -15,8 +15,8 @@ indirect enum Clew2AppState: StateType {
     case FamilyScreen
     case LocationScreen
     case POIScreen
-    case CreateMap(CreateMapState)
-    case NavigateMap(NavigateMapState)
+    case CreateARView(CreateMapState)
+    case NavigateARView(NavigateMapState)
     
     // Initial state upon opening the app
     static let initialState = Clew2AppState.HomeScreen
@@ -39,8 +39,10 @@ indirect enum Clew2AppState: StateType {
         case DropDoorAnchorRequested
         case DropStairAnchorRequested
         case ViewPOIsRequested
+        case NamePOIRequested
         case SaveMapRequested(mapName: String)
         case CancelMapRequested
+        
         case NewARFrame(cameraFrame: ARFrame) // to update AR screen during map creation
         case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) // if we are still using April tags
         case PlanesUpdated(planes: [ARPlaneAnchor])
@@ -93,14 +95,14 @@ indirect enum Clew2AppState: StateType {
             self = .NameMapScreen
             return [.NameMap] // should we send to Firebase after user presses 'Finished'?
             
-        // user finds a map's POIs without shortcut
+        // user finds a map's POIs without shortcut/searchbar - i.e. selects a domain -> ... -> POI
         case (.HomeScreen, .DomainSelected(let mapName)):
             self = .FamilyScreen
             return [.LoadFamilyScreen(mapName: mapName)]
         case (.DomainSelected(let mapName), .FamilySelected(let mapName)):
             self = .LocationScreen
             return [.LoadLocations(mapName: mapName)]
-        case (.FamilySelected(let mapName), .LocationSelected(let mapName)):
+        case (.FamilyScreen, .LocationSelected(let mapName)):
             self = .POIScreen
             return [.LoadPOIs(mapName: mapName)]
         // user finds a map's POIs through the search bar - takes shortcut
@@ -108,13 +110,48 @@ indirect enum Clew2AppState: StateType {
             self = .POIScreen
             return [.LoadPOIs(mapName: mapName)]
         
+        // handling lower level events for CreateMapState
+        case (.CreateARView(let state), _) where CreateMapState.Event(event) != nil:
+            var newState = state
+            let commands = newState.handle(event: CreateMapState.Event(event)!)
+            self = .CreateARView(newState)
+            return commands
+            
+        // handling lower level events for NavigateMapState
+        case (.NavigateARView(let state), _) where NavigateMapState.Event(event) != nil:
+            var newState = state
+            let commands = newState.handle(event: NavigateMapState.Event(event)!)
+            self = .NavigateARView(newState)
+            return commands
+        
         case (.POIScreen, .CreateMapRequested):
             self = .NameMapScreen
             return [.NameMap]
         case (.NameMapScreen, .LocateUserRequested):
-            self = .CreateMapOutside
+            self = .CreateARView
             return [.LocateAndCategorizeMap]
+            
+            
+        case (.CreateARView, .DropGeospatialAnchorRequested):
+            self = .CreateARView
+            return [.DropGeospatialAnchor]
+        case (.CreateARView, .ViewPOIsRequested):
+            self = .ViewPOIState // not be a state?
+            return [.ViewPOIs]
+        case (.CreateARView, .DropDoorAnchorRequested):
+            self = .DropDoorAnchorState
+            return [.DropDoorAnchor]
+        case (.CreateARView, .DropStairAnchorRequested):
+            self = .DropStairAnchorState
+            return [.DropDoorAnchor]
+        case (.CreateARView, .DropCloudAnchorRequested):
+            self = .CreateARView
+            return [.DropCloudAnchor]
+        case (.CreateARView, .NamePOIRequested)
+            self = .CreateARView
+            return [.NamePOI]
         
+            
         
             
 
@@ -127,16 +164,17 @@ indirect enum Clew2AppState: StateType {
 
 enum CreateMapState: StateType {
     // Lower level app states nested within CreateMapState
-    case CreateMap
+    case CreateARView
     case NameMapScreen  // for the purpose of naming hierarchy - to keep maps organized into folders
-    case CreateMapOutside // dropping geospatial anchors
-    case CreateMapInside // dropping cloud anchors
-    case DropDoorAnchor
-    case DropStairAnchor
-    case ViewPOIs // viewing points of interests that the user has dropped
+   //case CreateGeospatialAnchor // dropping geospatial anchors
+   // case CreateCloudAnchor // dropping cloud anchors
+    case ARView
+    case DropDoorAnchorState
+    case DropStairAnchorState
+    case ViewPOIState // viewing points of interests that the user has dropped from the ARView, CreateMap
     
     // Initial state upon transitioning into the CreateMapState
-    static let initialState = CreateMapState.CreateMap
+    static let initialState = CreateMapState.CreateARView
     
     // All the effectual inputs from the app which CreateMapState can react to
     enum Event {
@@ -168,13 +206,13 @@ extension CreateMapState.Event {
 
 enum NavigateMapState: StateType {
     // Lower level app states nested within NavigateMapState
-    case NavigateMap
+    case NavigateARView
     case ReviewsScreen
     case NewARView
     case PreviewDirectionScreen
     
     // Initial state upon transitioning into the NavigateMapState
-    static let initialState = NavigateMapState.CreateMap
+    static let initialState = NavigateMapState.NavigateARView
     
     // All the effectual inputs from the app which NavigateMapState can react to
     enum Event {
