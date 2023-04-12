@@ -135,7 +135,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
             ($0["id"] as! Int) < ($1["id"] as! Int)
         }
         
-        let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData, "plane_data": planeDataList]
+        let mapJsonFile: [String: Any] = ["map_id": mapId, "pose_data": poseData, "tag_data": tagData, "location_data": locationData, "plane_data": planeDataList, "cloud_data": cloudAnchorData]
         
         let folderPath = "rawMapData/" + String(describing: Auth.auth().currentUser!.uid)
         let imagePath = folderPath + "/" + mapId + ".jpg"
