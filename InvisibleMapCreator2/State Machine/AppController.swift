@@ -7,6 +7,7 @@
 
 import Foundation
 import ARKit
+import ARCoreCloudAnchors
 
 class AppController {
     public static var shared = AppController()
@@ -25,8 +26,8 @@ class AppController {
         for command in commands {
             switch command {
             // MapRecorder commands
-            case .RecordData(let cameraFrame):
-                mapRecorder.recordData(cameraFrame: cameraFrame)
+            case .RecordData(let cameraFrame, let garFrame):
+                mapRecorder.recordData(cameraFrame: cameraFrame, garFrame: garFrame)
             case .UpdatePlanes(let planes):
                 mapRecorder.updatePlanes(planes: planes)
             case .CacheLocation(let node, let picture, let textNode):
@@ -49,6 +50,8 @@ class AppController {
             // MapsController commands
             case .DeleteMap(let mapID):
                 mapsController.deleteMap(mapID: mapID)
+            case .HostCloudAnchor:
+                arViewer?.hostCloudAnchor()
             }
         }
     }
@@ -63,8 +66,8 @@ extension AppController {
     }
     
     // RecordMap events
-    func processNewARFrame(frame: ARFrame) {
-        processCommands(commands: state.handleEvent(event: .NewARFrame(cameraFrame: frame)))
+    func processNewARFrame(frame: ARFrame, garFrame: GARFrame) {
+        processCommands(commands: state.handleEvent(event: .NewARFrame(cameraFrame: frame, garFrame: garFrame)))
     }
     
     func processNewTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) {
@@ -81,6 +84,10 @@ extension AppController {
     
     func cacheLocationRequested(node: SCNNode, picture: UIImage, textNode: SCNNode) {
         processCommands(commands: [AppState.Command.CacheLocation(node: node, picture: picture, textNode: textNode)])
+    }
+    
+    func hostCloudAnchor() {
+        processCommands(commands: [.HostCloudAnchor])
     }
     
     func updateLocationListRequested(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
@@ -114,7 +121,7 @@ extension AppController {
 
 protocol MapRecorderController {
     // Commands that impact the map data being recorded
-    func recordData(cameraFrame: ARFrame)
+    func recordData(cameraFrame: ARFrame, garFrame: GARFrame)
     func cacheLocation(node: SCNNode, picture: UIImage, textNode: SCNNode)
     func sendToFirebase(mapName: String)
     func clearData()
@@ -126,6 +133,7 @@ protocol ARViewController {
     func detectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
     func raycastTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool) -> simd_float4x4?
     func pinLocation(locationName: String)
+    func hostCloudAnchor()
     func resetArSession()
 }
 

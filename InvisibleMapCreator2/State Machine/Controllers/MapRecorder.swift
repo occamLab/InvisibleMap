@@ -10,6 +10,7 @@ import ARKit
 import Firebase
 import FirebaseDatabase
 import FirebaseStorage
+import ARCoreCloudAnchors
 
 class MapRecorder: MapRecorderController, ObservableObject {
     var currentFrameTransform: simd_float4x4 = simd_float4x4.init()
@@ -22,6 +23,8 @@ class MapRecorder: MapRecorderController, ObservableObject {
     /// Allows you to asynchronously run a job on a background thread
     let aprilTagQueue = DispatchQueue(label: "edu.occamlab.apriltagfinder", qos: DispatchQoS.userInitiated)
     var poseId: Int = 0
+    var cloudAnchorData: [[[String: Any]]] = []
+    var dirtyCloudAnchors = Set<String>()
     var poseData: [[String: Any]] = []
     var tagData: [[[String: Any]]] = []
     var locationData: [[String: Any]] = []
@@ -63,8 +66,14 @@ class MapRecorder: MapRecorderController, ObservableObject {
         initFirebase()
     }
     
+    private func setDirtyBitForCloudAnchors(_ garFrame: GARFrame) {
+        let updatedCloudAnchors = garFrame.updatedAnchors.compactMap({$0.cloudIdentifier})
+        dirtyCloudAnchors.formUnion(Set<String>(updatedCloudAnchors))
+    }
+    
     /// Record pose, tag, location, and node data after a specified period of time
-    func recordData(cameraFrame: ARFrame) {
+    func recordData(cameraFrame: ARFrame, garFrame: GARFrame) {
+        setDirtyBitForCloudAnchors(garFrame)
         if lastRecordedTimestamp == nil {
             lastRecordedTimestamp = cameraFrame.timestamp
             lastRecordedFrame = cameraFrame
@@ -72,6 +81,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
+            recordCloudAnchorData(cameraFrame: cameraFrame, garFrame: garFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             poseId += 1
             
             print("Running \(poseId)")
@@ -85,6 +95,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
             recordPoseData(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordTags(cameraFrame: cameraFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             recordPlaneData(cameraFrame: cameraFrame, poseId: poseId)
+            recordCloudAnchorData(cameraFrame: cameraFrame, garFrame: garFrame, timestamp: lastRecordedTimestamp!, poseId: poseId)
             poseId += 1
             
             if let pendingLocation = pendingLocation {
@@ -183,6 +194,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
         poseData = []
         locationData = []
         tagData = []
+        cloudAnchorData = []
         print("Clear data")
     }
 }
@@ -192,6 +204,21 @@ extension MapRecorder {
     /// Append new pose data to list
     func recordPoseData(cameraFrame: ARFrame, timestamp: Double, poseId: Int) {
         poseData.append(getCameraCoordinates(cameraFrame: cameraFrame, timestamp: timestamp, poseId: poseId))
+    }
+    
+    @objc func recordCloudAnchorData(cameraFrame: ARFrame, garFrame: GARFrame, timestamp: Double, poseId: Int) {
+        let anchors = garFrame.anchors.filter({ dirtyCloudAnchors.contains($0.cloudIdentifier ?? "") })
+        cloudAnchorData.append(
+            anchors.map(
+                {[
+                    // convert the pose so it is relative to the camera transform
+                    "pose": (cameraFrame.camera.transform.inverse * $0.transform).toRowMajorOrder(),
+                    "poseId": poseId,
+                    "timestamp": timestamp,
+                    "cloudIdentifier": $0.cloudIdentifier!
+                ]}
+           )
+        )
     }
     
     /// Append new april tag data to list

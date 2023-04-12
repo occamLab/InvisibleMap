@@ -7,6 +7,7 @@
 
 import Foundation
 import ARKit
+import ARCoreCloudAnchors
 
 enum AppState: StateType {
     // Higher level app states
@@ -25,7 +26,7 @@ enum AppState: StateType {
         // EditMapScreen events
         case MapDeleted(mapID: String)
         // RecordMap events
-        case NewARFrame(cameraFrame: ARFrame)
+        case NewARFrame(cameraFrame: ARFrame, garFrame: GARFrame)
         case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case PlanesUpdated(planes: [ARPlaneAnchor])
         case SaveLocationRequested(locationName: String)
@@ -38,7 +39,7 @@ enum AppState: StateType {
     // All the effectful outputs which the state desires to have performed on the app
     enum Command {
         // RecordMap commands
-        case RecordData(cameraFrame: ARFrame)
+        case RecordData(cameraFrame: ARFrame, garFrame: GARFrame)
         case DetectTag(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case UpdatePlanes(planes: [ARPlaneAnchor])
         // case PauseRecording
@@ -49,6 +50,7 @@ enum AppState: StateType {
         case SendToFirebase(mapName: String)
         case ClearData
         case DeleteMap(mapID: String)
+        case HostCloudAnchor
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command
@@ -88,7 +90,7 @@ enum RecordMapState: StateType {
     
     // All the effectual inputs from the app which RecordMapState can react to
     enum Event {
-        case NewARFrame(cameraFrame: ARFrame)
+        case NewARFrame(cameraFrame: ARFrame, garFrame: GARFrame)
         case NewTagFound(tag: AprilTags, cameraTransform: simd_float4x4, snapTagsToVertical: Bool)
         case PlanesUpdated(planes: [ARPlaneAnchor])
         // case PauseRecordingPressed
@@ -105,8 +107,8 @@ enum RecordMapState: StateType {
     // In response to an event, RecordMapState may emit a command
     mutating func handleEvent(event: Event) -> [Command] {
         switch (self, event) {
-            case(.RecordMap, .NewARFrame(let cameraFrame)):
-                return [.RecordData(cameraFrame: cameraFrame), .UpdateInstructionText]
+            case(.RecordMap, .NewARFrame(let cameraFrame, let garFrame)):
+            return [.RecordData(cameraFrame: cameraFrame, garFrame: garFrame), .UpdateInstructionText]
             case(.RecordMap, .NewTagFound(let tag, let cameraTransform, let snapTagsToVertical)):
                 return [.DetectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)]
             case(.RecordMap, .PlanesUpdated(let planes)):
@@ -138,8 +140,8 @@ extension RecordMapState.Event {
     init?(_ event: AppState.Event) {
         // Translate between events in AppState and events in RecordMapState
         switch event {
-        case .NewARFrame(let cameraFrame):
-            self = .NewARFrame(cameraFrame: cameraFrame)
+        case .NewARFrame(let cameraFrame, let garFrame):
+            self = .NewARFrame(cameraFrame: cameraFrame, garFrame: garFrame)
         case .NewTagFound(let tag, let cameraTransform, let snapTagsToVertical):
             self = .NewTagFound(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
         case .PlanesUpdated(let planes):

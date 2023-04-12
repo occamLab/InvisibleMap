@@ -40,6 +40,11 @@
 		82823C3929E74D3B00C881E5 /* ARCoreCloudAnchors in Frameworks */ = {isa = PBXBuildFile; productRef = 82823C3829E74D3B00C881E5 /* ARCoreCloudAnchors */; };
 		82823C3B29E74D3B00C881E5 /* ARCoreGARSession in Frameworks */ = {isa = PBXBuildFile; productRef = 82823C3A29E74D3B00C881E5 /* ARCoreGARSession */; };
 		82823C3D29E74D3B00C881E5 /* ARCoreGeospatial in Frameworks */ = {isa = PBXBuildFile; productRef = 82823C3C29E74D3B00C881E5 /* ARCoreGeospatial */; };
+		82823C3F29E74E5F00C881E5 /* ARCoreCloudAnchors in Frameworks */ = {isa = PBXBuildFile; productRef = 82823C3E29E74E5F00C881E5 /* ARCoreCloudAnchors */; };
+		82823C4129E74E5F00C881E5 /* ARCoreGARSession in Frameworks */ = {isa = PBXBuildFile; productRef = 82823C4029E74E5F00C881E5 /* ARCoreGARSession */; };
+		82823C4329E74E5F00C881E5 /* ARCoreGeospatial in Frameworks */ = {isa = PBXBuildFile; productRef = 82823C4229E74E5F00C881E5 /* ARCoreGeospatial */; };
+		82823C4729E74FD500C881E5 /* ARCoreCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82823C4529E74FC300C881E5 /* ARCoreCredentials.swift */; };
+		82823C4829E74FD700C881E5 /* ARCoreCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82823C4529E74FC300C881E5 /* ARCoreCredentials.swift */; };
 		82A8259F24B3854000AFC390 /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
 		86112CCD211B805300736960 /* ChooseMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86112CCC211B805300736960 /* ChooseMapViewController.swift */; };
 		86112CD3211B837200736960 /* ChooseMapTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */; };
@@ -100,6 +105,7 @@
 		1F77A35F26F2493A0044BE18 /* InvisibleMap2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvisibleMap2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		822FA78224E2F9750001F463 /* DebugHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugHelpers.swift; sourceTree = "<group>"; };
 		822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AprilTagTracker.swift; sourceTree = "<group>"; };
+		82823C4529E74FC300C881E5 /* ARCoreCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARCoreCredentials.swift; sourceTree = "<group>"; };
 		82A8259E24B3854000AFC390 /* simd+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "simd+ext.swift"; sourceTree = "<group>"; };
 		86112CCC211B805300736960 /* ChooseMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseMapViewController.swift; sourceTree = "<group>"; };
 		86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseMapTableViewCell.swift; sourceTree = "<group>"; };
@@ -138,10 +144,13 @@
 			files = (
 				984C21DC26B44F93006EEF4F /* FirebaseDatabase in Frameworks */,
 				14995FC826263BB700A7C78B /* opencv2.framework in Frameworks */,
+				82823C4129E74E5F00C881E5 /* ARCoreGARSession in Frameworks */,
 				984C21DA26B44F8C006EEF4F /* FirebaseAuth in Frameworks */,
 				14995FC426263BA800A7C78B /* visp3.framework in Frameworks */,
 				984C21DE26B44F99006EEF4F /* FirebaseStorage in Frameworks */,
+				82823C3F29E74E5F00C881E5 /* ARCoreCloudAnchors in Frameworks */,
 				984C21D826B44F88006EEF4F /* FirebaseAnalytics in Frameworks */,
+				82823C4329E74E5F00C881E5 /* ARCoreGeospatial in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,9 +272,18 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		82823C4429E74FA900C881E5 /* Credentials */ = {
+			isa = PBXGroup;
+			children = (
+				82823C4529E74FC300C881E5 /* ARCoreCredentials.swift */,
+			);
+			path = Credentials;
+			sourceTree = "<group>";
+		};
 		86F39532210FA42500F209EC = {
 			isa = PBXGroup;
 			children = (
+				82823C4429E74FA900C881E5 /* Credentials */,
 				98BF269A26AF2E4F0076427E /* Authentication */,
 				86F3953D210FA42500F209EC /* InvisibleMap */,
 				86F39552210FA42600F209EC /* InvisibleMapTests */,
@@ -351,6 +369,9 @@
 				984C21D926B44F8C006EEF4F /* FirebaseAuth */,
 				984C21DB26B44F93006EEF4F /* FirebaseDatabase */,
 				984C21DD26B44F99006EEF4F /* FirebaseStorage */,
+				82823C3E29E74E5F00C881E5 /* ARCoreCloudAnchors */,
+				82823C4029E74E5F00C881E5 /* ARCoreGARSession */,
+				82823C4229E74E5F00C881E5 /* ARCoreGeospatial */,
 			);
 			productName = InvisibleMapCreator2;
 			productReference = 1447B703262421CC00230A58 /* InvisibleMapCreator2.app */;
@@ -506,6 +527,7 @@
 				141FF9C226499FCE00845059 /* ManageLocationsView.swift in Sources */,
 				1F4C30C626A1D70C008CBE3C /* RecordTagButton.swift in Sources */,
 				1447B7422624229600230A58 /* ContentView.swift in Sources */,
+				82823C4729E74FD500C881E5 /* ARCoreCredentials.swift in Sources */,
 				1447B75C2624230200230A58 /* StateType.swift in Sources */,
 				980E79A4285274840070B0D9 /* MenuView.swift in Sources */,
 				1447B75F2624230200230A58 /* AppState.swift in Sources */,
@@ -519,6 +541,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82823C4829E74FD700C881E5 /* ARCoreCredentials.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -945,6 +968,21 @@
 			productName = ARCoreGARSession;
 		};
 		82823C3C29E74D3B00C881E5 /* ARCoreGeospatial */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 82823C3729E74D3B00C881E5 /* XCRemoteSwiftPackageReference "arcore-ios-sdk" */;
+			productName = ARCoreGeospatial;
+		};
+		82823C3E29E74E5F00C881E5 /* ARCoreCloudAnchors */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 82823C3729E74D3B00C881E5 /* XCRemoteSwiftPackageReference "arcore-ios-sdk" */;
+			productName = ARCoreCloudAnchors;
+		};
+		82823C4029E74E5F00C881E5 /* ARCoreGARSession */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 82823C3729E74D3B00C881E5 /* XCRemoteSwiftPackageReference "arcore-ios-sdk" */;
+			productName = ARCoreGARSession;
+		};
+		82823C4229E74E5F00C881E5 /* ARCoreGeospatial */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 82823C3729E74D3B00C881E5 /* XCRemoteSwiftPackageReference "arcore-ios-sdk" */;
 			productName = ARCoreGeospatial;

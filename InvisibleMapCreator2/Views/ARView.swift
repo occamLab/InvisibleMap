@@ -8,6 +8,7 @@
 import Foundation
 import ARKit
 import SwiftUI
+import ARCoreCloudAnchors
 
 // ARViewIndicator
 struct ARViewIndicator: UIViewControllerRepresentable {
@@ -25,7 +26,7 @@ class ARView: UIViewController {
     var aprilTagDetectionDictionary = Dictionary<Int, AprilTagTracker>()
     let memoryChecker : MemoryChecker = MemoryChecker()
     let configuration = ARWorldTrackingConfiguration()
-    
+    var garSession: GARSession?
     // Create an AR view
     var arView: ARSCNView {
        return self.view as! ARSCNView
@@ -57,10 +58,51 @@ class ARView: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         arView.session.run(configuration)
+        startGARSession()
     }
     override func viewWillDisappear(_ animated: Bool) {
        super.viewWillDisappear(animated)
        arView.session.pause()
+    }
+    
+    private func startGARSession() {
+        do {
+            garSession = try GARSession(apiKey: garAPIKey, bundleIdentifier: nil)
+            var error: NSError?
+            let configuration = GARSessionConfiguration()
+            configuration.cloudAnchorMode = .enabled
+            garSession?.setConfiguration(configuration, error: &error)
+            garSession?.delegate = self
+            print("gar set configuration error \(error)")
+        } catch {
+            print("failed to create GARSession")
+        }
+    }
+}
+
+extension ARView: GARSessionDelegate {
+    /// This function is called whenever a cloud anchor has been successfully hosted by Google's ARCore library.  This gives our app a chance to store the newly created anchor in various datastructures or databases.
+    /// - Parameters:
+    ///   - session: the GAR session associated with the anchor
+    ///   - garAnchor: the GARAnchor itself (this will have the cloudIdentifier, which is the way to refer to this anchor across session, as well as the anchor identifier, which s the way to refer to the anchor within this session)
+    func session(_ session: GARSession, didHost garAnchor:GARAnchor) {
+        guard let cloudIdentifier = garAnchor.cloudIdentifier else {
+            return
+        }
+        do {
+            // we resolve right away so we can start to include these in the data
+            try garSession?.resolveCloudAnchor(cloudIdentifier)
+        } catch {
+            
+        }
+    }
+    
+    func session(_ session: GARSession, didFailToHost garAnchor: GARAnchor) {
+
+    }
+    
+    func session(_ session: GARSession, didResolve anchor:GARAnchor) {
+        print("did resolve cloud anchor")
     }
 }
 
@@ -70,11 +112,11 @@ extension ARView: ARSessionDelegate {
     }
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        AppController.shared.processNewARFrame(frame: frame)
-        self.memoryChecker.printRemainingMemory()
-        if(self.memoryChecker.getRemainingMemory() < 500) {
-            arView.session.pause()
-            arView.session.run(configuration, options: [.resetSceneReconstruction])
+        do {
+            if let garFrame = try garSession?.update(frame) {
+                AppController.shared.processNewARFrame(frame: frame, garFrame: garFrame)
+            }
+        } catch {
         }
     }
     
@@ -90,6 +132,19 @@ extension ARView: ARSessionDelegate {
 }
 
 extension ARView: ARViewController {
+    func hostCloudAnchor() {
+        guard let currentFrame = arView.session.currentFrame else {
+            return
+        }
+        do {
+            var anchorMatrix = matrix_identity_float4x4
+            anchorMatrix.columns.3 = currentFrame.camera.transform.columns.3
+            try self.garSession?.hostCloudAnchor(ARAnchor(transform: anchorMatrix))
+        } catch {
+            
+        }
+    }
+    
     /// Transforms the AprilTag position into world frame
     var supportsLidar: Bool {
         get {
