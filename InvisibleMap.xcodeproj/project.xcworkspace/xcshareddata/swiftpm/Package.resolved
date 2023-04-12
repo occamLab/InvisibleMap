@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "arcore-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google-ar/arcore-ios-sdk",
+      "state" : {
+        "revision" : "03978f8995dedc66773c59ad823aa825f8856a6b",
+        "version" : "1.36.0"
+      }
+    },
+    {
       "identity" : "boringssl-swiftpm",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/boringssl-SwiftPM.git",
@@ -23,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/firebase-ios-sdk.git",
       "state" : {
-        "revision" : "111d8d6ad1a1afd6c8e9561d26e55ab1e74fcb42",
-        "version" : "8.15.0"
+        "revision" : "7e80c25b51c2ffa238879b07fbfc5baa54bb3050",
+        "version" : "9.6.0"
       }
     },
     {
@@ -32,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleAppMeasurement.git",
       "state" : {
-        "revision" : "ef819db8c58657a6ca367322e73f3b6322afe0a2",
-        "version" : "8.15.0"
+        "revision" : "c1cfde8067668027b23a42c29d11c246152fe046",
+        "version" : "9.6.0"
       }
     },
     {
@@ -41,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleDataTransport.git",
       "state" : {
-        "revision" : "b905c49326b72211531ed9d7baa02d724828a8dc",
-        "version" : "9.1.4"
+        "revision" : "cc7265b8e3906304e6e81f32c1662a94bbae2357",
+        "version" : "9.2.2"
       }
     },
     {
@@ -68,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/gtm-session-fetcher.git",
       "state" : {
-        "revision" : "4e9bbf2808b8fee444e84a48f5f3c12641987d3e",
-        "version" : "1.7.2"
+        "revision" : "5ccda3981422a84186387dbb763ba739178b529c",
+        "version" : "2.3.0"
       }
     },
     {
@@ -95,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/nanopb.git",
       "state" : {
-        "revision" : "7ee9ef9f627d85cbe1b8c4f49a3ed26eed216c77",
-        "version" : "2.30908.0"
+        "revision" : "819d0a2173aff699fb8c364b6fb906f7cdb1a692",
+        "version" : "2.30909.0"
       }
     },
     {

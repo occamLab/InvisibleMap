@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
-import Firebase
+import FirebaseStorage
+import FirebaseDatabase
 import FirebaseAuth
+import FirebaseCore
 
 class MapDatabase: ObservableObject {
     @Published var maps: [String] = []

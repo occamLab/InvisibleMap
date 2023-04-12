@@ -37,6 +37,9 @@
 		1F64364F269DDD08007BD526 /* MemoryChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F64364E269DDD08007BD526 /* MemoryChecker.m */; };
 		822FA78324E2F9750001F463 /* DebugHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78224E2F9750001F463 /* DebugHelpers.swift */; };
 		822FA78624E2FB3E0001F463 /* AprilTagTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822FA78524E2FB3E0001F463 /* AprilTagTracker.swift */; };
+		82823C3929E74D3B00C881E5 /* ARCoreCloudAnchors in Frameworks */ = {isa = PBXBuildFile; productRef = 82823C3829E74D3B00C881E5 /* ARCoreCloudAnchors */; };
+		82823C3B29E74D3B00C881E5 /* ARCoreGARSession in Frameworks */ = {isa = PBXBuildFile; productRef = 82823C3A29E74D3B00C881E5 /* ARCoreGARSession */; };
+		82823C3D29E74D3B00C881E5 /* ARCoreGeospatial in Frameworks */ = {isa = PBXBuildFile; productRef = 82823C3C29E74D3B00C881E5 /* ARCoreGeospatial */; };
 		82A8259F24B3854000AFC390 /* simd+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A8259E24B3854000AFC390 /* simd+ext.swift */; };
 		86112CCD211B805300736960 /* ChooseMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86112CCC211B805300736960 /* ChooseMapViewController.swift */; };
 		86112CD3211B837200736960 /* ChooseMapTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86112CD2211B837200736960 /* ChooseMapTableViewCell.swift */; };
@@ -155,9 +158,12 @@
 			files = (
 				9860ED6A26B4532400C1EC55 /* SwiftGraph in Frameworks */,
 				980E79A0285266B00070B0D9 /* InAppSettingsKit in Frameworks */,
+				82823C3B29E74D3B00C881E5 /* ARCoreGARSession in Frameworks */,
 				86616BC52113369200DD565C /* visp3.framework in Frameworks */,
+				82823C3D29E74D3B00C881E5 /* ARCoreGeospatial in Frameworks */,
 				984C21D426B44F4D006EEF4F /* FirebaseAuth in Frameworks */,
 				8630963C21125E89003D4434 /* opencv2.framework in Frameworks */,
+				82823C3929E74D3B00C881E5 /* ARCoreCloudAnchors in Frameworks */,
 				984C21D026B44F4D006EEF4F /* FirebaseAnalytics in Frameworks */,
 				984C21D226B44F4D006EEF4F /* FirebaseStorage in Frameworks */,
 				984C21D626B44F4D006EEF4F /* FirebaseDatabase in Frameworks */,
@@ -387,6 +393,9 @@
 				984C21D526B44F4D006EEF4F /* FirebaseDatabase */,
 				9860ED6926B4532400C1EC55 /* SwiftGraph */,
 				980E799F285266B00070B0D9 /* InAppSettingsKit */,
+				82823C3829E74D3B00C881E5 /* ARCoreCloudAnchors */,
+				82823C3A29E74D3B00C881E5 /* ARCoreGARSession */,
+				82823C3C29E74D3B00C881E5 /* ARCoreGeospatial */,
 			);
 			productName = InvisibleMap;
 			productReference = 86F3953B210FA42500F209EC /* InvisibleMap.app */;
@@ -427,6 +436,7 @@
 				984C21CE26B44F4D006EEF4F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				9860ED6826B4532400C1EC55 /* XCRemoteSwiftPackageReference "SwiftGraph" */,
 				980E799E285266B00070B0D9 /* XCRemoteSwiftPackageReference "InAppSettingsKit" */,
+				82823C3729E74D3B00C881E5 /* XCRemoteSwiftPackageReference "arcore-ios-sdk" */,
 			);
 			productRefGroup = 86F3953C210FA42500F209EC /* Products */;
 			projectDirPath = "";
@@ -889,6 +899,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		82823C3729E74D3B00C881E5 /* XCRemoteSwiftPackageReference "arcore-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google-ar/arcore-ios-sdk";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.36.0;
+			};
+		};
 		980E799E285266B00070B0D9 /* XCRemoteSwiftPackageReference "InAppSettingsKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/futuretap/InAppSettingsKit.git";
@@ -902,7 +920,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 8.4.0;
+				minimumVersion = 9.0.0;
 			};
 		};
 		9860ED6826B4532400C1EC55 /* XCRemoteSwiftPackageReference "SwiftGraph" */ = {
@@ -916,6 +934,21 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		82823C3829E74D3B00C881E5 /* ARCoreCloudAnchors */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 82823C3729E74D3B00C881E5 /* XCRemoteSwiftPackageReference "arcore-ios-sdk" */;
+			productName = ARCoreCloudAnchors;
+		};
+		82823C3A29E74D3B00C881E5 /* ARCoreGARSession */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 82823C3729E74D3B00C881E5 /* XCRemoteSwiftPackageReference "arcore-ios-sdk" */;
+			productName = ARCoreGARSession;
+		};
+		82823C3C29E74D3B00C881E5 /* ARCoreGeospatial */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 82823C3729E74D3B00C881E5 /* XCRemoteSwiftPackageReference "arcore-ios-sdk" */;
+			productName = ARCoreGeospatial;
+		};
 		980E799F285266B00070B0D9 /* InAppSettingsKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 980E799E285266B00070B0D9 /* XCRemoteSwiftPackageReference "InAppSettingsKit" */;
