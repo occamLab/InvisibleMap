@@ -73,11 +73,11 @@ extension simd_float4x4 {
         return simd_float4x4.makeTranslation(x, y, z) * self
     }
     
-    func getRot()->float3x3 {
+    func getRot()->simd_float3x3 {
         return getUpper3x3()
     }
 
-    func getUpper3x3()->float3x3 {
+    func getUpper3x3()->simd_float3x3 {
         return float3x3(columns: (simd_float3(self.columns.0.x, self.columns.0.y, self.columns.0.z),
                                   simd_float3(self.columns.1.x, self.columns.1.y, self.columns.1.z),
                                   simd_float3(self.columns.2.x, self.columns.2.y, self.columns.2.z)))
@@ -87,23 +87,12 @@ extension simd_float4x4 {
         return simd_float3(self.columns.3.x, self.columns.3.y, self.columns.3.z)
     }
     
+    func toRowMajorOrderArray()->[Double] {
+        return [Double(self.columns.0.x), Double(self.columns.1.x), Double(self.columns.2.x), Double(self.columns.3.x), Double(self.columns.0.y), Double(self.columns.1.y), Double(self.columns.2.y), Double(self.columns.3.y), Double(self.columns.0.z), Double(self.columns.1.z), Double(self.columns.2.z), Double(self.columns.3.z), Double(self.columns.0.w), Double(self.columns.1.w), Double(self.columns.2.w), Double(self.columns.3.w)]
+    }
+    
     func toRowMajorOrder()->(Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double) {
-        return (Double(self.columns.0.x),
-                Double(self.columns.1.x),
-                Double(self.columns.2.x),
-                Double(self.columns.3.x),
-                Double(self.columns.0.y),
-                Double(self.columns.1.y),
-                Double(self.columns.2.y),
-                Double(self.columns.3.y),
-                Double(self.columns.0.z),
-                Double(self.columns.1.z),
-                Double(self.columns.2.z),
-                Double(self.columns.3.z),
-                Double(self.columns.0.w),
-                Double(self.columns.1.w),
-                Double(self.columns.2.w),
-                Double(self.columns.3.w))
+        return (Double(self.columns.0.x), Double(self.columns.1.x), Double(self.columns.2.x), Double(self.columns.3.x), Double(self.columns.0.y), Double(self.columns.1.y), Double(self.columns.2.y), Double(self.columns.3.y), Double(self.columns.0.z), Double(self.columns.1.z), Double(self.columns.2.z), Double(self.columns.3.z), Double(self.columns.0.w), Double(self.columns.1.w), Double(self.columns.2.w), Double(self.columns.3.w))
     }
 }
 

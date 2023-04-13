@@ -218,17 +218,13 @@ extension MapRecorder {
             anchors.map(
                 {[
                     // convert the pose so it is relative to the camera transform
-                    "pose": cameraFrame.camera.transform.inverse * $0.transform,
+                    "pose": (cameraFrame.camera.transform.inverse * $0.transform).toRowMajorOrderArray(),
                     "poseId": poseId,
                     "timestamp": timestamp,
                     "cloudIdentifier": $0.cloudIdentifier!
                 ]}
            )
         )
-        // BUG: for some weird reason the toRowMajorOrder() fails when we put it in the map expression above.  To workaround this, we use a loop.  (might be due to misinterpretation of parentheses
-        for var anchor in cloudAnchorData.last! {
-            anchor["pose"] = (anchor["pose"] as! simd_float4x4).toRowMajorOrder()
-        }
         dirtyCloudAnchors = Set<String>()
     }
     
