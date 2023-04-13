@@ -51,6 +51,7 @@ enum AppState: StateType {
         case ClearData
         case DeleteMap(mapID: String)
         case HostCloudAnchor
+        case MakeAnnouncement(announcement: String)
     }
     
     // In response to an event, a state may transition to a new state, and it may emit a command

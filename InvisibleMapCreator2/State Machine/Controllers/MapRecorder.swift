@@ -163,6 +163,9 @@ class MapRecorder: MapRecorderController, ObservableObject {
             if !JSONSerialization.isValidJSONObject(["plane_data": planeDataList]) {
                 log += "plane_data is invalid:\n\(planeDataList)\n"
             }
+            if !JSONSerialization.isValidJSONObject(["cloud_data": cloudAnchorData]) {
+                log += "cloudAnchorData is invalid:\n\(cloudAnchorData)\n"
+            }
         }
         else {
             log += "mapJsonFile is valid"
@@ -207,18 +210,25 @@ extension MapRecorder {
     }
     
     @objc func recordCloudAnchorData(cameraFrame: ARFrame, garFrame: GARFrame, timestamp: Double, poseId: Int) {
-        let anchors = garFrame.anchors.filter({ dirtyCloudAnchors.contains($0.cloudIdentifier ?? "") })
+        let anchors = garFrame.anchors.filter({ $0.hasValidTransform && dirtyCloudAnchors.contains($0.cloudIdentifier ?? "") })
+        guard !anchors.isEmpty else {
+            return
+        }
         cloudAnchorData.append(
             anchors.map(
                 {[
                     // convert the pose so it is relative to the camera transform
-                    "pose": (cameraFrame.camera.transform.inverse * $0.transform).toRowMajorOrder(),
+                    "pose": cameraFrame.camera.transform.inverse * $0.transform,
                     "poseId": poseId,
                     "timestamp": timestamp,
                     "cloudIdentifier": $0.cloudIdentifier!
                 ]}
            )
         )
+        // BUG: for some weird reason the toRowMajorOrder() fails when we put it in the map expression above.  To workaround this, we use a loop.  (might be due to misinterpretation of parentheses
+        for var anchor in cloudAnchorData.last! {
+            anchor["pose"] = (anchor["pose"] as! simd_float4x4).toRowMajorOrder()
+        }
         dirtyCloudAnchors = Set<String>()
     }
     

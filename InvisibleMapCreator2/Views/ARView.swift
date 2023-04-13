@@ -89,20 +89,29 @@ extension ARView: GARSessionDelegate {
         guard let cloudIdentifier = garAnchor.cloudIdentifier else {
             return
         }
-        do {
-            // we resolve right away so we can start to include these in the data
-            try garSession?.resolveCloudAnchor(cloudIdentifier)
-        } catch {
-            
+        AppController.shared.announce("Hosted")
+        // wait a bit
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            do {
+                try self.garSession?.resolveCloudAnchor(cloudIdentifier)
+                AppController.shared.announce("Resolving")
+            } catch {
+                AppController.shared.announce("failed to resolve")
+                print("error \(error)")
+            }
         }
     }
     
     func session(_ session: GARSession, didFailToHost garAnchor: GARAnchor) {
-
+        AppController.shared.announce("failed to host")
     }
     
     func session(_ session: GARSession, didResolve anchor:GARAnchor) {
-        print("did resolve cloud anchor")
+        AppController.shared.announce("resolved")
+    }
+    
+    func session(_ session: GARSession, didFailToResolve anchor:GARAnchor) {
+        AppController.shared.announce("failed resolve")
     }
 }
 
@@ -133,6 +142,7 @@ extension ARView: ARSessionDelegate {
 
 extension ARView: ARViewController {
     func hostCloudAnchor() {
+        AppController.shared.announce("Hosting Cloud Anchor")
         guard let currentFrame = arView.session.currentFrame else {
             return
         }

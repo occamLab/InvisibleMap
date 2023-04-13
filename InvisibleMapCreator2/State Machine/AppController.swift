@@ -18,6 +18,7 @@ class AppController {
     var arViewer: ARViewController? // Initialized in ARView.swift
     var recordViewer: RecordViewController? // Initialized in RecordMapView.swift
     var mapsController = MapDatabase()  // Initialized in ContentView.swift
+    var announcementManager = AnnouncementManager()
     
     private init() {
     }
@@ -42,6 +43,8 @@ class AppController {
                 arViewer?.detectTag(tag: tag, cameraTransform: cameraTransform, snapTagsToVertical: snapTagsToVertical)
             case .PinLocation(let locationName):
                 arViewer?.pinLocation(locationName: locationName)
+            case .MakeAnnouncement(let announcement):
+                announcementManager.announce(announcement: announcement)
             // RecordViewer commands
             case .UpdateInstructionText:
                 recordViewer?.updateInstructionText()
@@ -92,6 +95,10 @@ extension AppController {
     
     func updateLocationListRequested(node: SCNNode, picture: UIImage, textNode: SCNNode, poseId: Int) {
         processCommands(commands: [AppState.Command.UpdateLocationList(node: node, picture: picture, textNode: textNode, poseId: poseId)])
+    }
+    
+    func announce(_ announcement: String) {
+        processCommands(commands: [.MakeAnnouncement(announcement: announcement)])
     }
     
     func viewLocationsRequested() {

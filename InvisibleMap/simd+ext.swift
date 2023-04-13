@@ -10,7 +10,7 @@ import simd
 import GLKit
 import ARKit
 
-extension float4x4 {
+extension simd_float4x4 {
 
     static func makeScale(_ x: Float, _ y: Float, _ z: Float) -> float4x4 {
         return unsafeBitCast(GLKMatrix4MakeScale(x, y, z), to: float4x4.self)
@@ -62,15 +62,15 @@ extension float4x4 {
     }
 
     func scale(x: Float, y: Float, z: Float) -> float4x4 {
-        return float4x4.makeScale(x, y, z) * self
+        return simd_float4x4.makeScale(x, y, z) * self
     }
 
     func rotate(radians: Float, _ x: Float, _ y: Float, _ z: Float) -> float4x4 {
-        return float4x4.makeRotate(radians: radians, x, y, z) * self
+        return simd_float4x4.makeRotate(radians: radians, x, y, z) * self
     }
 
     func translate(x: Float, _ y: Float, _ z: Float) -> float4x4 {
-        return float4x4.makeTranslation(x, y, z) * self
+        return simd_float4x4.makeTranslation(x, y, z) * self
     }
     
     func getRot()->float3x3 {
@@ -83,32 +83,47 @@ extension float4x4 {
                                   simd_float3(self.columns.2.x, self.columns.2.y, self.columns.2.z)))
     }
 
-    func getTrans()->float3 {
-        return float3(self.columns.3.x, self.columns.3.y, self.columns.3.z)
+    func getTrans()->simd_float3 {
+        return simd_float3(self.columns.3.x, self.columns.3.y, self.columns.3.z)
     }
     
     func toRowMajorOrder()->(Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double) {
-        return (Double(self.columns.0.x), Double(self.columns.1.x), Double(self.columns.2.x), Double(self.columns.3.x), Double(self.columns.0.y), Double(self.columns.1.y), Double(self.columns.2.y), Double(self.columns.3.y), Double(self.columns.0.z), Double(self.columns.1.z), Double(self.columns.2.z), Double(self.columns.3.z), Double(self.columns.0.w), Double(self.columns.1.w), Double(self.columns.2.w), Double(self.columns.3.w))
+        return (Double(self.columns.0.x),
+                Double(self.columns.1.x),
+                Double(self.columns.2.x),
+                Double(self.columns.3.x),
+                Double(self.columns.0.y),
+                Double(self.columns.1.y),
+                Double(self.columns.2.y),
+                Double(self.columns.3.y),
+                Double(self.columns.0.z),
+                Double(self.columns.1.z),
+                Double(self.columns.2.z),
+                Double(self.columns.3.z),
+                Double(self.columns.0.w),
+                Double(self.columns.1.w),
+                Double(self.columns.2.w),
+                Double(self.columns.3.w))
     }
 }
 
-extension float4 {
-    func dropw()->float3 {
-        return float3(self.x, self.y, self.z)
+extension simd_float4 {
+    func dropw()->simd_float3 {
+        return simd_float3(self.x, self.y, self.z)
     }
 }
 
-extension float3 {
-    func rotate(radians: Float, _ x: Float, _ y: Float, _ z: Float) -> float3 {
+extension simd_float3 {
+    func rotate(radians: Float, _ x: Float, _ y: Float, _ z: Float) -> simd_float3 {
         let homogeneous = float4x4.makeRotate(radians: radians, x, y, z) * self.toHomogeneous()
-        return float3(x: homogeneous.x/homogeneous.w, y: homogeneous.y/homogeneous.w, z: homogeneous.z/homogeneous.w)
+        return simd_float3(x: homogeneous.x/homogeneous.w, y: homogeneous.y/homogeneous.w, z: homogeneous.z/homogeneous.w)
     }
-    func intrinsicRotate(radians: Float, _ x: Float, _ y: Float, _ z: Float) -> float3 {
+    func intrinsicRotate(radians: Float, _ x: Float, _ y: Float, _ z: Float) -> simd_float3 {
         let homogeneous = self.toHomogeneous()*float4x4.makeRotate(radians: radians, x, y, z)
-        return float3(x: homogeneous.x/homogeneous.w, y: homogeneous.y/homogeneous.w, z: homogeneous.z/homogeneous.w)
+        return simd_float3(x: homogeneous.x/homogeneous.w, y: homogeneous.y/homogeneous.w, z: homogeneous.z/homogeneous.w)
     }
-    func toHomogeneous()->float4 {
-        return float4(x: self.x, y: self.y, z: self.z, w: 1)
+    func toHomogeneous()->simd_float4 {
+        return simd_float4(x: self.x, y: self.y, z: self.z, w: 1)
     }
 }
 
@@ -119,9 +134,9 @@ extension simd_float3x3 {
 }
 
 extension simd_quatf {
-    func toRotVec()->float3 {
+    func toRotVec()->simd_float3 {
         if self.angle == 0 {
-            return simd_float3(0.0)
+            return simd_float3(repeating: 0.0)
         } else {
             return self.axis*self.angle
         }
