@@ -16,8 +16,8 @@ class MapDatabase: ObservableObject {
     @Published var images: [UIImage] = []
     @Published var files: [String] = []
     
-    var mapsRef: DatabaseReference!
-    var storageRef: StorageReference!
+    var mapsRef: DatabaseReference
+    var storageRef: StorageReference
     
     init() {
         var userMapsPath = "maps/"
@@ -52,7 +52,7 @@ class MapDatabase: ObservableObject {
     
     func processMap(key: String, values: [String: Any]) {
         // Only include in the list if it is processed
-        // prcoess map file and its image and update the map database 
+        // process map file and its image and update the map database 
         if let processedMapFile = values["map_file"] as? String {
             // TODO: pick a sensible default image
             let imageRef = storageRef.child((values["image"] as? String) ?? "olin_library.jpg")

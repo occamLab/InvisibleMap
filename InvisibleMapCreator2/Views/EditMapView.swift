@@ -10,7 +10,7 @@ import SwiftUI
 struct EditMapView: View {
     
     @State private var showingDeleteConfirmation = false
-    @ObservedObject var mapDatabase = MapDatabase()
+    @StateObject var mapDatabase = MapDatabase()
   //  var map: (UIImage, String)
     var map: String
     

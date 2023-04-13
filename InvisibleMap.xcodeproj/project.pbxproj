@@ -611,6 +611,10 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-D IS_MAP_CREATOR";
 				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMapCreator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -642,6 +646,10 @@
 					"@executable_path/Frameworks",
 				);
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-D IS_MAP_CREATOR";
 				PRODUCT_BUNDLE_IDENTIFIER = edu.occamlab.InvisibleMapCreator;
 				PRODUCT_NAME = "$(TARGET_NAME)";

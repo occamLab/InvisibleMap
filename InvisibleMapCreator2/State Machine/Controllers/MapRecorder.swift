@@ -147,7 +147,7 @@ class MapRecorder: MapRecorderController, ObservableObject {
         firebaseStorageRef.child(imagePath).putData(mapImage.jpegData(compressionQuality: 0)!, metadata: StorageMetadata(dictionary: ["contentType": "image/jpeg"]))
         
         var log = ""
-        if JSONSerialization.isValidJSONObject(mapJsonFile) {
+        if !JSONSerialization.isValidJSONObject(mapJsonFile) {
             if !JSONSerialization.isValidJSONObject(["map_id": mapId]) {
                 log += "map_id \(mapId) is invalid\n"
             }
@@ -219,6 +219,7 @@ extension MapRecorder {
                 ]}
            )
         )
+        dirtyCloudAnchors = Set<String>()
     }
     
     /// Append new april tag data to list
